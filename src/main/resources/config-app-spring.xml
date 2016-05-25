@@ -15,4 +15,8 @@
 		<property name="password" value="" />
 	</bean>
 	
+	<bean id="hol2EihParamJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSourceHol2Eih"/>
+	</bean>
+	
 </beans>

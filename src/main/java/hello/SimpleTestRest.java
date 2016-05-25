@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SimpleTestRest {
-	@Autowired StudyCamunda studyCamunda ;
+
+	@Autowired StudyCamunda studyCamunda;
+
 	@RequestMapping(value = "/v/helloJsonMap", method = RequestMethod.GET)
 	public  @ResponseBody Map<String, Object> helloJsonMap(Principal userPrincipal, HttpServletRequest request) {
 		HashMap<String, Object> map = new HashMap<>();
@@ -32,7 +34,7 @@ public class SimpleTestRest {
 			list.add(Integer.parseInt(task.getId()));
 		}
 		System.out.println(allTasks);
-//		map.put("allTasks", allTasks);
 		return map;
 	}
+
 }

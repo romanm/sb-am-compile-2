@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+ -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+
+<script src="/h/dev/med-procedure-v1.js"></script>
+<script src="/h/dev/med-procedure-angular.js"></script>
+<style type="text/css">
+table.column td{
+	vertical-align: top;
+}
+li > span:hover{
+	background-color: yellow;
+}
+.procedure-group {
+	font-size: 75%;
+	font-weight: oblique;
+	text-decoration: underline;
+}
+}
+.nowrap {
+	white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+	<div ng-app="myApp" ng-controller="MyCtrl as myCtrl">
+		<small> <a
+			href="http://www.moz.gov.ua/ua/portal/dn_20070214_67.html"> <i>14.02.2007
+					<b>НАКАЗ</b> N 67
+			</i>
+		</a>
+		</small>
+		<table>
+			<tr>
+				<td>
+					<h2>Перехід кодування операції Хмельницької обласної лікарні на стандарт МОЗ</h2>
+				</td>
+				<td>
+					
+					</td>
+			</tr>
+		</table>
+
+		<div ng-if="!isShowSql">
+			<label>Пошук: <input ng-model="myCtrl.seekText" />
+			</label> 
+			<div ng-if="myCtrl.seekText != null">
+				<small ng-if="myCtrl.seekText.length"> '{{myCtrl.seekText}}'
+					Знайдено {{seekProcedure.seekProcedure.length}} входжень </small>
+			</div>
+			<table class="column">
+				<tr>
+					<td>
+						<div ng-if="seekProcedure.seekProcedure.length <= 200">
+							<div ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:''}"
+								ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
+								<span
+									ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
+								</span> <b> {{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
+							</div>
+						</div>
+						<div
+							ng-if="myCtrl.seekText
+							== null || seekProcedure.seekProcedure.length>
+							200">
+							<ul>
+								<li ng-repeat="medprocedure in medProcedureDb"
+									ng-if="medprocedure.PROCEDURE_ID != 0"
+									title="{{medprocedure.PROCEDURE_ID}}"><span
+									ng-click="openChildDb(medprocedure)">
+										{{medprocedure.PROCEDURE_CODE}} :
+										{{medprocedure.PROCEDURE_NAME}} </span>
+									<ul ng-if="isOpen(medprocedure)">
+										<li ng-repeat="medprocedure2 in medprocedure.procedure"
+											title="{{medprocedure2.PROCEDURE_ID}}"><span
+											ng-click="openChildDb(medprocedure2)">
+												{{medprocedure2.PROCEDURE_CODE}} :
+												{{medprocedure2.PROCEDURE_NAME}} </span>
+											<ul ng-if="isOpen(medprocedure2)">
+												<li ng-repeat="medprocedure3 in medprocedure2.procedure"
+													title="{{medprocedure3.PROCEDURE_ID}}"><span
+													ng-click="openChildDb(medprocedure3)">
+														{{medprocedure3.PROCEDURE_CODE}} :
+														{{medprocedure3.PROCEDURE_NAME}} </span>
+													<ul ng-if="isOpen(medprocedure3)">
+														<li ng-repeat="medprocedure4 in medprocedure3.procedure"
+															title="{{medprocedure4.PROCEDURE_ID}}"><span
+															ng-click="openChildDb(medprocedure4)">
+																{{medprocedure4.PROCEDURE_CODE}} :
+																{{medprocedure4.PROCEDURE_NAME}} </span>
+															<ul ng-if="isOpen(medprocedure4)">
+																<li ng-repeat="medprocedure5 in medprocedure4.procedure"
+																	title="{{medprocedure5.PROCEDURE_ID}}"><span
+																	ng-click="openChildDb(medprocedure5)">
+																		{{medprocedure5.PROCEDURE_CODE}} :
+																		{{medprocedure5.PROCEDURE_NAME}} </span>
+																	<ul ng-if="isOpen(medprocedure5)">
+																		<li
+																			ng-repeat="medprocedure6 in medprocedure5.procedure"
+																			title="{{medprocedure6.PROCEDURE_ID}}"><span
+																			ng-click="openChildDb(medprocedure6)">
+																				{{medprocedure6.PROCEDURE_CODE}} :
+																				{{medprocedure6.PROCEDURE_NAME}} </span></li>
+																	</ul></li>
+															</ul></li>
+													</ul></li>
+											</ul></li>
+									</ul></li>
+							</ul>
+						</div>
+					</td>
+					<td>
+						<ul>
+							<li ng-repeat="op in operationDb"><span>
+									{{op.OPERATION_GROUP_NAME}} </span></li>
+						</ul>
+
+					</td>
+				</tr>
+			</table>
+
+		</div>
+		<div ng-if="isShowSql">
+			<div>create schema if not exists list;</div>
+			<div>set schema list;</div>
+			<div>drop table if exists procedure;</div>
+			<div>CREATE TABLE PROCEDURE (
+    PROCEDURE_ID INT(10) primary key,
+    PROCEDURE_PARENT_ID INT(10) NOT NULL,
+    PROCEDURE_CODE VARCHAR(10) NOT NULL,
+    PROCEDURE_NAME VARCHAR(150) NOT NULL
+);</div>
+			<div>ALTER TABLE  PROCEDURE ADD CONSTRAINT ID_PARENT_ID 
+			FOREIGN KEY (PROCEDURE_PARENT_ID) REFERENCES  PROCEDURE (PROCEDURE_ID) ON UPDATE RESTRICT ON DELETE RESTRICT;</div>
+			insert into procedure (procedure_id, procedure_parent_id,
+			procedure_code, procedure_name) values (0,0,'0','/');
+			<div ng-repeat="medprocedure in medProcedure">
+				<span ng-bind="showSqlInsert(medprocedure)"></span>
+				<div ng-repeat="medprocedure2 in medprocedure.procedure">
+					<span ng-bind="showSqlInsert(medprocedure2, medprocedure)"></span>
+					<div ng-repeat="medprocedure3 in medprocedure2.procedure">
+						<span ng-bind="showSqlInsert(medprocedure3, medprocedure2)"></span>
+						<div ng-repeat="medprocedure4 in medprocedure3.procedure">
+							<span ng-bind="showSqlInsert(medprocedure4, medprocedure3)"></span>
+							<div ng-repeat="medprocedure5 in medprocedure4.procedure">
+								<span ng-bind="showSqlInsert(medprocedure5, medprocedure4)"></span>
+								<div ng-repeat="medprocedure6 in medprocedure5.procedure">
+									<span ng-bind="showSqlInsert(medprocedure6, medprocedure5)"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
