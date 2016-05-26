@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+ -->
+	
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+	
+<script src="procedure-test.js"></script>
+<script src="med-procedure-build.js"></script>
+<body>
+
+	<div ng-app="myApp" ng-controller="myCtrl">
+
+		<p>Today's welcome message is:</p>
+
+		<h1>Медичні процедури</h1>
+		<ul>procedure-test.js
+			<li ng-repeat="medprocedure in data.medprocedure">
+				{{medprocedure.code1}} : {{medprocedure.name}} <br />
+				<ul>
+					<li ng-repeat="medprocedure2 in medprocedure.procedures">
+					{{medprocedure2.code1}} : {{medprocedure2.name}} 
+					</li>
+				</ul>
+			</li>
+		</ul>
+			<ul>
+				<li ng-repeat="medprocedure in testProcedure"
+					title="{{medprocedure.id}}">{{medprocedure.codeId}} :
+					{{medprocedure.name}}
+					<ul ng-if="medprocedure.codeId == 3">
+						<li ng-repeat="medprocedure2 in medprocedure.procedure"
+							title="{{medprocedure2.id}}">{{medprocedure2.codeId}} :
+							{{medprocedure2.name}}
+							<ul ng-if="medprocedure2.codeId == '3D'">
+								<li ng-repeat="medprocedure3 in medprocedure2.procedure"
+									title="{{medprocedure3.id}}">{{medprocedure3.codeId}} :
+									{{medprocedure3.name}}
+									<ul
+										ng-if="medprocedure3.codeId == '3DE' || medprocedure3.codeId == '3DF'">
+										<li ng-repeat="medprocedure4 in medprocedure3.procedure"
+											title="{{medprocedure4.id}}">{{medprocedure4.codeId}} :
+											{{medprocedure4.name}}
+											<!-- 
+												ng-if="medprocedure4.codeId == 'AE1.01' || medprocedure4.codeId == '2BJA'"
+											 -->
+											<ul
+												>
+												<li ng-repeat="medprocedure5 in medprocedure4.procedure"
+													title="{{medprocedure5.id}}">{{medprocedure5.codeId}}
+													: {{medprocedure5.name}}
+													<ul>
+														<li ng-repeat="medprocedure6 in medprocedure5.procedure"
+															title="{{medprocedure6.id}}">{{medprocedure6.codeId}}
+															: {{medprocedure6.name}}</li>
+													</ul>
+												</li>
+											</ul>
+										</li>
+								
+										</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		<!-- 
+		 -->
+		<div>var medProcedure =</div>
+		{{testProcedure}}
+		
+	</div>
+
+</body>
+</html>

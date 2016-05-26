@@ -2,7 +2,6 @@ var app = angular.module('myApp', []);
 app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	console.log('MyCtrl');
 	
-	$scope.medProcedureDb = [];
 	var siblingLevel = 0;
 	$scope.operationDb = [];
 	$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
@@ -19,7 +18,11 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 		if(newValue != null){
 			$http.get("/v/seekProcedure/"+newValue).success(function(response) {
 				$scope.seekProcedure = response;
-				console.log(response);
+				console.log($scope.seekProcedure);
+			});
+			$http.get("/v/operation/seek/"+newValue).success(function(response) {
+				$scope.seekOperation = response;
+				console.log($scope.seekOperation);
 			});
 		}
 	});
@@ -27,11 +30,41 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	$scope.medProcedure  = medProcedure;
 	console.log($scope.medProcedure);
 	
+	$scope.filterCode = '';
+	$scope.changeFilterCode = function (){
+		if($scope.filterCode == ''){
+			$scope.filterCode = '7';
+		}else{
+			$scope.filterCode = '';
+		}
+	}
+	
 	$scope.isShowSql = false;
 
+	$scope.isOperationGroup = function (operation){
+		return !isNaN(code.substring(0,1));
+	}
 	$scope.isProcedureGroup = function (code){
 		return !isNaN(code.substring(0,1));
 	}
+	// prepare to save and save
+	$scope.procedureToSave = {};
+	$scope.operationToSave = {};
+	$scope.isToSaveOperation = function (operation){
+		return operation.OPERATION_ID != null && $scope.operationToSave.OPERATION_ID == operation.OPERATION_ID;
+	}
+	$scope.isToSaveProcedure = function (procedure){
+		return $scope.procedureToSave.PROCEDURE_ID == procedure.PROCEDURE_ID;
+	}
+	$scope.toSaveOperation = function (operation){
+		$scope.operationToSave = operation;
+		console.log($scope.operationToSave);
+	}
+	$scope.toSaveProcedure = function (procedure){
+		$scope.procedureToSave = procedure;
+		console.log($scope.procedureToSave);
+	}
+	// prepare to save and save END
 
 	$scope.showSqlInsert = function (v, parentV){
 		var procedureParentId = 0;
@@ -64,7 +97,29 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 		if($scope.isOpenAll) return true;
 		return procedure.open;
 	}
-	$scope.openChildDb = function (procedure){
+	$scope.openOperationDb = function (operation){
+		$scope.openChild(operation);
+		if(operation.operation == null){
+			console.log("-------------------");
+			console.log("/v/operation/operation/"+operation.OPERATION_SUBGROUP_ID);
+			$http.get("/v/operation/operation/"+operation.OPERATION_SUBGROUP_ID).success(function(response) {
+				operation.operation = response;
+				console.log(operation);
+			});
+		}
+	}
+	$scope.openOperationSubGroupDb = function (operation){
+		$scope.openChild(operation);
+		if(operation.operation == null){
+			console.log("-------------------");
+			console.log("/v/operation/subgroup/"+operation.OPERATION_GROUP_ID);
+			$http.get("/v/operation/subgroup/"+operation.OPERATION_GROUP_ID).success(function(response) {
+				operation.operation = response;
+				console.log(operation);
+			});
+		}
+	}
+	$scope.openChildProcedureDb = function (procedure){
 		$scope.openChild(procedure);
 		if(procedure.procedure == null){
 			var siblingLevel = procedure.PROCEDURE_ID;

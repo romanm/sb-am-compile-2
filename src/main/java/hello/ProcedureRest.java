@@ -32,10 +32,13 @@ public class ProcedureRest {
 
 	@RequestMapping(value = "/v/seekProcedure/{seekText}", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> seekProcedure(@PathVariable String seekText) {
-		String sqlListProcedureSeek = Util.replace(this.sqlListProcedureSeek);
+//		String sqlListProcedureSeek = Util.replace(this.sqlListProcedureSeek);
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("seekText", seekText);
-		
+		System.out.println();
+		System.out.println();
+		System.out.println(sqlListProcedureSeek);
+		System.out.println();
 		List<Map<String, Object>> seekProcedure 
 		= hol2EihParamJdbcTemplate.queryForList(sqlListProcedureSeek, new MapSqlParameterSource("likeText", "%"
 				+ seekText

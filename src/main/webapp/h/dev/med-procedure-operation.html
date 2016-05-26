@@ -11,11 +11,23 @@
 <script src="/h/dev/med-procedure-v1.js"></script>
 <script src="/h/dev/med-procedure-angular.js"></script>
 <style type="text/css">
+tr.seek-count td{
+	text-align: center;
+}
 table.column td{
 	vertical-align: top;
 }
+span.selected-to-save{
+/*
+	background-color: green;
+*/
+	background-color: #4CAF50;
+	color: #ffffff;
+}
+div > span.code:hover,
 li > span:hover{
 	background-color: yellow;
+	color: black;
 }
 .procedure-group {
 	font-size: 75%;
@@ -29,83 +41,101 @@ li > span:hover{
 </style>
 </head>
 <body>
-
 	<div ng-app="myApp" ng-controller="MyCtrl as myCtrl">
 		<small> <a
-			href="http://www.moz.gov.ua/ua/portal/dn_20070214_67.html"> <i>14.02.2007
-					<b>НАКАЗ</b> N 67
+			href="http://www.moz.gov.ua/ua/portal/dn_20160121_0029.html"> <i>12.02.2016
+					<b>НАКАЗ</b> № 29
+			</i>
+		</a> (<a href="http://zakon5.rada.gov.ua/laws/show/z0230-16">Лінк 2</a>) |
+			<a href="http://www.moz.gov.ua/ua/portal/dn_20070214_67.html"> <i>14.02.2007
+					<b>НАКАЗ</b> № 67
 			</i>
 		</a>
 		</small>
 		<table>
 			<tr>
 				<td>
-					<h2>Перехід кодування операції Хмельницької обласної лікарні на стандарт МОЗ</h2>
+					<h2>Перехід кодування процедур і операції Хмельницької обласної лікарні на стандарт МОЗ</h2>
 				</td>
 				<td>
-					
 					</td>
 			</tr>
 		</table>
 
 		<div ng-if="!isShowSql">
 			<label>Пошук: <input ng-model="myCtrl.seekText" />
-			</label> 
-			<div ng-if="myCtrl.seekText != null">
-				<small ng-if="myCtrl.seekText.length"> '{{myCtrl.seekText}}'
-					Знайдено {{seekProcedure.seekProcedure.length}} входжень </small>
-			</div>
+			</label> <a href="med-procedure-operation.html">Поновити сторінку</a>
+			|| <span ng-click="changeFilterCode()"> <input type="checkbox" ng-if="filterCode == '7'" checked>
+				<input type="checkbox" ng-if="filterCode != '7'"> шукати тільки операції
+			</span>
 			<table class="column">
+				<tr>
+					<td><span ng-if="procedureToSave.PROCEDURE_ID>0"
+						class="selected-to-save"><b>
+								{{procedureToSave.PROCEDURE_CODE}}: </b>
+							{{procedureToSave.PROCEDURE_NAME}} </span></td>
+					<td><span ng-if="operationToSave.OPERATION_ID > 0"
+						class="selected-to-save"><b>
+								{{operationToSave.OPERATION_CODE}} </b> {{operationToSave.NAME}} </span></td>
+				</tr>
+				<tr class="seek-count">
+					<th><small ng-if="myCtrl.seekText != null">
+							'{{myCtrl.seekText}}' {{seekProcedure.seekProcedure.length}}
+							входжень МОЗ</small></th>
+					<th><small ng-if="myCtrl.seekText != null">
+							'{{myCtrl.seekText}}' {{seekOperation.seekOperation.length}}
+							входжень ХОЛ</small></th>
+				</tr>
 				<tr>
 					<td>
 						<div ng-if="seekProcedure.seekProcedure.length <= 200">
-							<div ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:''}"
+							<div
+								ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:filterCode}"
 								ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
-								<span
-									ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
-								</span> <b> {{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
+								<span ng-class="{'code':!isProcedureGroup(p.PROCEDURE_CODE),'selected-to-save':isToSaveProcedure(p)}"
+								ng-click="toSaveProcedure(p)"
+								>
+									<b> {{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
+								</span>
 							</div>
 						</div>
-						<div
-							ng-if="myCtrl.seekText
-							== null || seekProcedure.seekProcedure.length>
-							200">
+						<div ng-if="myCtrl.seekText == null || seekProcedure.seekProcedure.length > 200">
 							<ul>
-								<li ng-repeat="medprocedure in medProcedureDb"
+								<li ng-repeat="medprocedure in medProcedureDb | filter:{PROCEDURE_CODE:filterCode}"
 									ng-if="medprocedure.PROCEDURE_ID != 0"
 									title="{{medprocedure.PROCEDURE_ID}}"><span
-									ng-click="openChildDb(medprocedure)">
+									ng-click="openChildProcedureDb(medprocedure)">
 										{{medprocedure.PROCEDURE_CODE}} :
 										{{medprocedure.PROCEDURE_NAME}} </span>
 									<ul ng-if="isOpen(medprocedure)">
 										<li ng-repeat="medprocedure2 in medprocedure.procedure"
 											title="{{medprocedure2.PROCEDURE_ID}}"><span
-											ng-click="openChildDb(medprocedure2)">
+											ng-click="openChildProcedureDb(medprocedure2)">
 												{{medprocedure2.PROCEDURE_CODE}} :
 												{{medprocedure2.PROCEDURE_NAME}} </span>
 											<ul ng-if="isOpen(medprocedure2)">
 												<li ng-repeat="medprocedure3 in medprocedure2.procedure"
 													title="{{medprocedure3.PROCEDURE_ID}}"><span
-													ng-click="openChildDb(medprocedure3)">
+													ng-click="openChildProcedureDb(medprocedure3)">
 														{{medprocedure3.PROCEDURE_CODE}} :
 														{{medprocedure3.PROCEDURE_NAME}} </span>
 													<ul ng-if="isOpen(medprocedure3)">
 														<li ng-repeat="medprocedure4 in medprocedure3.procedure"
 															title="{{medprocedure4.PROCEDURE_ID}}"><span
-															ng-click="openChildDb(medprocedure4)">
+															ng-click="openChildProcedureDb(medprocedure4)">
 																{{medprocedure4.PROCEDURE_CODE}} :
 																{{medprocedure4.PROCEDURE_NAME}} </span>
 															<ul ng-if="isOpen(medprocedure4)">
 																<li ng-repeat="medprocedure5 in medprocedure4.procedure"
 																	title="{{medprocedure5.PROCEDURE_ID}}"><span
-																	ng-click="openChildDb(medprocedure5)">
+																	ng-click="openChildProcedureDb(medprocedure5)">
 																		{{medprocedure5.PROCEDURE_CODE}} :
 																		{{medprocedure5.PROCEDURE_NAME}} </span>
 																	<ul ng-if="isOpen(medprocedure5)">
 																		<li
 																			ng-repeat="medprocedure6 in medprocedure5.procedure"
 																			title="{{medprocedure6.PROCEDURE_ID}}"><span
-																			ng-click="openChildDb(medprocedure6)">
+																			ng-click="openChildProcedureDb(medprocedure6)">
 																				{{medprocedure6.PROCEDURE_CODE}} :
 																				{{medprocedure6.PROCEDURE_NAME}} </span></li>
 																	</ul></li>
@@ -117,10 +147,34 @@ li > span:hover{
 						</div>
 					</td>
 					<td>
-						<ul>
-							<li ng-repeat="op in operationDb"><span>
-									{{op.OPERATION_GROUP_NAME}} </span></li>
-						</ul>
+						<div ng-if="seekOperation.seekOperation.length <= 200">
+							<div ng-repeat="o in seekOperation.seekOperation "
+								ng-class="{'procedure-group': o.OPERATION_CODE == null}">
+								<span ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
+								ng-click="toSaveOperation(o)"
+								>
+									<b> {{o.OPERATION_CODE}}</b> : {{o.NAME}}
+								</span>
+							</div>
+						</div>
+						<div ng-if="myCtrl.seekText == null || seekOperation.seekOperation.length > 200">
+							<ul>
+								<li ng-repeat="operationGroup in operationDb"><span
+									ng-click="openOperationSubGroupDb(operationGroup)">
+										{{operationGroup.OPERATION_GROUP_NAME}} </span>
+									<ul ng-if="operationGroup.open">
+										<li ng-repeat="operationSubGroup in operationGroup.operation"><span
+											ng-click="openOperationDb(operationSubGroup)">
+												{{operationSubGroup.OPERATION_SUBGROUP_NAME}} </span>
+											<ul ng-if="operationSubGroup.open">
+												<li ng-repeat="operation in operationSubGroup.operation"><span
+													ng-click="openOperationDb(operation)">
+													<b> {{operation.OPERATION_CODE}}</b> :
+									OPERATION 					{{operation.OPERATION_NAME}} </span></li>
+											</ul></li>
+									</ul></li>
+							</ul>
+						</div>
 
 					</td>
 				</tr>

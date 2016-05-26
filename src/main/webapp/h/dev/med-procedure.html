@@ -129,6 +129,9 @@ li > span:hover{
 );</div>
 			<div>ALTER TABLE  PROCEDURE ADD CONSTRAINT ID_PARENT_ID 
 			FOREIGN KEY (PROCEDURE_PARENT_ID) REFERENCES  PROCEDURE (PROCEDURE_ID) ON UPDATE RESTRICT ON DELETE RESTRICT;</div>
+			<div>
+			alter table list.PROCEDURE add constraint code_unique unique(PROCEDURE_CODE);
+			</div>
 			insert into procedure (procedure_id, procedure_parent_id,
 			procedure_code, procedure_name) values (0,0,'0','/');
 			<div ng-repeat="medprocedure in medProcedure">
