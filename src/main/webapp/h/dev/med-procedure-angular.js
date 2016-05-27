@@ -56,6 +56,17 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	$scope.isToSaveProcedure = function (procedure){
 		return $scope.procedureToSave.PROCEDURE_ID == procedure.PROCEDURE_ID;
 	}
+	$scope.saveProceduteToOperation = function (){
+		console.log("saveProceduteToOperation");
+		console.log($scope.procedureToSave);
+		console.log($scope.operationToSave);
+		var insertProcedureToOperation = {
+				"PROCEDURE_CODE":$scope.procedureToSave.PROCEDURE_CODE
+				,"OPERATION_CODE":$scope.operationToSave.OPERATION_CODE};
+		$http.post("/v/saveProceduteToOperation", insertProcedureToOperation).success(function(response) {
+			console.log(response);
+		});
+	}
 	$scope.toSaveOperation = function (operation){
 		$scope.operationToSave = operation;
 		console.log($scope.operationToSave);

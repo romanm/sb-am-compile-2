@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<!-- 
-<script
-	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
- -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 
@@ -77,6 +73,10 @@ li > span:hover{
 					<td><span ng-if="operationToSave.OPERATION_ID > 0"
 						class="selected-to-save"><b>
 								{{operationToSave.OPERATION_CODE}} </b> {{operationToSave.NAME}} </span></td>
+				</tr>
+				<tr ng-if="procedureToSave.PROCEDURE_ID > 0 && operationToSave.OPERATION_ID > 0">
+					<td colspan="2"><span class=""> >_ </span>
+						<button ng-click="saveProceduteToOperation()">Запис</button></td>
 				</tr>
 				<tr class="seek-count">
 					<th><small ng-if="myCtrl.seekText != null">
