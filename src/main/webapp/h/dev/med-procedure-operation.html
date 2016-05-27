@@ -5,36 +5,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 
 <script src="/h/dev/med-procedure-v1.js"></script>
-<script src="/h/dev/med-procedure-angular.js"></script>
-<style type="text/css">
-tr.seek-count td{
-	text-align: center;
-}
-table.column td{
-	vertical-align: top;
-}
-span.selected-to-save{
-/*
-	background-color: green;
-*/
-	background-color: #4CAF50;
-	color: #ffffff;
-}
-div > span.code:hover,
-li > span:hover{
-	background-color: yellow;
-	color: black;
-}
-.procedure-group {
-	font-size: 75%;
-	font-weight: oblique;
-	text-decoration: underline;
-}
-}
-.nowrap {
-	white-space: nowrap;
-}
-</style>
+<script src="/h/dev/med-procedure-operation.js"></script>
+<link rel="stylesheet" href="/h/dev/navbar_horizontal_gray.css"/>
+<link rel="stylesheet" href="/h/dev/med-procedure-operation.css"/>
 </head>
 <body>
 	<div ng-app="myApp" ng-controller="MyCtrl as myCtrl">
@@ -53,12 +26,30 @@ li > span:hover{
 				<td>
 					<h2>Перехід кодування процедур і операції Хмельницької обласної лікарні на стандарт МОЗ</h2>
 				</td>
-				<td>
-					</td>
+				<td></td>
 			</tr>
 		</table>
 
-		<div ng-if="!isShowSql">
+		<ul class="navbar_horizontal_gray">
+			<li><a ng-class="{'active': viewTab == 'linking'}" href="#"
+				ng-click="viewTab = 'linking'"> Зв'язати коди </a></li>
+			<li><a ng-class="{'active': viewTab == 'linked'}" href="#"
+				ng-click="viewTab = 'linked'"> Зв'язані коди </a></li>
+		</ul>
+		
+		<div ng-if="viewTab == 'linked'">
+			<table class="linie">
+				<tr>
+					<th>МОЗ</th>
+					<th>ХОЛ</th>
+				</tr>
+				<tr ng-repeat="po in procedureOperation">
+					<td>{{po.PROCEDURE_CODE}}: {{po.PROCEDURE_NAME}}</td>
+					<td>{{po.OPERATION_CODE}}: {{po.OPERATION_NAME}}</td>
+				</tr>
+			</table>
+		</div>
+		<div ng-if="viewTab == 'linking'">
 			<label>Пошук: <input ng-model="myCtrl.seekText" />
 			</label> <a href="med-procedure-operation.html">Поновити сторінку</a>
 			|| <span ng-click="changeFilterCode()"> <input type="checkbox" ng-if="filterCode == '7'" checked>
@@ -72,7 +63,10 @@ li > span:hover{
 							{{procedureToSave.PROCEDURE_NAME}} </span></td>
 					<td><span ng-if="operationToSave.OPERATION_ID > 0"
 						class="selected-to-save"><b>
-								{{operationToSave.OPERATION_CODE}} </b> {{operationToSave.NAME}} </span></td>
+								{{operationToSave.OPERATION_CODE}} </b> 
+								{{operationToSave.OPERATION_NAME}} 
+								{{operationToSave.NAME}} 
+								</span></td>
 				</tr>
 				<tr ng-if="procedureToSave.PROCEDURE_ID > 0 && operationToSave.OPERATION_ID > 0">
 					<td colspan="2"><span class=""> >_ </span>
@@ -122,6 +116,7 @@ li > span:hover{
 													<ul ng-if="isOpen(medprocedure3)">
 														<li ng-repeat="medprocedure4 in medprocedure3.procedure"
 															title="{{medprocedure4.PROCEDURE_ID}}"><span
+															ng-class="{'selected-to-save':isToSaveProcedure(medprocedure4)}"
 															ng-click="openChildProcedureDb(medprocedure4)">
 																{{medprocedure4.PROCEDURE_CODE}} :
 																{{medprocedure4.PROCEDURE_NAME}} </span>
@@ -167,10 +162,18 @@ li > span:hover{
 											ng-click="openOperationDb(operationSubGroup)">
 												{{operationSubGroup.OPERATION_SUBGROUP_NAME}} </span>
 											<ul ng-if="operationSubGroup.open">
-												<li ng-repeat="operation in operationSubGroup.operation"><span
+												<li ng-repeat="o in operationSubGroup.operation">
+												<span
+													ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
+													ng-click="toSaveOperation(o)"> <b>
+															{{o.OPERATION_CODE}}</b> : {{o.OPERATION_NAME}}
+												</span> <!-- 
+										<span
 													ng-click="openOperationDb(operation)">
 													<b> {{operation.OPERATION_CODE}}</b> :
-									OPERATION 					{{operation.OPERATION_NAME}} </span></li>
+														{{operation.OPERATION_NAME}} </span>
+										 -->		
+												</li>
 											</ul></li>
 									</ul></li>
 							</ul>
@@ -181,39 +184,7 @@ li > span:hover{
 			</table>
 
 		</div>
-		<div ng-if="isShowSql">
-			<div>create schema if not exists list;</div>
-			<div>set schema list;</div>
-			<div>drop table if exists procedure;</div>
-			<div>CREATE TABLE PROCEDURE (
-    PROCEDURE_ID INT(10) primary key,
-    PROCEDURE_PARENT_ID INT(10) NOT NULL,
-    PROCEDURE_CODE VARCHAR(10) NOT NULL,
-    PROCEDURE_NAME VARCHAR(150) NOT NULL
-);</div>
-			<div>ALTER TABLE  PROCEDURE ADD CONSTRAINT ID_PARENT_ID 
-			FOREIGN KEY (PROCEDURE_PARENT_ID) REFERENCES  PROCEDURE (PROCEDURE_ID) ON UPDATE RESTRICT ON DELETE RESTRICT;</div>
-			insert into procedure (procedure_id, procedure_parent_id,
-			procedure_code, procedure_name) values (0,0,'0','/');
-			<div ng-repeat="medprocedure in medProcedure">
-				<span ng-bind="showSqlInsert(medprocedure)"></span>
-				<div ng-repeat="medprocedure2 in medprocedure.procedure">
-					<span ng-bind="showSqlInsert(medprocedure2, medprocedure)"></span>
-					<div ng-repeat="medprocedure3 in medprocedure2.procedure">
-						<span ng-bind="showSqlInsert(medprocedure3, medprocedure2)"></span>
-						<div ng-repeat="medprocedure4 in medprocedure3.procedure">
-							<span ng-bind="showSqlInsert(medprocedure4, medprocedure3)"></span>
-							<div ng-repeat="medprocedure5 in medprocedure4.procedure">
-								<span ng-bind="showSqlInsert(medprocedure5, medprocedure4)"></span>
-								<div ng-repeat="medprocedure6 in medprocedure5.procedure">
-									<span ng-bind="showSqlInsert(medprocedure6, medprocedure5)"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		
 	</div>
 
 </body>

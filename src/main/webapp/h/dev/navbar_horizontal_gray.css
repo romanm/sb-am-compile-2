@@ -1,0 +1,31 @@
+
+ul.navbar_horizontal_gray {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid #e7e7e7;
+	background-color: #f3f3f3;
+}
+ul.navbar_horizontal_gray li {
+	float: left;
+}
+
+ul.navbar_horizontal_gray li a {
+	display: block;
+	color: #666;
+	text-align: center;
+	text-decoration: none;
+	padding: 4px 8px;
+	/*
+	padding: 14px 16px;
+	*/
+}
+ul.navbar_horizontal_gray  li a:hover:not(.active ) {
+	background-color: #ddd;
+}
+
+ul.navbar_horizontal_gray li a.active {
+	color: white;
+	background-color: #4CAF50;
+}

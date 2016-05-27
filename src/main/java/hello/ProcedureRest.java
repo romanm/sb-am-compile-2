@@ -25,15 +25,20 @@ public class ProcedureRest {
 	@RequestMapping(value = "/v/saveProceduteToOperation", method = RequestMethod.POST)
 	public  @ResponseBody Map<String, String> saveProceduteToOperation(
 			@RequestBody Map<String, String> insertProcedureOperation, Principal userPrincipal) {
-		System.out.println(insertProcedureOperation);
-		String pROCEDURE_CODE = (String) insertProcedureOperation.get("PROCEDURE_CODE");
-		String oPERATION_CODE = (String) insertProcedureOperation.get("OPERATION_CODE");
-		System.out.println(pROCEDURE_CODE+"/"+oPERATION_CODE);
 		int update = hol2EihParamJdbcTemplate.update(sqlInsertListProcedure_operation, insertProcedureOperation);
-		System.out.println(update);
+		insertProcedureOperation.put("update", ""+update);
 		return insertProcedureOperation;
 	}
 
+	@Value("${sql.select.list.procedure_operation}") private String sqlSelectListProcedureSibling;
+	
+	@RequestMapping(value = "/v/procedureOperation", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> getProcedureOperation() {
+		List<Map<String, Object>> seekProcedure 
+		= hol2EihParamJdbcTemplate.queryForList(sqlSelectListProcedureSibling, 
+				new MapSqlParameterSource("num",  0 ));
+		return seekProcedure;
+	}
 	@Value("${sql.list.procedure.sibling}") private String sqlListProcedureSibling;
 
 	@RequestMapping(value = "/v/siblingProcedure/{parentId}", method = RequestMethod.GET)

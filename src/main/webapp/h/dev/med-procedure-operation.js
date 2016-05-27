@@ -3,14 +3,19 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	console.log('MyCtrl');
 	
 	var siblingLevel = 0;
-	$scope.operationDb = [];
 	$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
 		$scope.medProcedureDb = response;
 		console.log($scope.medProcedureDb);
 	});
+	$scope.operationDb = [];
 	$http.get("/v/operation/group").success(function(response) {
 		$scope.operationDb = response;
 		console.log($scope.operationDb);
+	});
+	$scope.procedureOperation = [];
+	$http.get("/v/procedureOperation").success(function(response) {
+		$scope.procedureOperation = response;
+		console.table($scope.procedureOperation);
 	});
 	
 	$scope.$watch("myCtrl.seekText", function handleChange( newValue, oldValue ) {
@@ -131,6 +136,12 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 			});
 		}
 	}
+	checkToSaveProcedure = function (procedure){
+		if(procedure.PROCEDURE_CODE.split(".").length == 2){
+			console.log(procedure.PROCEDURE_CODE)
+			$scope.toSaveProcedure(procedure)
+		}
+	}
 	$scope.openChildProcedureDb = function (procedure){
 		$scope.openChild(procedure);
 		if(procedure.procedure == null){
@@ -138,8 +149,12 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 			$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
 				procedure.procedure = response;
 				console.log(response);
-				console.log(procedure);
+				if(response.length == 0){
+					checkToSaveProcedure(procedure);
+				}
 			});
+		}else{
+			checkToSaveProcedure(procedure);
 		}
 	}
 	$scope.openChild = function (procedure){
@@ -181,40 +196,4 @@ var setCodeId = function (v){
 		v.codeId += "."+(v.code2<10?"0":"")+v.code2;
 	}
 }
-
-function findString (str) {
-	 if (parseInt(navigator.appVersion)<4) return;
-	 var strFound;
-	 if (window.find) {
-
-	  // CODE FOR BROWSERS THAT SUPPORT window.find
-
-	  strFound=self.find(str);
-	  if (!strFound) {
-	   strFound=self.find(str,0,1);
-	   while (self.find(str,0,1)) continue;
-	  }
-	 }
-	 else if (navigator.appName.indexOf("Microsoft")!=-1) {
-
-	  // EXPLORER-SPECIFIC CODE
-
-	  if (TRange!=null) {
-	   TRange.collapse(false);
-	   strFound=TRange.findText(str);
-	   if (strFound) TRange.select();
-	  }
-	  if (TRange==null || strFound==0) {
-	   TRange=self.document.body.createTextRange();
-	   strFound=TRange.findText(str);
-	   if (strFound) TRange.select();
-	  }
-	 }
-	 else if (navigator.appName=="Opera") {
-	  alert ("Opera browsers not supported, sorry...")
-	  return;
-	 }
-	 if (!strFound) alert ("String '"+str+"' not found!")
-	 return;
-	}
 
