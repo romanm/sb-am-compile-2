@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-
 <script src="/h/dev/med-procedure-v1.js"></script>
 <script src="/h/dev/med-procedure-operation.js"></script>
 <link rel="stylesheet" href="/h/dev/navbar_horizontal_gray.css"/>
@@ -41,7 +39,7 @@
 			<table class="linie">
 				<tr>
 					<th>МОЗ</th>
-					<th>ХОЛ</th>
+					<th>ХОЛ до № 29 </th>
 				</tr>
 				<tr ng-repeat="po in procedureOperation">
 					<td>{{po.PROCEDURE_CODE}}: {{po.PROCEDURE_NAME}}</td>
@@ -78,7 +76,7 @@
 							входжень МОЗ</small></th>
 					<th><small ng-if="myCtrl.seekText != null">
 							'{{myCtrl.seekText}}' {{seekOperation.seekOperation.length}}
-							входжень ХОЛ</small></th>
+							входжень ХОЛ № 29 </small></th>
 				</tr>
 				<tr>
 					<td>
@@ -86,10 +84,11 @@
 							<div
 								ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:filterCode}"
 								ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
-								<span ng-class="{'code':!isProcedureGroup(p.PROCEDURE_CODE),'selected-to-save':isToSaveProcedure(p)}"
-								ng-click="toSaveProcedure(p)"
-								>
-									<b> {{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
+								<span
+									ng-class="{'code':!isProcedureGroup(p.PROCEDURE_CODE),'selected-to-save':isToSaveProcedure(p)}"
+									ng-click="toSaveProcedure(p)"> <b
+									ng-class="{'saved': mapProcedureOperation.p[p.PROCEDURE_CODE] >= 0}">
+										{{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
 								</span>
 							</div>
 						</div>
@@ -145,10 +144,11 @@
 						<div ng-if="seekOperation.seekOperation.length <= 200">
 							<div ng-repeat="o in seekOperation.seekOperation "
 								ng-class="{'procedure-group': o.OPERATION_CODE == null}">
-								<span ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
-								ng-click="toSaveOperation(o)"
-								>
-									<b> {{o.OPERATION_CODE}}</b> : {{o.NAME}}
+								<span
+									ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
+									ng-click="toSaveOperation(o)"> <b
+									ng-class="{'saved': mapProcedureOperation.o[o.OPERATION_CODE] >= 0}">
+										{{o.OPERATION_CODE}}</b> : {{o.NAME}}
 								</span>
 							</div>
 						</div>

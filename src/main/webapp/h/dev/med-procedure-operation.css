@@ -5,6 +5,13 @@ tr.seek-count td{
 table.column td{
 	vertical-align: top;
 }
+b.saved{
+/*
+	background-color: green;
+*/
+	background-color: blue;
+	color: #ffffff;
+}
 span.selected-to-save{
 /*
 	background-color: green;

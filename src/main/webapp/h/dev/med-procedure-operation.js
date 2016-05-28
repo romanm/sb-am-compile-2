@@ -5,35 +5,40 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	var siblingLevel = 0;
 	$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
 		$scope.medProcedureDb = response;
-		console.log($scope.medProcedureDb);
 	});
 	$scope.operationDb = [];
 	$http.get("/v/operation/group").success(function(response) {
 		$scope.operationDb = response;
-		console.log($scope.operationDb);
 	});
 	$scope.procedureOperation = [];
+	$scope.mapProcedureOperation = {p:{},o:{}};
+	var setMapProcedureOperation = function(procedureOperation){
+		angular.forEach($scope.procedureOperation, function(value, key) {
+			if(this.p[value.PROCEDURE_CODE] == null){
+				this.p[value.PROCEDURE_CODE] = key;
+			}
+			if(this.o[value.OPERATION_CODE] == null){
+				this.o[value.OPERATION_CODE] = key;
+			}
+		}, $scope.mapProcedureOperation);
+	}
 	$http.get("/v/procedureOperation").success(function(response) {
 		$scope.procedureOperation = response;
-		console.table($scope.procedureOperation);
+		setMapProcedureOperation();
 	});
 	
 	$scope.$watch("myCtrl.seekText", function handleChange( newValue, oldValue ) {
-		console.log( "myCtrl.seekText:", newValue );
 		if(newValue != null){
 			$http.get("/v/seekProcedure/"+newValue).success(function(response) {
 				$scope.seekProcedure = response;
-				console.log($scope.seekProcedure);
 			});
 			$http.get("/v/operation/seek/"+newValue).success(function(response) {
 				$scope.seekOperation = response;
-				console.log($scope.seekOperation);
 			});
 		}
 	});
 
 	$scope.medProcedure  = medProcedure;
-	console.log($scope.medProcedure);
 	$scope.viewTab = "linking";//linked
 	
 	$scope.filterCode = '';
@@ -63,9 +68,6 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 		return $scope.procedureToSave.PROCEDURE_ID == procedure.PROCEDURE_ID;
 	}
 	$scope.saveProceduteToOperation = function (){
-		console.log("saveProceduteToOperation");
-		console.log($scope.procedureToSave);
-		console.log($scope.operationToSave);
 		var insertProcedureToOperation = {
 				"PROCEDURE_CODE":$scope.procedureToSave.PROCEDURE_CODE
 				,"OPERATION_CODE":$scope.operationToSave.OPERATION_CODE};
@@ -75,11 +77,9 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	}
 	$scope.toSaveOperation = function (operation){
 		$scope.operationToSave = operation;
-		console.log($scope.operationToSave);
 	}
 	$scope.toSaveProcedure = function (procedure){
 		$scope.procedureToSave = procedure;
-		console.log($scope.procedureToSave);
 	}
 	// prepare to save and save END
 
@@ -117,28 +117,21 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	$scope.openOperationDb = function (operation){
 		$scope.openChild(operation);
 		if(operation.operation == null){
-			console.log("-------------------");
-			console.log("/v/operation/operation/"+operation.OPERATION_SUBGROUP_ID);
 			$http.get("/v/operation/operation/"+operation.OPERATION_SUBGROUP_ID).success(function(response) {
 				operation.operation = response;
-				console.log(operation);
 			});
 		}
 	}
 	$scope.openOperationSubGroupDb = function (operation){
 		$scope.openChild(operation);
 		if(operation.operation == null){
-			console.log("-------------------");
-			console.log("/v/operation/subgroup/"+operation.OPERATION_GROUP_ID);
 			$http.get("/v/operation/subgroup/"+operation.OPERATION_GROUP_ID).success(function(response) {
 				operation.operation = response;
-				console.log(operation);
 			});
 		}
 	}
 	checkToSaveProcedure = function (procedure){
 		if(procedure.PROCEDURE_CODE.split(".").length == 2){
-			console.log(procedure.PROCEDURE_CODE)
 			$scope.toSaveProcedure(procedure)
 		}
 	}
@@ -148,7 +141,6 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 			var siblingLevel = procedure.PROCEDURE_ID;
 			$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
 				procedure.procedure = response;
-				console.log(response);
 				if(response.length == 0){
 					checkToSaveProcedure(procedure);
 				}
@@ -159,13 +151,11 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 	}
 	$scope.openChild = function (procedure){
 		procedure.open = !procedure.open;
-		console.log(procedure);
 	}
 });
 
 var replaceAll = function (str, f, r){
 	if(str.indexOf(f) >= 0){
-		console.log(str.indexOf(f)+"/"+f+"/"+str);
 		return replaceAll(str.replace(f,r),f,r);
 	}
 	return str;
