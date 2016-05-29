@@ -2,23 +2,30 @@
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-<script src="/h/dev/med-procedure-v1.js"></script>
-<script src="/h/dev/med-procedure-operation.js"></script>
-<link rel="stylesheet" href="/h/dev/navbar_horizontal_gray.css"/>
-<link rel="stylesheet" href="/h/dev/med-procedure-operation.css"/>
+<script src="med-procedure-v1.js"></script>
+<script src="med-procedure-operation.js"></script>
+<link rel="stylesheet" href="med-procedure-operation.css"/>
+<link rel="stylesheet" href="navbar_horizontal_gray.css"/>
 </head>
 <body>
-	<div ng-app="myApp" ng-controller="MyCtrl as myCtrl">
-		<small> <a
-			href="http://www.moz.gov.ua/ua/portal/dn_20160121_0029.html"> <i>12.02.2016
-					<b>НАКАЗ</b> № 29
-			</i>
-		</a> (<a href="http://zakon5.rada.gov.ua/laws/show/z0230-16">Лінк 2</a>) |
-			<a href="http://www.moz.gov.ua/ua/portal/dn_20070214_67.html"> <i>14.02.2007
-					<b>НАКАЗ</b> № 67
-			</i>
-		</a>
-		</small>
+<div id="menu-fix-top" class="no-print">
+	<ul class="navbar_horizontal_gray">
+		<li><a href="#L384">Section 1</a>
+			<li><a href="#details">Section 2</a>
+		<li><a href="#FAQ">Section 3</a>
+	</ul>
+</div>
+<small> <a
+	href="http://www.moz.gov.ua/ua/portal/dn_20160121_0029.html"> <i>12.02.2016
+			<b>НАКАЗ</b> № 29
+	</i>
+</a> (<a href="http://zakon5.rada.gov.ua/laws/show/z0230-16">Лінк 2</a>) |
+	<a href="http://www.moz.gov.ua/ua/portal/dn_20070214_67.html"> <i>14.02.2007
+			<b>НАКАЗ</b> № 67
+	</i>
+</a>
+</small>
+<div ng-app="myApp" ng-controller="MyCtrl as myCtrl">
 		<table>
 			<tr>
 				<td>
@@ -30,9 +37,9 @@
 
 		<ul class="navbar_horizontal_gray">
 			<li><a ng-class="{'active': viewTab == 'linking'}" href="#"
-				ng-click="viewTab = 'linking'"> Зв'язати коди </a></li>
+							ng-click="viewTab = 'linking'"> Зв'язати коди </a></li>
 			<li><a ng-class="{'active': viewTab == 'linked'}" href="#"
-				ng-click="viewTab = 'linked'"> Зв'язані коди </a></li>
+							ng-click="viewTab = 'linked'"> Зв'язані коди </a></li>
 		</ul>
 		
 		<div ng-if="viewTab == 'linked'">
@@ -50,23 +57,25 @@
 		<div ng-if="viewTab == 'linking'">
 			<label>Пошук: <input ng-model="myCtrl.seekText" />
 			</label> <a href="med-procedure-operation.html">Поновити сторінку</a>
-			|| <span ng-click="changeFilterCode()"> <input type="checkbox" ng-if="filterCode == '7'" checked>
+			|| <span ng-click="changeFilterCode()"> <input type="checkbox"
+							ng-if="filterCode == '7'" checked>
 				<input type="checkbox" ng-if="filterCode != '7'"> шукати тільки операції
 			</span>
 			<table class="column">
 				<tr>
 					<td><span ng-if="procedureToSave.PROCEDURE_ID>0"
-						class="selected-to-save"><b>
+									class="selected-to-save"><b>
 								{{procedureToSave.PROCEDURE_CODE}}: </b>
 							{{procedureToSave.PROCEDURE_NAME}} </span></td>
 					<td><span ng-if="operationToSave.OPERATION_ID > 0"
-						class="selected-to-save"><b>
+									class="selected-to-save"><b>
 								{{operationToSave.OPERATION_CODE}} </b> 
 								{{operationToSave.OPERATION_NAME}} 
 								{{operationToSave.NAME}} 
 								</span></td>
 				</tr>
-				<tr ng-if="procedureToSave.PROCEDURE_ID > 0 && operationToSave.OPERATION_ID > 0">
+				<tr
+								ng-if="procedureToSave.PROCEDURE_ID > 0 && operationToSave.OPERATION_ID > 0">
 					<td colspan="2"><span class=""> >_ </span>
 						<button ng-click="saveProceduteToOperation()">Запис</button></td>
 				</tr>
@@ -82,54 +91,56 @@
 					<td>
 						<div ng-if="seekProcedure.seekProcedure.length <= 200">
 							<div
-								ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:filterCode}"
-								ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
+											ng-repeat="p in seekProcedure.seekProcedure | filter:{PROCEDURE_CODE:filterCode}"
+											ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}">
 								<span
-									ng-class="{'code':!isProcedureGroup(p.PROCEDURE_CODE),'selected-to-save':isToSaveProcedure(p)}"
-									ng-click="toSaveProcedure(p)"> <b
-									ng-class="{'saved': mapProcedureOperation.p[p.PROCEDURE_CODE] >= 0}">
+												ng-class="{'code':!isProcedureGroup(p.PROCEDURE_CODE),'selected-to-save':isToSaveProcedure(p)}"
+												ng-click="toSaveProcedure(p)"> <b
+												ng-class="{'saved': mapProcedureOperation.p[p.PROCEDURE_CODE] >= 0}">
 										{{p.PROCEDURE_CODE}}</b> : {{p.PROCEDURE_NAME}}
 								</span>
 							</div>
 						</div>
-						<div ng-if="myCtrl.seekText == null || seekProcedure.seekProcedure.length > 200">
+						<div
+										ng-if="myCtrl.seekText == null || seekProcedure.seekProcedure.length > 200">
 							<ul>
-								<li ng-repeat="medprocedure in medProcedureDb | filter:{PROCEDURE_CODE:filterCode}"
-									ng-if="medprocedure.PROCEDURE_ID != 0"
-									title="{{medprocedure.PROCEDURE_ID}}"><span
-									ng-click="openChildProcedureDb(medprocedure)">
+								<li
+												ng-repeat="medprocedure in medProcedureDb | filter:{PROCEDURE_CODE:filterCode}"
+												ng-if="medprocedure.PROCEDURE_ID != 0"
+												title="{{medprocedure.PROCEDURE_ID}}"><span
+												ng-click="openChildProcedureDb(medprocedure)">
 										{{medprocedure.PROCEDURE_CODE}} :
 										{{medprocedure.PROCEDURE_NAME}} </span>
 									<ul ng-if="isOpen(medprocedure)">
 										<li ng-repeat="medprocedure2 in medprocedure.procedure"
-											title="{{medprocedure2.PROCEDURE_ID}}"><span
-											ng-click="openChildProcedureDb(medprocedure2)">
+														title="{{medprocedure2.PROCEDURE_ID}}"><span
+														ng-click="openChildProcedureDb(medprocedure2)">
 												{{medprocedure2.PROCEDURE_CODE}} :
 												{{medprocedure2.PROCEDURE_NAME}} </span>
 											<ul ng-if="isOpen(medprocedure2)">
 												<li ng-repeat="medprocedure3 in medprocedure2.procedure"
-													title="{{medprocedure3.PROCEDURE_ID}}"><span
-													ng-click="openChildProcedureDb(medprocedure3)">
+																title="{{medprocedure3.PROCEDURE_ID}}"><span
+																ng-click="openChildProcedureDb(medprocedure3)">
 														{{medprocedure3.PROCEDURE_CODE}} :
 														{{medprocedure3.PROCEDURE_NAME}} </span>
 													<ul ng-if="isOpen(medprocedure3)">
 														<li ng-repeat="medprocedure4 in medprocedure3.procedure"
-															title="{{medprocedure4.PROCEDURE_ID}}"><span
-															ng-class="{'selected-to-save':isToSaveProcedure(medprocedure4)}"
-															ng-click="openChildProcedureDb(medprocedure4)">
+																		title="{{medprocedure4.PROCEDURE_ID}}"><span
+																		ng-class="{'selected-to-save':isToSaveProcedure(medprocedure4)}"
+																		ng-click="openChildProcedureDb(medprocedure4)">
 																{{medprocedure4.PROCEDURE_CODE}} :
 																{{medprocedure4.PROCEDURE_NAME}} </span>
 															<ul ng-if="isOpen(medprocedure4)">
 																<li ng-repeat="medprocedure5 in medprocedure4.procedure"
-																	title="{{medprocedure5.PROCEDURE_ID}}"><span
-																	ng-click="openChildProcedureDb(medprocedure5)">
+																				title="{{medprocedure5.PROCEDURE_ID}}"><span
+																				ng-click="openChildProcedureDb(medprocedure5)">
 																		{{medprocedure5.PROCEDURE_CODE}} :
 																		{{medprocedure5.PROCEDURE_NAME}} </span>
 																	<ul ng-if="isOpen(medprocedure5)">
 																		<li
-																			ng-repeat="medprocedure6 in medprocedure5.procedure"
-																			title="{{medprocedure6.PROCEDURE_ID}}"><span
-																			ng-click="openChildProcedureDb(medprocedure6)">
+																						ng-repeat="medprocedure6 in medprocedure5.procedure"
+																						title="{{medprocedure6.PROCEDURE_ID}}"><span
+																						ng-click="openChildProcedureDb(medprocedure6)">
 																				{{medprocedure6.PROCEDURE_CODE}} :
 																				{{medprocedure6.PROCEDURE_NAME}} </span></li>
 																	</ul></li>
@@ -143,29 +154,30 @@
 					<td>
 						<div ng-if="seekOperation.seekOperation.length <= 200">
 							<div ng-repeat="o in seekOperation.seekOperation "
-								ng-class="{'procedure-group': o.OPERATION_CODE == null}">
+											ng-class="{'procedure-group': o.OPERATION_CODE == null}">
 								<span
-									ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
-									ng-click="toSaveOperation(o)"> <b
-									ng-class="{'saved': mapProcedureOperation.o[o.OPERATION_CODE] >= 0}">
+												ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
+												ng-click="toSaveOperation(o)"> <b
+												ng-class="{'saved': mapProcedureOperation.o[o.OPERATION_CODE] >= 0}">
 										{{o.OPERATION_CODE}}</b> : {{o.NAME}}
 								</span>
 							</div>
 						</div>
-						<div ng-if="myCtrl.seekText == null || seekOperation.seekOperation.length > 200">
+						<div
+										ng-if="myCtrl.seekText == null || seekOperation.seekOperation.length > 200">
 							<ul>
 								<li ng-repeat="operationGroup in operationDb"><span
-									ng-click="openOperationSubGroupDb(operationGroup)">
+												ng-click="openOperationSubGroupDb(operationGroup)">
 										{{operationGroup.OPERATION_GROUP_NAME}} </span>
 									<ul ng-if="operationGroup.open">
 										<li ng-repeat="operationSubGroup in operationGroup.operation"><span
-											ng-click="openOperationDb(operationSubGroup)">
+														ng-click="openOperationDb(operationSubGroup)">
 												{{operationSubGroup.OPERATION_SUBGROUP_NAME}} </span>
 											<ul ng-if="operationSubGroup.open">
 												<li ng-repeat="o in operationSubGroup.operation">
 												<span
-													ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
-													ng-click="toSaveOperation(o)"> <b>
+																ng-class="{'code':o.OPERATION_CODE != null,'selected-to-save':isToSaveOperation(o)}"
+																ng-click="toSaveOperation(o)"> <b>
 															{{o.OPERATION_CODE}}</b> : {{o.OPERATION_NAME}}
 												</span> <!-- 
 										<span
@@ -187,5 +199,7 @@
 		
 	</div>
 
-</body>
+
+		
+			</body>
 </html>

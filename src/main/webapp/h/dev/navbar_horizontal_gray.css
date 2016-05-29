@@ -1,3 +1,23 @@
+#menu-fix-top {
+	position: fixed;
+	right: 0;
+	top: 5%;
+	margin-top: -2.5em;
+	/*
+	width: 8em;
+	color: white;
+	font-size: large;
+	text-align: left;
+	font-weight: bold;
+https://www.w3.org/Style/Examples/007/menus.en.html#L384
+	*/
+	background: hsla(80, 90%, 40%, 0.7);
+	border: solid hsla(80, 90%, 40%, 0.5);
+	border-right: none;
+	padding: 0.1em 0.5em 0.1em 1.5em;
+	box-shadow: 0 1px 3px black;
+	border-radius: 3em 0.5em 0.5em 3em;
+}
 
 ul.navbar_horizontal_gray {
 	list-style-type: none;
