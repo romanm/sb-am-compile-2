@@ -1,0 +1,32 @@
+.navcontainer > ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	border: 1px solid #e7e7e7;
+	background-color: #f3f3f3;
+}
+
+.navcontainer > ul > li {
+	display: inline;
+	padding: 4px 8px;
+}
+.navcontainer > ul > li a {
+	text-decoration: none;
+	color: #666;
+}
+.navcontainer > ul > li a:hover {
+	background-color: #ddd;
+}
+
+.tooltip2 {
+	display: inline-block;
+}
+.tooltip2 .tooltiptext {
+	visibility: hidden;
+	position: absolute;
+	border: 1px solid #e7e7e7;
+	background-color: #f3f3f3;
+}
+.tooltip2:hover .tooltiptext {
+	visibility: visible;
+}

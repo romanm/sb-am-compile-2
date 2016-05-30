@@ -1,0 +1,46 @@
+@media print {
+	.no-print, .no-print * {
+		display: none !important;
+	}
+}
+
+tr.seek-count td{
+	text-align: center;
+}
+table.column td{
+	vertical-align: top;
+}
+b.saved{
+/*
+	background-color: green;
+*/
+	background-color: blue;
+	color: #ffffff;
+}
+span.selected-to-save{
+/*
+	background-color: green;
+*/
+	background-color: #4CAF50;
+	color: #ffffff;
+}
+
+table.linie  th, table.linie  td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+div > span.code:hover,
+li > span:hover{
+	background-color: yellow;
+	color: black;
+}
+.procedure-group {
+	font-size: 75%;
+	font-weight: oblique;
+	text-decoration: underline;
+}
+}
+.nowrap {
+	white-space: nowrap;
+}
