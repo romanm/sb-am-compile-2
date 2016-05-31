@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ng JSON Editor Example</title>
+<link rel="stylesheet" href="/v/lib/css/font-awesome.min.css">
+<link rel="stylesheet" href="jsoneditor.min.css" />
+<script src="/v/lib/js/angular.min.js"></script>
+<script src="jsoneditor.min.js"></script>
+<script src="ng-jsoneditor.min.js"></script>
+<script type="text/javascript" src="first.js"></script>
+</head>
+<body>
+	<h1>ng JSON Editor Example</h1>
+	<a href="https://github.com/angular-tools/ng-jsoneditor">
+	<p>
+		https://github.com/angular-tools/ng-jsoneditor </a>
+	</p>
+	<div ng-app="MyApp" ng-controller="ngCtrl">
+		<div ng-jsoneditor="onLoad" ng-model="obj.data" options="obj.options"
+			style="width: 400px;"></div>
+
+		<button type="button" class="btn btn-primary" ng-click="changeData()">
+			<i class="fa fa-check-circle"></i> change data
+		</button>
+
+		<button type="button" class="btn btn-primary"
+			ng-click="changeOptions()">
+			<i class="fa fa-check-circle"></i> change options
+		</button>
+
+		<pre>{{pretty(obj.data)}}</pre>
+
+	</div>
+</body>
+</html>
