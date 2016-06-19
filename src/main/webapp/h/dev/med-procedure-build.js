@@ -1,6 +1,6 @@
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $http) {
-	console.log('myCtrl');
+	console.log('myCtrl --------------------- ');
 buildTestProcedure($scope);
 	console.table($scope.testProcedure);
 	$http.get("/v/medprocedure1").then(function(response) {

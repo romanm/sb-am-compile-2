@@ -9,7 +9,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 
 <script src="/h/dev/med-procedure-v1.js"></script>
-<script src="/h/dev/med-procedure-angular.js"></script>
+<script src="/h/dev/med-procedure.js"></script>
 <style type="text/css">
 table.column td{
 	vertical-align: top;
@@ -71,8 +71,7 @@ li > span:hover{
 						<div ng-if="seekProcedure.seekProcedure.length < 200">
 							<div ng-repeat="p in seekProcedure.seekProcedure"
 							ng-class="{'procedure-group': isProcedureGroup(p.PROCEDURE_CODE)}"
-							>
-								{{p.PROCEDURE_CODE}}
+							> {{p.PROCEDURE_CODE}}
 								: {{p.PROCEDURE_NAME}}</div>
 						</div></td>
 					<td>

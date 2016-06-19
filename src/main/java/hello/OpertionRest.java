@@ -19,7 +19,6 @@ public class OpertionRest {
 	@Autowired NamedParameterJdbcTemplate hol2EihParamJdbcTemplate;
 	
 	@Value("${sql.hol1.operation.seek}") private String sqlHol1OperationSeek;
-
 	@RequestMapping(value = "/v/operation/seek/{seekText}", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> seekOperation(@PathVariable String seekText) {
 		HashMap<String, Object> map = new HashMap<>();

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class ProcedureRest {
+	private static final Logger logger = LoggerFactory.getLogger(ProcedureRest.class);
 	@Autowired NamedParameterJdbcTemplate hol2EihParamJdbcTemplate;
 
 	@Value("${sql.insert.list.procedure_operation}") private String sqlInsertListProcedure_operation;
@@ -43,9 +46,13 @@ public class ProcedureRest {
 
 	@RequestMapping(value = "/v/siblingProcedure/{parentId}", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> getSibling(@PathVariable Integer parentId) {
+		logger.info("\n ------------------------- Start "
+				+"/v/siblingProcedure/"+parentId);
 		List<Map<String, Object>> seekProcedure 
 		= hol2EihParamJdbcTemplate.queryForList(sqlListProcedureSibling, 
 				new MapSqlParameterSource("parentId",  parentId ));
+		logger.info("\n"
+				+seekProcedure);
 		return seekProcedure;
 	}
 

@@ -139,8 +139,11 @@ app.controller('MyCtrl', function myCtrlF($scope, $http) {
 		$scope.openChild(procedure);
 		if(procedure.procedure == null){
 			var siblingLevel = procedure.PROCEDURE_ID;
+			console.log("--------------");
 			$http.get("/v/siblingProcedure/"+siblingLevel).success(function(response) {
 				procedure.procedure = response;
+				console.log("--------------");
+				console.log(procedure.procedure);
 				if(response.length == 0){
 					checkToSaveProcedure(procedure);
 				}
