@@ -9,24 +9,26 @@
 <script src="/v/lib/js/angular.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/jsoneditor.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/ng-jsoneditor.min.js"></script>
+<!-- 
 <script src="protocol1.json.js"></script>
+ -->
 <script src="protocol1.js"></script>
 </head>
 <body ng-app="MyApp" ng-controller="ngCtrl">
 	<div class="container">
 		<h1>ng JSON Editor Example</h1>
-		<a href="https://github.com/angular-tools/ng-jsoneditor">
-			<p>https://github.com/angular-tools/ng-jsoneditor
-		</a>
+		<p>
+			<a href="https://github.com/angular-tools/ng-jsoneditor">
+				https://github.com/angular-tools/ng-jsoneditor </a> |
+			<button ng-click="saveFile()">save</button>
 		</p>
 		<div class="row">
 			<div class="col-md-4">
-			<!-- 
+				<!-- 
 					style="width: 400px;"
 			 -->
 				<div ng-jsoneditor="onLoad" ng-model="obj.data"
-					options="obj.options" 
-					></div>
+					options="obj.options"></div>
 			</div>
 			<div class="col-md-4">
 				{{obj.data.protocolName}}
@@ -37,9 +39,7 @@
 							{{value}} </span>
 					</span>
 					<div ng-if="value.openChild">
-						<div ng-repeat="(key2,value2) in value"
-						ng-if="isShowField(key2)"
-						>
+						<div ng-repeat="(key2,value2) in value" ng-if="isShowField(key2)">
 							<span ng-click="openChild(value2)"> .<i
 								ng-if="isObject(value2)" class="fa fa-caret-right"
 								aria-hidden="true"></i> {{key2}} : <span
@@ -48,8 +48,7 @@
 
 							<div ng-if="value2.openChild">
 								<div ng-repeat="(key3,value3) in value2"
-						ng-if="isShowField(key3)"
-								>
+									ng-if="isShowField(key3)">
 									<span ng-click="openChild(value3)"> ..<i
 										ng-if="isObject(value3)" class="fa fa-caret-right"
 										aria-hidden="true"></i> {{key3}} : <span
@@ -60,8 +59,7 @@
 
 						</div>
 						<div ng-if="value['xmlContent']">
-						xmlContent
-							<i ng-click="editField(value,'xmlContent')"
+							. xmlContent <i ng-click="editField(value,'xmlContent')"
 								class="fa fa-pencil-square-o" aria-hidden="true"></i>
 							<div ng-if="value.editField == 'xmlContent'">
 								<textarea ng-model="value.xmlContent" style="width: 100%"></textarea>
