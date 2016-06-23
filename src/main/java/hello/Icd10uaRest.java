@@ -32,7 +32,6 @@ public class Icd10uaRest {
 		System.out.println(sqlHol1IcdSeek.replaceAll(":likeText", "'%"
 				+ seekText
 				+ "%'"));
-		
 		List<Map<String, Object>> seekIcdList 
 		= hol1EihParamJdbcTemplate.queryForList(sqlHol1IcdSeek, new MapSqlParameterSource("likeText", "%"
 				+ seekText

@@ -50,6 +50,7 @@ public class StudyCamunda {
 		//SELECT * FROM ACT_RU_TASK
 		return list1;
 	}
+
 	public static List<Task> allTasks(ProcessEngineImpl processEngine, String processKey) {
 		TaskService taskService = processEngine.getTaskService();
 		TaskQuery createTaskQuery = taskService.createTaskQuery();
@@ -67,7 +68,6 @@ public class StudyCamunda {
 		//NAME_, PARENT_TASK_ID_, DESCRIPTION_, OWNER_, ASSIGNEE_, START_TIME_, END_TIME_, 
 		//DURATION_, DELETE_REASON_, PRIORITY_, DUE_DATE_, FOLLOW_UP_DATE_
 		//FROM ACT_HI_TASKINST;
-
 		//SELECT * FROM ACT_RU_TASK
 		return list1;
 	}
