@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html ng-app="MyApp" ng-controller="NgCtrl as ngCtrl">
+<head>
+<title ng-bind="pageTitle"></title>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="/v/lib/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/v/lib/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/h/dev/ng-jsoneditor/jsoneditor.min.css" />
+<script src="/v/lib/js/angular.min.js"></script>
+<script src="/v/lib/js/xml2json.min.js"></script>
+<script src="/h/dev/ng-jsoneditor/jsoneditor.min.js"></script>
+<script src="/h/dev/ng-jsoneditor/ng-jsoneditor.min.js"></script>
+<script src="protocol2.js"></script>
+</head>
+<body>
+	<div class="container">
+		<h1 ng-bind="pageTitle"></h1>
+		<button ng-click="saveFile()">save</button>
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-6">
+						<div ng-jsoneditor="onLoad" ng-model="obj.data"
+							options="obj.options"></div>
+					</div>
+					<div class="col-md-6">
+						<div ng-include="'ui/json-tree-walker.html'"></div>
+					</div>
+				</div>
+				<button ng-click="showRule()">показати правило</button>
+			</div>
+			<div class="col-md-4">
+				<pre>{{pretty(obj.data)}}</pre>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="/v/lib/css/font-awesome.min.css">
 <link rel="stylesheet" href="/h/dev/ng-jsoneditor/jsoneditor.min.css" />
 <script src="/v/lib/js/angular.min.js"></script>
+<script src="/v/lib/js/xml2json.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/jsoneditor.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/ng-jsoneditor.min.js"></script>
 <!-- 
@@ -23,56 +24,61 @@
 			<button ng-click="saveFile()">save</button>
 		</p>
 		<div class="row">
-			<div class="col-md-4">
-				<!-- 
-					style="width: 400px;"
-			 -->
-				<div ng-jsoneditor="onLoad" ng-model="obj.data"
-					options="obj.options"></div>
-			</div>
-			<div class="col-md-4">
-				{{obj.data.protocolName}}
-				<div ng-repeat="(key,value) in obj.data">
-					<span ng-click="openChild(value)"> <i
-						ng-if="isObject(value)" class="fa fa-caret-right"
-						aria-hidden="true"></i> {{key}} : <span ng-if="!isObject(value)">
-							{{value}} </span>
-					</span>
-					<div ng-if="value.openChild">
-						<div ng-repeat="(key2,value2) in value" ng-if="isShowField(key2)">
-							<span ng-click="openChild(value2)"> .<i
-								ng-if="isObject(value2)" class="fa fa-caret-right"
-								aria-hidden="true"></i> {{key2}} : <span
-								ng-if="!isObject(value2)"> {{value2}} </span>
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-6">
+						<div ng-jsoneditor="onLoad" ng-model="obj.data"
+							options="obj.options"></div>
+					</div>
+					<div class="col-md-6">
+						{{obj.data.protocolName}}
+						<div ng-repeat="(key,value) in obj.data">
+							<span ng-click="openChild(value)"> <i
+								ng-if="isObject(value)" class="fa fa-caret-right"
+								aria-hidden="true"></i> {{key}} : <span ng-if="!isObject(value)">
+									{{value}} </span>
 							</span>
-
-							<div ng-if="value2.openChild">
-								<div ng-repeat="(key3,value3) in value2"
-									ng-if="isShowField(key3)">
-									<span ng-click="openChild(value3)"> ..<i
-										ng-if="isObject(value3)" class="fa fa-caret-right"
-										aria-hidden="true"></i> {{key3}} : <span
-										ng-if="!isObject(value3)"> {{value3}} </span>
+							<div ng-if="value.openChild">
+								<div ng-repeat="(key2,value2) in value"
+									ng-if="isShowField(key2)">
+									<span ng-click="openChild(value2)"> .<i
+										ng-if="isObject(value2)" class="fa fa-caret-right"
+										aria-hidden="true"></i> {{key2}} : <span
+										ng-if="!isObject(value2)"> {{value2}} </span>
 									</span>
-								</div>
-							</div>
 
-						</div>
-						<div ng-if="value['xmlContent']">
-							. xmlContent <i ng-click="editField(value,'xmlContent')"
-								class="fa fa-pencil-square-o" aria-hidden="true"></i>
-							<div ng-if="value.editField == 'xmlContent'">
-								<textarea ng-model="value.xmlContent" style="width: 100%"></textarea>
+									<div ng-if="value2.openChild">
+										<div ng-repeat="(key3,value3) in value2"
+											ng-if="isShowField(key3)">
+											<span ng-click="openChild(value3)"> ..<i
+												ng-if="isObject(value3)" class="fa fa-caret-right"
+												aria-hidden="true"></i> {{key3}} : <span
+												ng-if="!isObject(value3)"> {{value3}} </span>
+											</span>
+										</div>
+									</div>
+
+								</div>
+								<div ng-if="value['xmlContent']">
+									. xmlContent <i ng-click="editField(value,'xmlContent')"
+										class="fa fa-pencil-square-o" aria-hidden="true"></i>
+									<div ng-if="value.editField == 'xmlContent'">
+										<textarea ng-model="value.xmlContent" style="width: 100%"></textarea>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+<button ng-click="showRule()">показати правило</button>
 			</div>
 			<div class="col-md-4">
 				<pre>{{pretty(obj.data)}}</pre>
 			</div>
 		</div>
-
+		<div class="row">
+			<div class="col-md-4"></div>
+		</div>
 	</div>
 </body>
 </html>

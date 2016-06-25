@@ -1,27 +1,25 @@
-//var myAppModule = angular.module('MyApp', [ 'ng.jsoneditor' ]);
-angular .module('MyApp', [ 'ng.jsoneditor' ]) .controller( 'ngCtrl', function($scope, $http) {
-	$scope.obj = {
-			data : {},
-			options : { mode : 'tree' }
-	};
-	$http.get("/v/readContent").success(function(response) {
-		var protocol1 = response;
-		console.log(protocol1);
+(function(angular) {
+	'use strict';
+	angular.module('MyApp', ['ng.jsoneditor'])
+	.controller('NgCtrl', ['$scope', '$http', function($scope, $http) {
+		$scope.pageTitle = "Протокол з BPMN & DMN";
+		declareJsonSamples($scope);
+		declareProtocol2($scope);
 		$scope.obj = {
-			data : protocol1,
-			options : { mode : 'tree' }
+				data : {},
+				options : { mode : 'tree' }
 		};
-	});
-	$scope.saveFile = function(){
-		console.log("-------saveFile--------");
-		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
+		$http.get("/v/readContent").success(function(response) {
 			console.log(response);
+			$scope.obj = {
+				data : response,
+				options : { mode : 'tree' }
+			};
 		});
-	}
-	var notShowFields = ["xmlContent", "openChild", "editField"];
-	$scope.isShowField = function(key) {
-		return !(notShowFields.indexOf(key) >= 0);
-	}
+	}]);
+})(window.angular);
+
+var declareProtocol2 = function($scope){
 	$scope.showRule = function() {
 		console.log("-------showRule------------");
 		console.log($scope.obj.data.dmn);
@@ -35,6 +33,9 @@ angular .module('MyApp', [ 'ng.jsoneditor' ]) .controller( 'ngCtrl', function($s
 		console.log(json.definitions.decision);
 		console.log(json.definitions.decision.decisionTable);
 	}
+	$scope.isObject = function(object) {
+		return angular.isObject(object);
+	};
 	$scope.openChild = function(object) {
 		if(angular.isObject(object)){
 			object.openChild = !object.openChild;
@@ -48,15 +49,15 @@ angular .module('MyApp', [ 'ng.jsoneditor' ]) .controller( 'ngCtrl', function($s
 		else
 			object.editField = fieldName;
 	};
-	$scope.isObject = function(object) {
-		return angular.isObject(object);
-	};
-	$scope.onLoad = function(instance) {
-		instance.expandAll();
-	};
+	var notShowFields = ["xmlContent", "openChild", "editField"];
+	$scope.isShowField = function(key) {
+		return !(notShowFields.indexOf(key) >= 0);
+	}
+}
 
-	//other
+var declareJsonSamples = function($scope){
+	console.log("---declareJsonSamples-------------");
 	$scope.pretty = function(obj) {
 		return angular.toJson(obj, true);
 	}
-});
+}
