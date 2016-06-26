@@ -8,17 +8,24 @@
 <link rel="stylesheet" href="/v/lib/css/font-awesome.min.css" />
 <link rel="stylesheet" href="/h/dev/ng-jsoneditor/jsoneditor.min.css" />
 <script src="/v/lib/js/angular.min.js"></script>
+<script src="/v/libpm/bpmn-modeler.js"></script>
 <script src="/v/lib/js/xml2json.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/jsoneditor.min.js"></script>
 <script src="/h/dev/ng-jsoneditor/ng-jsoneditor.min.js"></script>
 <script src="protocol2.js"></script>
+<script src="/v/lib/js/require.min.js"></script>
+<script src="bpml-demo3.js"></script>
 </head>
 <body>
 	<div class="container">
 		<h1 ng-bind="pageTitle"></h1>
-		<button ng-click="saveFile()">save</button>
 		<div class="row">
 			<div class="col-md-8">
+				<button ng-click="saveFile()">save</button>
+				<button ng-click="showRule()">показати правило</button>
+				<hr/>
+				
+				<div ng-include="'ui/show-rules.html'"></div>
 				<div class="row">
 					<div class="col-md-6">
 						<div ng-jsoneditor="onLoad" ng-model="obj.data"
@@ -28,7 +35,10 @@
 						<div ng-include="'ui/json-tree-walker.html'"></div>
 					</div>
 				</div>
-				<button ng-click="showRule()">показати правило</button>
+				<!-- 
+				<div id="canvas"></div>
+				 -->
+				<div id="diagram"></div>
 			</div>
 			<div class="col-md-4">
 				<pre>{{pretty(obj.data)}}</pre>
