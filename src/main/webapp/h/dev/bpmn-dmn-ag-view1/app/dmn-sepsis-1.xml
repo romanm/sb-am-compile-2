@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd"
+	id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+	<decision id="decision"
+		name="серцево судинна підтримка при респіраторній терапії сепсісу">
+		<decisionTable id="decisionTable">
+			<input id="input1" label="ЦВТ (см Н2О)">
+				<inputExpression id="inputExpression1" typeRef="integer">
+					<text>CVP</text>
+				</inputExpression>
+			</input>
+			<input id="InputClause_159lrks" label="СІ (мл/кг/год)">
+				<inputExpression id="LiteralExpression_0t19wrn"
+					typeRef="double">
+					<text>CI</text>
+				</inputExpression>
+			</input>
+			<input id="InputClause_0ulem5w" label="Діурез (мл/кг/год)">
+				<inputExpression id="LiteralExpression_0zm218p"
+					typeRef="double">
+					<text>diuresis</text>
+				</inputExpression>
+			</input>
+			<output id="output1" label="інотроп" name="" typeRef="string" />
+			<output id="OutputClause_0abbz7u" label="діуретик" name=""
+				typeRef="string" />
+			<output id="OutputClause_0lmeacr" label="інфузія" typeRef="string" />
+			<rule id="row-398553976-4">
+				<description>надлишок води</description>
+				<inputEntry id="UnaryTests_1744vab">
+					<text><![CDATA[> 13]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_07a1wmv">
+					<text><![CDATA[< 2.5]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_0ou113r">
+					<text><![CDATA[< 0.5]]></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_0ffciex">
+					<text>добутамін</text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1g83ypi">
+					<text>фуросемід</text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_0uq6lte">
+					<text></text>
+				</outputEntry>
+			</rule>
+			<rule id="row-302291223-1">
+				<description>зниження преднагрузки</description>
+				<inputEntry id="UnaryTests_1v5tcyh">
+					<text><![CDATA[> 13]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_0rwnrfz">
+					<text><![CDATA[> 2.5]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_1iyqwew">
+					<text><![CDATA[> 0.5]]></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_06n8ptp">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_0al6k53">
+					<text>фуросемід</text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1226gqy">
+					<text></text>
+				</outputEntry>
+			</rule>
+			<rule id="row-302291223-2">
+				<inputEntry id="UnaryTests_0gplzy4">
+					<text>[8..13]</text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_1x70e8q">
+					<text><![CDATA[< 2.5]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_16z3guk">
+					<text><![CDATA[< 0.5]]></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_0258mzr">
+					<text>добутамін</text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1xj8rub">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_0w6fwo6">
+					<text></text>
+				</outputEntry>
+			</rule>
+			<rule id="row-302291223-3">
+				<description>всеодно зниження преднагрузки</description>
+				<inputEntry id="UnaryTests_1q8nwb5">
+					<text>[8..13]</text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_177yjpj">
+					<text><![CDATA[> 2.5]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_04nk4i3">
+					<text><![CDATA[> 0.5]]></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_09gb8j4">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1p9o2kn">
+					<text>фуросемід</text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1s5trwu">
+					<text></text>
+				</outputEntry>
+			</rule>
+			<rule id="row-302291223-4">
+				<description>дефіцит води</description>
+				<inputEntry id="UnaryTests_0lheu05">
+					<text><![CDATA[< 8]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_04xw0uy">
+					<text></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_0nepak2">
+					<text></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_1v18dk7">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_030r3ly">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_0rypqf1">
+					<text>болюсна рідина</text>
+				</outputEntry>
+			</rule>
+			<rule id="row-302291223-5">
+				<description>дефіцит води</description>
+				<inputEntry id="UnaryTests_0g56zkh">
+					<text><![CDATA[< 4]]></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_1b64xii">
+					<text></text>
+				</inputEntry>
+				<inputEntry id="UnaryTests_12l7qom">
+					<text></text>
+				</inputEntry>
+				<outputEntry id="LiteralExpression_1ie4ic7">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_04tpnmq">
+					<text></text>
+				</outputEntry>
+				<outputEntry id="LiteralExpression_1sqdr6p">
+					<text>болюсна рідина+</text>
+				</outputEntry>
+			</rule>
+		</decisionTable>
+	</decision>
+</definitions>

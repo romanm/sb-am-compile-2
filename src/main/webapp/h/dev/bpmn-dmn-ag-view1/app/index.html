@@ -1,0 +1,113 @@
+<html>
+<head>
+  <title>bpmn-js url viewer demo</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+
+  <style>
+    .header input[type=text] {
+      width: 300px;
+      max-width: 100%;
+    }
+
+    .console textarea {
+      width: 100%;
+      min-height: 80px;
+      border: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Open BPMN 2.0 diagram from URL</h1>
+    <p>
+      <input type="text" id="js-url" placeholder="path to diagram" /><button id="js-open">Open</button>
+    </p>
+    <p>
+      <small>Hint: try <code>../resources/complex.bpmn</code></small>
+    </p>
+  </div>
+
+  <hr>
+
+  <div class="canvas">
+    <h3>diagram</h3>
+    <div id="js-canvas"></div>
+  </div>
+
+  <hr>
+
+  <div class="console">
+    <h3>console</h3>
+	o1
+    <textarea id="js-console"></textarea>
+	o2
+  </div>
+
+  <!-- demo dependencies -->
+  <script src="../bower_components/jquery/dist/jquery.js"></script>
+  <!-- viewer -->
+  <script src="../bower_components/bpmn-js/dist/bpmn-viewer.js"></script>
+  <!-- app -->
+  <script>
+    var BpmnViewer = window.BpmnJS;
+
+    var viewer = new BpmnViewer({ container: $('#js-canvas'), height: 500 });
+console.log(viewer);
+    function log(str) {
+      var consol = $('#js-console');
+console.log(consol);
+console.log(str);
+      consol.val(console.val() + str + '\n');
+      consol.val('---------------------');
+    }
+
+    function openFromUrl(url) {
+
+	  console.log(url);
+      //log('attempting to open <' + url + '>');
+
+      $.ajax(url, { dataType : 'text' }).done(function(xml) {
+
+	  console.log(xml);
+        viewer.importXML(xml, function(err) {
+
+          if (err) {
+            log('error: ' + err.message);
+            console.error(err);
+          } else {
+            viewer.get('canvas').zoom('fit-viewport');
+            log('success');
+          }
+        });
+      });
+    }
+
+    $('#js-open').click(function() {
+      var url = $('#js-url').val();
+	  console.log(url);
+      openFromUrl(url);
+    });
+
+
+    ///// auto open ?url=diagram-url ///////////////////////
+
+    (function() {
+      var str = window.location.search;
+console.log(str);
+      var match = /(?:\&|\?)url=([^&]+)/.exec(str);
+console.log(match);
+
+      if (match) {
+        var url = decodeURIComponent(match[1]);
+console.log(url);
+        $('#js-url').val(url);
+        openFromUrl(url);
+      }
+    })();
+  </script>
+</html>

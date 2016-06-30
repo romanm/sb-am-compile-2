@@ -1,0 +1,16 @@
+{
+  "name": "bpmn-url-viewer2",
+  "version": "0.0.0",
+  "authors": [
+    "Nico Rehwaldt <nico.rehwaldt@camunda.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bpmn-js": "^0.15.0",
+	"dmn-js": "latest",
+	"angular": "latest",
+	"fs": "latest",
+    "jquery": "~2.1.0"
+  }
+}

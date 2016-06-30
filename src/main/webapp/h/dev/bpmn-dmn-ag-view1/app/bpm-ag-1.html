@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../bower_components/dmn-js/dist/css/dmn-js.css"/>
+<script src="../bower_components/angular/angular.min.js"></script>
+<script src="../bower_components/bpmn-js/dist/bpmn-viewer.js"></script>
+<script src="../bower_components/dmn-js/dist/dmn-viewer.js"></script>
+<script src="bpm-ag-1.js"></script>
+</head>
+<body>
+
+	<div ng-app="myApp" ng-controller="myCtrl">
+
+		First Name: <input type="text" ng-model="firstName"><br>
+		Last Name: <input type="text" ng-model="lastName"><br> <br>
+		Full Name: {{firstName + " " + lastName}}
+
+	</div>
+	<div id="bpmn-canvas"></div>
+	<div>TEXT AFTER</div>
+	<div id="dmn-canvas"></div>
+
+</body>
+</html>
