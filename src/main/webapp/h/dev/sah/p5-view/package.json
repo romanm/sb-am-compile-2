@@ -1,0 +1,43 @@
+{
+  "name": "bpmn-js-example-commonjs",
+  "version": "0.0.0",
+  "description": "An example how to use bpmn-js with CommonJS + npm + browserify",
+  "main": "app/app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bpmn-io/bpmn-js-examples"
+  },
+  "keywords": [
+    "bpmnjs-example"
+  ],
+  "author": {
+    "name": "Nico Rehwaldt",
+    "url": "https://github.com/nikku"
+  },
+  "contributors": [
+    {
+      "name": "bpmn.io contributors",
+      "url": "https://github.com/bpmn-io"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~1.0.1",
+    "brfs": "^1.2.0",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-watch": "~1.0.0",
+    "grunt-contrib-connect": "~1.0.2",
+    "grunt-contrib-jshint": "~1.0.0",
+    "grunt-contrib-copy": "~1.0.0",
+    "load-grunt-tasks": "~3.5.0"
+  },
+  "dependencies": {
+    "query-string": "latest",
+    "jsoneditor": "latest",
+    "angular": "latest",
+	"dmn-js": "latest",
+	"request": "latest",
+    "diagram-js": "^0.15.0",
+    "bpmn-js": "^0.15.2"
+  }
+}

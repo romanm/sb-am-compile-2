@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html ng-app="Protocole5App" ng-controller="Protocole5Ctrl as myCtrl">
+<head>
+<meta charset="utf-8">
+<link href="/v/dmn/css/dmn-js.css" rel="stylesheet" />
+<link href="/v/lib/css/jsoneditor.min.css" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet" href="css/diagram-js.css" />
+<link rel="stylesheet" href="vendor/bpmn-font/css/bpmn-embedded.css" />
+</head>
+<body>
+	<h1 ng-bind="obj.data.protocolName">Protocole5App</h1>
+	<div>
+		<button ng-click="saveFile()">save</button>
+		<input type="text" ng-model="obj.data.protocolName" /> <a href="#"></a>
+		<label>json <input type="checkbox" ng-model="useJsonEditor" ng-click="editJson()"/>
+		</label>
+	</div>
+
+	<div ng-show="!useJsonEditor">
+		<div ng-repeat="(k,v) in obj.data">
+			<div ng-switch on="k">
+				<p ng-switch-when="p">{{v}}</p>
+				<div ng-switch-when="home">Home Span</div>
+				<div class="animate-switch" ng-switch-default>
+				</div>
+			</div>
+		</div>
+		<div id="appendix">
+			<div id="bpmn-canvas-0"></div>
+			<div id="bpmn-canvas-1"></div>
+			<div id="bpmn-canvas-2"></div>
+			<div id="bpmn-canvas-3"></div>
+			<div id="bpmn-canvas-4"></div>
+			<hr/>
+			<div id="dmn-canvas-0"></div>
+			<div id="dmn-canvas-1"></div>
+			<div id="dmn-canvas-2"></div>
+			<div id="dmn-canvas-3"></div>
+			<div id="dmn-canvas-4"></div>
+			<hr/>
+		</div>
+	</div>
+	<div id="jsoneditor" ng-show="useJsonEditor"></div>
+
+	<script src="./app.js"></script>
+</body>
+</html>

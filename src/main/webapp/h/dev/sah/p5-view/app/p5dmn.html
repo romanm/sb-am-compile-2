@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html ng-app="P5DmnApp" ng-controller="P5DmnCtrl as myCtrl">
+<head>
+<meta charset="utf-8">
+<link href="/v/dmn/css/dmn-js.css" rel="stylesheet" />
+</head>
+<body>
+	<h1 ng-bind="obj.data.protocolName">Protocol 4</h1>
+	<div>
+		<button ng-click="saveFile()">save</button>
+		<a ng-click="saveFile()"
+			href="/h/dev/sah/p5-view/dist/protocol5.html#{{params.jsonpath}}">Перегляд
+			всього протоколу</a>
+	</div>
+	<div id="dmn-canvas"></div>
+	<script src="./app.js"></script>
+</body>
+</html>
