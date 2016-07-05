@@ -112,7 +112,7 @@ function viewerBpmnDmn(protocol){
 		var dmnViewerInitData = protocol.init.camundaAppendix.dmn[dmnNr];
 		console.log(dmnViewerInitData);
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
-		caElement.prepend(angular.element('<a id="'
+		caElement.prepend(angular.element('<a id="/'
 				+dmnViewerInitData.path+'" href="/h/dev/sah/p5-view/dist/p5dmn.html?jsonpath='
 				+dmnViewerInitData.path+'">' +dmnViewerInitData.path+ '</a>'));
 		var viewerDmn = new DmnViewer(dmnViewerInitData.container);
@@ -129,7 +129,7 @@ function viewerBpmnDmn(protocol){
 		var bpmnViewerInitData = protocol.init.camundaAppendix.bpmn[bpmnNr];
 		console.log(bpmnViewerInitData.container.container);
 		var caElement = angular.element(document.querySelector(bpmnViewerInitData.container.container));
-		caElement.prepend(angular.element('<a id="'
+		caElement.prepend(angular.element('<a id="/'
 				+bpmnViewerInitData.path+'" href="/h/dev/sah/p4/dist/index.html?jsonpath='
 				+bpmnViewerInitData.path+'">' +bpmnViewerInitData.path+ '</a>'));
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);

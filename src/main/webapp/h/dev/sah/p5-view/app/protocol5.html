@@ -7,8 +7,14 @@
 
 <link rel="stylesheet" href="css/diagram-js.css" />
 <link rel="stylesheet" href="vendor/bpmn-font/css/bpmn-embedded.css" />
+
+<link rel="stylesheet" href="/v/css/navbar_horizontal_gray.css"/>
+<link rel="stylesheet" href="/v/css/ui.css"/>
+<link rel='stylesheet prefetch' href='/v/lib/css/font-awesome.min.css'/>
+<link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>
 </head>
 <body>
+	<div ng-include="'ui/menu.html'"></div>
 	<h1 ng-bind="obj.data.protocolName">Protocole5App</h1>
 	<div>
 		<button ng-click="saveFile()">save</button>
@@ -26,19 +32,27 @@
 				</div>
 			</div>
 		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-10">
+					<div id="bpmn-canvas-0"></div>
+					<div id="bpmn-canvas-1"></div>
+					<div id="bpmn-canvas-2"></div>
+					<div id="bpmn-canvas-3"></div>
+					<div id="bpmn-canvas-4"></div>
+					<hr />
+					<div id="dmn-canvas-0"></div>
+					<div id="dmn-canvas-1"></div>
+					<div id="dmn-canvas-2"></div>
+					<div id="dmn-canvas-3"></div>
+					<div id="dmn-canvas-4"></div>
+					<hr />
+				</div>
+				<div class="col-md-2">info</div>
+			</div>
+		</div>
 		<div id="appendix">
-			<div id="bpmn-canvas-0"></div>
-			<div id="bpmn-canvas-1"></div>
-			<div id="bpmn-canvas-2"></div>
-			<div id="bpmn-canvas-3"></div>
-			<div id="bpmn-canvas-4"></div>
-			<hr/>
-			<div id="dmn-canvas-0"></div>
-			<div id="dmn-canvas-1"></div>
-			<div id="dmn-canvas-2"></div>
-			<div id="dmn-canvas-3"></div>
-			<div id="dmn-canvas-4"></div>
-			<hr/>
+			
 		</div>
 	</div>
 	<div id="jsoneditor" ng-show="useJsonEditor"></div>
