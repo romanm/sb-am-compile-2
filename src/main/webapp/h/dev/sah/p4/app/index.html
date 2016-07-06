@@ -11,8 +11,9 @@
 	<h1 ng-bind="obj.data.protocolName">Protocol 4</h1>
 	<div>
 		<button ng-click="saveFile()">save</button>
-		<input type="text" ng-model="obj.data.protocolName" />
-		<a href="#">Перегляд всього протоколу</a>
+		<a ng-click="saveFile()"
+			href="/h/dev/sah/p5-view/dist/protocol5.html#/{{params.jsonpath}}">Перегляд
+			всього протоколу</a>
 	</div>
 	<div class="content" id="js-drop-zone">
 		<div class="message intro">

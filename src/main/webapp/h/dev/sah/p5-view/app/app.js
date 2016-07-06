@@ -37,6 +37,12 @@ angular.module('P5DmnApp', [])
 			});
 		}
 		renderer.on('commandStack.changed', exportArtifacts);
+	$scope.saveFile = function(){
+		console.log("-------saveFile--------");
+		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
+			console.log(response.length);
+		});
+	}
 		
 		initAngularCommon($scope, $http);
 
@@ -79,12 +85,54 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 //		openDiagram(bpmnContent);
 	});
 
+	function getMaxNr(keyPart){
+		var maxN = 0;
+		for (var key1 in $scope.obj.data) {
+			if(key1.indexOf('dmn')>=0){
+				var n = key1.split('dmn')[1];
+				if(!isNaN(n)){
+					maxN = Math.max(maxN, n);
+				}
+			}
+		}
+		maxN++;
+		return maxN;
+	}
+	
+	$scope.createNewDMN = function(){
+		console.log("-------createNewDMN--------");
+		var maxN = getMaxNr('dmn');
+		console.log(maxN);
+		$http.get("/h/dev/sah/p4/resources/newDMN.dmn").success(function(response) {
+			$scope.obj.data['dmn'+maxN] = {dmnContent:response};
+			console.log($scope.obj.data);
+			if($scope.useJsonEditor){
+				editor.set($scope.obj.data);
+			}
+			$scope.saveFile();
+		});
+	}
+	$scope.createNewBpmn = function(){
+		console.log("-------createNewBpmn--------");
+		var maxN = getMaxNr('bpmn');
+		console.log(maxN);
+		$http.get("/h/dev/sah/p4/resources/newDiagram.bpmn").success(function(response) {
+			$scope.obj.data['bpmn'+maxN] = {height:200, bpmnContent:response};
+			console.log($scope.obj.data);
+			if($scope.useJsonEditor){
+				editor.set($scope.obj.data);
+			}
+			$scope.saveFile();
+		});
+	}
 	$scope.editJson = function(){
 		console.log("-------editJson--------");
 		if($scope.useJsonEditor){
 			editor.set($scope.obj.data);
 		}else{
 			$scope.obj.data = editor.get();
+			$scope.saveFile();
+			location.reload();
 		}
 	}
 
@@ -92,25 +140,27 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 	var container = document.getElementById("jsoneditor");
 	var editor = new JSONEditor(container, { });
 
+	$scope.saveFile = function(){
+		console.log("-------saveFile--------");
+		console.log($scope.useJsonEditor);
+		if($scope.useJsonEditor){
+			$scope.obj.data = editor.get();
+		}
+		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
+			console.log(response.length);
+		});
+	}
+
 	initAngularCommon($scope, $http);
 });
 
 function initAngularCommon($scope, $http){
 	$scope.params = params;
-	$scope.saveFile = function(){
-		console.log("-------saveFile--------");
-//		$http.post("/saveCommonContent", editor.get() ).success(function(response) {
-		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
-			console.log(response.length);
-		});
-	}
 }
 
 function viewerBpmnDmn(protocol){
-	console.log(protocol.init.camundaAppendix);
 	for (var dmnNr in protocol.init.camundaAppendix.dmn){
 		var dmnViewerInitData = protocol.init.camundaAppendix.dmn[dmnNr];
-		console.log(dmnViewerInitData);
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
 				+dmnViewerInitData.path+'" href="/h/dev/sah/p5-view/dist/p5dmn.html?jsonpath='
@@ -127,7 +177,6 @@ function viewerBpmnDmn(protocol){
 	}
 	for (var bpmnNr in protocol.init.camundaAppendix.bpmn){
 		var bpmnViewerInitData = protocol.init.camundaAppendix.bpmn[bpmnNr];
-		console.log(bpmnViewerInitData.container.container);
 		var caElement = angular.element(document.querySelector(bpmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
 				+bpmnViewerInitData.path+'" href="/h/dev/sah/p4/dist/index.html?jsonpath='

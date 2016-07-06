@@ -8,8 +8,6 @@ var canvas = $('#js-canvas');
 
 var modeler = new BpmnModeler({ container: canvas });
 
-var newDiagramXML = fs.readFileSync(__dirname + '/../resources/newDiagram.bpmn', 'utf-8');
-
 function createNewDiagram() {
 	openDiagram(newDiagramXML);
 }
@@ -99,7 +97,8 @@ var angular = require('angular');
 var app = angular.module('BpmnModelerApp', []);
 app.controller('BpmnModelerCtrl', function($scope, $http) {
 	console.log("BpmnModelerCtrl");
-
+	$scope.params = params;
+	
 	var exportArtifacts = _.debounce(function() {
 		saveDiagram(function(err, xml) {
 			setBpmnContent($scope.obj.data, params.jsonpath, xml);
@@ -117,7 +116,12 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 		};
 		console.log($scope.obj);
 		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath)
-		openDiagram(bpmnContent);
+		if(bpmnContent === '-'){
+			var newDiagramXML = fs.readFileSync(__dirname + '/../resources/newDiagram.bpmn', 'utf-8');
+			openDiagram(newDiagramXML)
+		}else{
+			openDiagram(bpmnContent);
+		}
 	});
 	
 	$scope.saveFile = function(){
@@ -130,7 +134,6 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 });
 
 function setBpmnContent(obj, path, xml){
-	console.log(xml);
 	var pathList = path.split('.');
 	if(pathList.length == 1){
 		obj[pathList[0]] = xml;
