@@ -3,86 +3,33 @@ var BpmnViewer = require('bpmn-js');
 var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
-angular.module('P5DmnApp', [])
-.controller('P5DmnCtrl', function($scope, $http) {
-	console.log('p5Dmn');
-	var DmnModeler = require('dmn-js/lib/Modeler');
-	console.log(DmnModeler);
-	var renderer = new DmnModeler({ container: '#dmn-canvas' });
-	console.log(renderer);
-	$http.get("/v/readContent").success(function(response) {
-		var protocol1 = response;
-		$scope.obj = {
-			data : protocol1,
-			options : { mode : 'tree' }
-		};
-		var dmnContent = jsonPath($scope.obj.data, params.jsonpath)
-//		console.log(dmnContent);
-		renderer.importXML(dmnContent, function(err) {
-			if (err) {
-				console.log('error rendering', err);
-			} else {
-				console.log('rendered: ' + params.jsonpath);
-			}
-		});
-		function saveDiagram(done) {
-			renderer.saveXML({ format: true }, function(err, xml) {
-				done(err, xml);
-			});
-		}
-		var exportArtifacts = function() {
-			saveDiagram(function(err, xml) {
-				console.log("-----2-------------------");
-				setBpmnContent($scope.obj.data, params.jsonpath, xml);
-			});
-		}
-		renderer.on('commandStack.changed', exportArtifacts);
-	$scope.saveFile = function(){
-		console.log("-------saveFile--------");
-		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
-			console.log(response.length);
-		});
-	}
-		
-		initAngularCommon($scope, $http);
 
-	});
+var app = angular.module('HomeApp', [])
+.controller('HomeCtrl', function($scope, $http) {
+	console.log('HomeCtrl');
+	readProtocolDir($scope, $http)
 });
-
-function setBpmnContent(obj, path, xml){
-//	console.log(xml);
-	var pathList = path.split('.');
-	if(pathList.length == 1){
-		obj[pathList[0]] = xml;
-	} else if(pathList.length == 2){
-		obj[pathList[0]][pathList[1]] = xml;
-	}
-}
-
-function jsonPath(obj, path){
-	var findObj = obj;
-	var pathList = path.split('.');
-	pathList.forEach(function(key){
-		findObj = findObj[key];
-	});
-	return findObj;
-}
-
-var app = angular.module('Protocole5App', []);
-app.controller('Protocole5Ctrl', function($scope, $http) {
+var app = angular.module('Protocole5App', [])
+.controller('Protocole5Ctrl', function($scope, $http) {
 	console.log('protocole5');
-
-	$http.get("/v/readContent").success(function(response) {
-		var protocol1 = response;
+	initAngularCommon($scope, $http);
+	console.log($scope.params.p);
+	
+	var urlForContent = '/v/readContent';
+	if($scope.params.p){
+		urlForContent = '/v/readProtocol/' + $scope.params.p;
+	}
+	console.log(urlForContent);
+	
+	$http.get(urlForContent).success(function(protocol) {
+		console.log(protocol);
 		$scope.obj = {
-			data : protocol1,
+			data : protocol,
 			options : { mode : 'tree' }
 		};
 		editor.set($scope.obj.data);
 		initBpmnDmnToId($scope.obj.data);
 		viewerBpmnDmn($scope.obj.data);
-//		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath)
-//		openDiagram(bpmnContent);
 	});
 
 	function getMaxNr(keyPart){
@@ -98,7 +45,7 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 		maxN++;
 		return maxN;
 	}
-	
+
 	$scope.createNewDMN = function(){
 		console.log("-------createNewDMN--------");
 		var maxN = getMaxNr('dmn');
@@ -112,6 +59,7 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 			$scope.saveFile();
 		});
 	}
+
 	$scope.createNewBpmn = function(){
 		console.log("-------createNewBpmn--------");
 		var maxN = getMaxNr('bpmn');
@@ -125,6 +73,7 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 			$scope.saveFile();
 		});
 	}
+
 	$scope.editJson = function(){
 		console.log("-------editJson--------");
 		if($scope.useJsonEditor){
@@ -146,25 +95,40 @@ app.controller('Protocole5Ctrl', function($scope, $http) {
 		if($scope.useJsonEditor){
 			$scope.obj.data = editor.get();
 		}
-		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
+		
+		var urlToSave = '/saveCommonContent';
+		if($scope.obj.data.fileName){
+			urlToSave = '/saveProtocol';
+		}
+		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
 			console.log(response.length);
 		});
 	}
 
-	initAngularCommon($scope, $http);
+	readProtocolDir($scope, $http);
 });
 
-function initAngularCommon($scope, $http){
-	$scope.params = params;
+function readProtocolDir($scope, $http){
+	$http.get("/v/readProtocolDir").success(function(response) {
+		$scope.protocolList = response;
+		console.log($scope.protocolList)
+		$scope.openOtherProtocol = true;
+	});
 }
 
+function addProtocol(){
+	if(params.p){
+		return '&p='+params.p;
+	}
+	return '';
+}
 function viewerBpmnDmn(protocol){
 	for (var dmnNr in protocol.init.camundaAppendix.dmn){
 		var dmnViewerInitData = protocol.init.camundaAppendix.dmn[dmnNr];
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
 				+dmnViewerInitData.path+'" href="/h/dev/sah/p5-view/dist/p5dmn.html?jsonpath='
-				+dmnViewerInitData.path+'">' +dmnViewerInitData.path+ '</a>'));
+				+dmnViewerInitData.path+addProtocol()+'">' +dmnViewerInitData.path+ '</a>'));
 		var viewerDmn = new DmnViewer(dmnViewerInitData.container);
 		var dmnContext = jsonPath(protocol, dmnViewerInitData.path);
 		viewerDmn.importXML(dmnContext, function(err) {
@@ -180,7 +144,7 @@ function viewerBpmnDmn(protocol){
 		var caElement = angular.element(document.querySelector(bpmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
 				+bpmnViewerInitData.path+'" href="/h/dev/sah/p4/dist/index.html?jsonpath='
-				+bpmnViewerInitData.path+'">' +bpmnViewerInitData.path+ '</a>'));
+				+bpmnViewerInitData.path+addProtocol()+'">' +bpmnViewerInitData.path+ '</a>'));
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);
 		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path);
 		viewerBpm.importXML(bpmnContext, function(err) {
@@ -229,6 +193,96 @@ function initBpmnDmnToId(protocol){
 		}
 	}
 	protocol['init'] = {'camundaAppendix':camundaAppendix};
+}
+
+
+//Controler
+angular.module('P5DmnApp', [])
+.controller('P5DmnCtrl', function($scope, $http) {
+	console.log('p5Dmn');
+	initAngularCommon($scope, $http);
+	var DmnModeler = require('dmn-js/lib/Modeler');
+	console.log(DmnModeler);
+	var renderer = new DmnModeler({ container: '#dmn-canvas' });
+	console.log(renderer);
+	var urlForContent = '/v/readContent';
+	if($scope.params.p){
+		urlForContent = '/v/readProtocol/' + $scope.params.p;
+	}
+	console.log(urlForContent);
+	$http.get(urlForContent).success(function(response) {
+		var protocol1 = response;
+		$scope.obj = {
+			data : protocol1,
+			options : { mode : 'tree' }
+		};
+		var dmnContent = jsonPath($scope.obj.data, params.jsonpath)
+//		console.log(dmnContent);
+		renderer.importXML(dmnContent, function(err) {
+			if (err) {
+				console.log('error rendering', err);
+			} else {
+				console.log('rendered: ' + params.jsonpath);
+			}
+		});
+		function saveDiagram(done) {
+			renderer.saveXML({ format: true }, function(err, xml) {
+				done(err, xml);
+			});
+		}
+		function exportArtifacts() {
+			saveDiagram(function(err, xml) {
+				console.log("-----2-------------------");
+				setBpmnContent($scope.obj.data, params.jsonpath, xml);
+			});
+		}
+		renderer.on('commandStack.changed', exportArtifacts);
+
+	});
+	$scope.saveFile = function(){
+		console.log("-------saveFile--------");
+		var urlToSave = '/saveCommonContent';
+		if($scope.obj.data.fileName){
+			urlToSave = '/saveProtocol';
+		}
+		console.log($scope.obj.data);
+		console.log(urlToSave);
+		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
+			console.log(response.length);
+		});
+	}
+	
+	$scope.addProtocolUrl = function(){
+		if(params.p){
+			return '?p='+params.p;
+		}
+		return '';
+	}
+
+});
+
+
+function setBpmnContent(obj, path, xml){
+//	console.log(xml);
+	var pathList = path.split('.');
+	if(pathList.length == 1){
+		obj[pathList[0]] = xml;
+	} else if(pathList.length == 2){
+		obj[pathList[0]][pathList[1]] = xml;
+	}
+}
+
+function jsonPath(obj, path){
+	var findObj = obj;
+	var pathList = path.split('.');
+	pathList.forEach(function(key){
+		findObj = findObj[key];
+	});
+	return findObj;
+}
+
+function initAngularCommon($scope, $http){
+	$scope.params = params;
 }
 
 //console.log("params = " + location.search);

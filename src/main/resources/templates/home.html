@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
+	
 <head>
-<title>Spring Security Example</title>
+<title>САХ домашня сторінка</title>
+<link rel="stylesheet" href="sah.css"/>
+<link rel="stylesheet" href="/v/css/ui.css"/>
+<link rel="stylesheet" href="/v/css/navbar_horizontal_gray.css"/>
+<link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>
+<link rel='stylesheet prefetch' href='/v/lib/css/font-awesome.min.css'/>
+
+<script type="text/javascript" src="/v/lib/js/angular.min.js"></script>
+<script src="/v/lib/js/angular-locale_uk.js"></script>
+
+<script src="/v/lib/js/jquery-2.2.4.min.js"></script>
+<script src="/v/lib/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<h1>Welcome!</h1>
+	<div class="container-fluid">
+		<h1>Спілка анестезіологів Хмельниччини</h1>
+	</div>
 
+	<p>
+	<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolList.html'"></div>
+
+	</p>
+	<hr/>
 	<p>
 		Click <a th:href="@{/hello}">here</a> to see a greeting.
 	</p>
@@ -21,5 +41,6 @@
 			||
 			<a href="/home">home</a>
 	</p>
+	<script src="/h/dev/sah/p5-view/dist/app.js"></script>
 </body>
 </html>

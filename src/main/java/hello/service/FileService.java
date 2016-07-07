@@ -34,6 +34,10 @@ public class FileService {
 	public Map<String, Object> readJsonFromFileName(String fileName) {
 		String fileLongName = folderDb + fileName;
 //		fileLongName = fileLongName.trim();
+		return readFileFromLongName(fileLongName);
+	}
+
+	public Map<String, Object> readFileFromLongName(String fileLongName) {
 		File file = new File(fileLongName);
 		logger.debug(file.toString());
 		return readJsonFromFullFileName(file);
@@ -84,13 +88,18 @@ public class FileService {
 	ObjectMapper mapper = new ObjectMapper();
 
 	public void saveJsonToFile(Map<String, Object> javaObjectToJson, String fileName) {
-		File file = new File(folderDb + fileName);
+		saveMapAsFile(javaObjectToJson, folderDb + fileName);
+	}
+
+	public void saveMapAsFile(Map<String, Object> javaObjectToJson, String longFileName) {
+		File file = new File(longFileName);
 		System.out.println(file);
 		ObjectWriter writerWithDefaultPrettyPrinter = mapper.writerWithDefaultPrettyPrinter();
 		System.out.println(23);
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			writerWithDefaultPrettyPrinter.writeValue(fileOutputStream, javaObjectToJson);
+			System.out.println("saved " + javaObjectToJson.keySet());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -112,10 +121,14 @@ public class FileService {
 	}
 
 	public void backup(String fileName) {
+		backup(folderDb, fileName);
+	}
+
+	public void backup(String folderDbSource, String fileName) {
 		DateTime today = new DateTime();
 		String timestampStr = propertiConfig.yyyyMMddHHmmssDateFormat.format(today.toDate());
 		try {
-			Files.copy(new File(folderDb + fileName).toPath()
+			Files.copy(new File(folderDbSource + fileName).toPath()
 			, new File(folderDb + "backup/" + fileName +"."+ timestampStr).toPath()
 			, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {

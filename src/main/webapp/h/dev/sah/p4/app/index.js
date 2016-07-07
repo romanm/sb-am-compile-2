@@ -107,7 +107,14 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 
 	modeler.on('commandStack.changed', exportArtifacts);
 	
-	$http.get("/v/readContent").success(function(response) {
+	
+	var urlForContent = '/v/readContent';
+	if(params.p){
+		urlForContent = '/v/readProtocol/' + params.p;
+	}
+	console.log(urlForContent);
+	
+	$http.get(urlForContent).success(function(response) {
 		var protocol1 = response;
 		console.log(protocol1);
 		$scope.obj = {
@@ -124,9 +131,20 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 		}
 	});
 	
+	$scope.addProtocolUrl = function(){
+		if(params.p){
+			return '?p='+params.p;
+		}
+		return '';
+	}
 	$scope.saveFile = function(){
 		console.log("-------saveFile--------");
-		$http.post("/saveCommonContent", $scope.obj.data ).success(function(response) {
+		
+		var urlToSave = '/saveCommonContent';
+		if($scope.obj.data.fileName){
+			urlToSave = '/saveProtocol';
+		}
+		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
 			console.log(response.length);
 		});
 	}
