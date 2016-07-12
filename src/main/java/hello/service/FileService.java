@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class FileService {
 	
 	@Autowired private PropertiConfig propertiConfig;
 	@Value("${folder.db:/tmp}") public  String folderDb;
+	@Value("${folder.db.tmp}") public  String protocolDirTmp;
 
 	public Map<String, Object> readJsonFromFileName(String fileName) {
 		String fileLongName = folderDb + fileName;
@@ -105,6 +107,20 @@ public class FileService {
 		}
 	}
 
+	public void saveBpmnAsFile(String fileName, String bpmnContent) {
+		String ext = ".bpmn";
+		saveCamundaXmlAsFile(fileName, bpmnContent, ext);
+	}
+
+	public void saveCamundaXmlAsFile(String fileName, String bpmnContent, String ext) {
+		File file = new File(protocolDirTmp+fileName+ext);
+		try {
+			FileUtils.writeStringToFile(file, bpmnContent);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Map<String, Object> readJsonFromFile(String fileName) {
 		File file = new File(folderDb + fileName);
 		Map<String, Object> readJsonFileToJavaObject = null;

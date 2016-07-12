@@ -7,6 +7,19 @@
 
 <import resource="camunda.cfg.xml"/>
 
+	<bean id="dataSourceCamunda1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+		<property name="driverClassName" value="org.h2.Driver" />
+		<property name="url" value="jdbc:h2:tcp://localhost/h2-camunda-130-s/h2-camunda-130-s" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+	<bean id="camunda1ParamJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSourceCamunda1"/>
+	</bean>
+		<bean id="camunda1JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSourceCamunda1"/>
+	</bean>
+
 	<bean id="dataSourceHol2Eih" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close" primary="true">
 		<property name="driverClassName" value="org.h2.Driver" />
@@ -30,6 +43,7 @@
 	<bean id="hol1EihParamJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
 		<constructor-arg ref="dataSourceHol1Eih"/>
 	</bean>
+
 	<bean id="hol1EihJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<constructor-arg ref="dataSourceHol1Eih"/>
 	</bean>

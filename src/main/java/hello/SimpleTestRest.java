@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * @author roman
+ * Перший приклад REST
+ * First REST examples
+ */
 @Controller
 public class SimpleTestRest {
 
@@ -28,12 +33,16 @@ public class SimpleTestRest {
 		list.add(33);
 		list.add(34);
 		map.put("list", list);
-		String processKey = "SampleSelfDeploy";
+//		String processKey = "SampleSelfDeploy";
+		String processKey = "Sample";
 		List<Task> allTasks = studyCamunda.allTasks(processKey);
 		for (Task task : allTasks) {
 			list.add(Integer.parseInt(task.getId()));
 		}
+		System.out.println(list);
+		System.out.println("----------------");
 		System.out.println(allTasks);
+		System.out.println(map);
 		return map;
 	}
 

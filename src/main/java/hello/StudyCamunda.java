@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -15,9 +16,17 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * @author roman
+ * Вивчання camunda
+ * Camunda teach
+ */
 public class StudyCamunda {
+	private static final Logger logger = LoggerFactory.getLogger(StudyCamunda.class);
 
 	@Autowired ProcessEngine processEngine;
 
@@ -28,8 +37,19 @@ public class StudyCamunda {
 //			processEngine.getTaskService().resolveTask(taskId);
 		processEngine.getTaskService().complete(task.getId());
 	}
+	
+	void test1(){
+		DecisionService decisionService = processEngine.getDecisionService();
+		RepositoryService repositoryService = processEngine.getRepositoryService();		
+	}
 
 	public List<Task> allTasks(String processKey) {
+//		List<Deployer> customPreDeployers = processEngineConfiguration.getDeployers();
+//		logger.debug("- "+customPreDeployers);
+////		for (Deployer deployer : customPreDeployers) System.out.println(deployer);
+//		BpmnDeployer bpmnDeployer = (BpmnDeployer) customPreDeployers.get(0);
+//		System.out.println(bpmnDeployer);
+		logger.debug("-------customDeployers--------------END");
 		TaskService taskService = processEngine.getTaskService();
 		TaskQuery createTaskQuery = taskService.createTaskQuery();
 		System.out.println("-----doUserTask---------------3--");
@@ -82,12 +102,29 @@ public class StudyCamunda {
 		return startProcessInstanceByKey;
 	}
 
-	public void deployProcess(ProcessEngineImpl processEngine, String processName, String fileLocation) throws FileNotFoundException { 
-		FileInputStream inputStream = new FileInputStream(new File(fileLocation));
-		RepositoryService repositoryService = processEngine.getRepositoryService();
-		DeploymentBuilder deploymentBuilder = repositoryService.createDeployment(); 
-		DeploymentBuilder name = deploymentBuilder.name(processName);
-		DeploymentBuilder addInputStream = name.addInputStream(processName + ".bpmn", inputStream);
+//	public void deployProcess(ProcessEngineImpl processEngine, String processName, String fileLocation) throws FileNotFoundException { 
+//		deployProces(processEngine, processName, fileLocation);
+//	}
+
+	void deployDmn(String processName, String fileLocation) throws FileNotFoundException {
+		File file = new File(fileLocation);
+		System.out.println(file);
+		FileInputStream inputStream = new FileInputStream(file);
+		DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment(); 
+		DeploymentBuilder deploymentNamed = deploymentBuilder.name(processName);
+		DeploymentBuilder addInputStream = deploymentNamed.addInputStream(processName + ".dmn", inputStream);
+		Deployment deploy = addInputStream.deploy(); 
+		System.out.println(deploy);
+		//SELECT * FROM ACT_RE_DEPLOYMENT (id_DEPLOYMENT -1  = id_BYTEARRAY)
+		//SELECT * FROM ACT_GE_BYTEARRAY
+	}
+	void deployProcess(String processName, String fileLocation) throws FileNotFoundException {
+		File file = new File(fileLocation);
+		System.out.println(file);
+		FileInputStream inputStream = new FileInputStream(file);
+		DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment(); 
+		DeploymentBuilder deploymentNamed = deploymentBuilder.name(processName);
+		DeploymentBuilder addInputStream = deploymentNamed.addInputStream(processName + ".bpmn", inputStream);
 		Deployment deploy = addInputStream.deploy(); 
 		System.out.println(deploy);
 		//SELECT * FROM ACT_RE_DEPLOYMENT (id_DEPLOYMENT -1  = id_BYTEARRAY)

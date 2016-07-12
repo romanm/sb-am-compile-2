@@ -6,14 +6,15 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 	
 <head>
 <title>САХ домашня сторінка</title>
-<link rel="stylesheet" href="sah.css"/>
 <link rel="stylesheet" href="/v/css/ui.css"/>
 <link rel="stylesheet" href="/v/css/navbar_horizontal_gray.css"/>
 <link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>
 <link rel='stylesheet prefetch' href='/v/lib/css/font-awesome.min.css'/>
-
+<!-- 
+<link rel="stylesheet" href="sah.css"/>
 <script type="text/javascript" src="/v/lib/js/angular.min.js"></script>
-<script src="/v/lib/js/angular-locale_uk.js"></script>
+ -->
+
 
 <script src="/v/lib/js/jquery-2.2.4.min.js"></script>
 <script src="/v/lib/js/bootstrap.min.js"></script>
@@ -21,12 +22,10 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 <body>
 	<div class="container-fluid">
 		<h1>Спілка анестезіологів Хмельниччини</h1>
+		<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolList.html'"></div>
 	</div>
 
-	<p>
-	<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolList.html'"></div>
-
-	</p>
+	
 	<hr/>
 	<p>
 		Click <a th:href="@{/hello}">here</a> to see a greeting.
@@ -42,5 +41,6 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 			<a href="/home">home</a>
 	</p>
 	<script src="/h/dev/sah/p5-view/dist/app.js"></script>
+	<script src="/v/lib/js/angular-locale_uk.js"></script>
 </body>
 </html>

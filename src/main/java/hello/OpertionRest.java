@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * @author roman
+ * Робота з операціями ХОЛ
+ * Work with HOL operation
+ */
 @Controller
 public class OpertionRest {
 	@Autowired NamedParameterJdbcTemplate hol2EihParamJdbcTemplate;

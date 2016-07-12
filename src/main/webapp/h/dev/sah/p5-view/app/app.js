@@ -4,11 +4,19 @@ var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
 
-var app = angular.module('HomeApp', [])
+angular.module('HomeApp', [])
 .controller('HomeCtrl', function($scope, $http) {
 	console.log('HomeCtrl');
-	readProtocolDir($scope, $http)
+	$scope.openOtherProtocol = true;
+
+	readProtocolDir($scope, $http);
+
+	$http.get("/v/readAllDeployment").success(function(response) {
+		$scope.readAllDeployment = response;
+		console.log($scope.readAllDeployment)
+	});
 });
+
 var app = angular.module('Protocole5App', [])
 .controller('Protocole5Ctrl', function($scope, $http) {
 	console.log('protocole5');
@@ -88,6 +96,14 @@ var app = angular.module('Protocole5App', [])
 	var JSONEditor = require('jsoneditor');
 	var container = document.getElementById("jsoneditor");
 	var editor = new JSONEditor(container, { });
+
+	$scope.deployFile = function(){
+		console.log("-------deployFile--------");
+		var urlToSave = '/v/deployProtocol';
+		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
+			console.log(response.length);
+		});
+	}
 
 	$scope.saveFile = function(){
 		console.log("-------saveFile--------");

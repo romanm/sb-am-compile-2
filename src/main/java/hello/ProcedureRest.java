@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * @author roman
+ * Робота з процедурами МОЗ
+ * Work with proceduren of MOZ
+ */
 @Controller
 public class ProcedureRest {
 	private static final Logger logger = LoggerFactory.getLogger(ProcedureRest.class);
