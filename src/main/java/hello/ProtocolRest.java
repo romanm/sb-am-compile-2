@@ -5,10 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +38,10 @@ public class ProtocolRest {
 		DeploymentBuilder createDeployment = processEngine.getRepositoryService().createDeployment();
 		DeploymentBuilder deploymentBuilder = createDeployment.enableDuplicateFiltering(false);
 		logger.debug("-------createDeployment-------------- "+deploymentBuilder);
-		deployDmn();
 		String name = "Hipertension3";
-		//		String bpmFileLongName2 = "/home/roman/dev-20160518/research_2/db-protocol/tmp/sample2.bpmn";
-		String bpmFileLongName2 = "/home/roman/dev-20160518/research_2/db-protocol/tmp/sample2.bpmn.xml";
-		studyCamunda.deployProcess( name, bpmFileLongName2);
 		if(true)
 			return null;
-		Set<String> keySet = protocol.keySet();
-		for (String key : keySet) {
+		for (String key : protocol.keySet()) {
 			if(key.indexOf("b-pmn")==0){
 				System.out.println(key);
 				Map<String,Object> bpmnMap = (Map<String, Object>) protocol.get(key);
@@ -76,20 +69,6 @@ public class ProtocolRest {
 				}
 		}
 		return protocol;
-	}
-
-	private void deployDmn() {
-		String name = "DmnAT1";
-		String bpmFileLongName2 = "/home/roman/dev-20160518/research_2/db-protocol/tmp/dmn1.dmn";
-		System.out.println("--------------");
-		DecisionDefinition decisionDefinition = processEngine.getRepositoryService().createDecisionDefinitionQuery()
-				.decisionDefinitionKey("decision").latestVersion().singleResult();
-		System.out.println(decisionDefinition);
-
-//		studyCamunda.deployDmn(name, bpmFileLongName2);
-//		Deployment deployment = createDeployment.addClasspathResource(bpmFileLongName2).deploy();
-//		System.out.println(deployment);
-
 	}
 
 	@RequestMapping(value = "/saveProtocol", method = RequestMethod.POST)

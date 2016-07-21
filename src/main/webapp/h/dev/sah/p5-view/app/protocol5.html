@@ -50,7 +50,11 @@
 					<hr />
 				</div>
 				<div class="col-md-2">
-					<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolList.html'"></div>
+					<h3 ng-click="openOtherProtocol = !openOtherProtocol">
+						<small> <i class="fa fa-bars" aria-hidden="true"></i>
+						</small> Протоколи <small ng-if="!openOtherProtocol"> відкрити </small>
+					</h3>
+					<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
 				</div>
 			</div>
 		</div>

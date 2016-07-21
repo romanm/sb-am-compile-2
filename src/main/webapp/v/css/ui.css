@@ -1,3 +1,11 @@
+.showme{ 
+display: none;
+}
+.showhim:hover .showme{
+display : inline;
+}
+
+
 .navcontainer > ul {
 	margin: 0;
 	padding: 0;

@@ -10,8 +10,9 @@
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
     <property name="jdbcUrl" value="jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000" />
             <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/h2-camunda-1/h2-camunda-1" />
- -->
             <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/h2-camunda-130-s/h2-camunda-130-s" />
+ -->
+    <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/h2-camunda-130-s4/h2-camunda-130-s4" />
     
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
