@@ -61,6 +61,7 @@ var app = angular.module('Protocole5App', [])
 		editor.set($scope.obj.data);
 		initBpmnDmnToId($scope.obj.data);
 		viewerBpmnDmn($scope.obj.data);
+		console.log($scope.obj.data);
 	});
 
 	function getMaxNr(keyPart){
@@ -75,6 +76,20 @@ var app = angular.module('Protocole5App', [])
 		}
 		maxN++;
 		return maxN;
+	}
+
+	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask){
+//		console.log(dmn.toString());
+		console.log(dmnXmldoc.firstChild.attr.id);
+		console.log(dmnXmldoc.descendantWithPath('decision').toString());
+		console.log(dmnXmldoc.descendantWithPath('decision.decisionTable.output').toString());
+		var dmnId = dmnXmldoc.descendantWithPath('decision').attr.id;
+		console.log(dmnId);
+		var outputName = dmnXmldoc.descendantWithPath('decision.decisionTable.output').attr.name;
+		businessRuleTask.attr['camunda:decisionRef'] = dmnId;
+		businessRuleTask.attr['camunda:resultVariable'] = dmnId+'__'+outputName;
+		businessRuleTask.attr['camunda:mapDecisionResult'] = 'singleEntry';
+		console.log(businessRuleTask.toString());
 	}
 
 	$scope.createNewDMN = function(){
@@ -166,7 +181,9 @@ function addProtocol(){
 	}
 	return '';
 }
+
 function viewerBpmnDmn(protocol){
+
 	for (var dmnNr in protocol.init.camundaAppendix.dmn){
 		var dmnViewerInitData = protocol.init.camundaAppendix.dmn[dmnNr];
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
@@ -183,12 +200,19 @@ function viewerBpmnDmn(protocol){
 			}
 		});
 	}
+
 	for (var bpmnNr in protocol.init.camundaAppendix.bpmn){
+		console.log(bpmnNr);
 		var bpmnViewerInitData = protocol.init.camundaAppendix.bpmn[bpmnNr];
+		console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc);
+		console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc.descendantWithPath(
+		'bpmn:process').childNamed('bpmn:businessRuleTask').toString());
+		/*
 		var caElement = angular.element(document.querySelector(bpmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
 				+bpmnViewerInitData.path+'" href="/h/dev/sah/p4/dist/index.html?jsonpath='
 				+bpmnViewerInitData.path+addProtocol()+'">' +bpmnViewerInitData.path+ '</a>'));
+		 * */
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);
 		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path);
 		viewerBpm.importXML(bpmnContext, function(err) {
@@ -199,6 +223,7 @@ function viewerBpmnDmn(protocol){
 			}
 		});
 	}
+
 }
 
 function jsonPath(obj, path){
@@ -225,12 +250,18 @@ function initNewDmn(keyDmn, $scope){
 	var camundaAppendix = $scope.obj.data.init.camundaAppendix;
 	var dmnNr = camundaAppendix.dmn.length;
 	addAppendixDmn(keyDmn, dmnNr, dmnContent, camundaAppendix);
-	console.log($scope.obj.data);
 	initNewDmnId(dmnNr, $scope);
 }
 
 function addAppendixDmn(key1, dmnNr, dmnContent, camundaAppendix){
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
+	console.log(dmnXmldoc);
+	console.log(dmnXmldoc.children[0]);
+	console.log(dmnXmldoc.firstChild);
+	console.log(dmnXmldoc.firstChild.attr);
+	console.log("------------");
+	console.log(dmnXmldoc.firstChild.attr.id);
+	console.log("------------");
 //	camundaAppendix.dmn.push({path: key1+'.dmnContent'
 	camundaAppendix.dmn.push({path: key1
 		, xmldoc: dmnXmldoc
@@ -258,8 +289,8 @@ function initBpmnDmnToId(protocol){
 							}
 						}
 					);
+					bpmnNr++;
 				}
-				bpmnNr++;
 			}
 		}
 	}
@@ -300,8 +331,8 @@ angular.module('P5DmnApp', [])
 			data : protocol1,
 			options : { mode : 'tree' }
 		};
-		var dmnContent = jsonPath($scope.obj.data, params.jsonpath)
-//		console.log(dmnContent);
+		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
+		console.log(dmnContent);
 		renderer.importXML(dmnContent, function(err) {
 			if (err) {
 				console.log('error rendering', err);
@@ -317,13 +348,13 @@ angular.module('P5DmnApp', [])
 		function exportArtifacts() {
 			saveDiagram(function(err, xml) {
 				console.log("-----2-------------------");
-				setBpmnContent($scope.obj.data, params.jsonpath, xml);
+				setBpmnContent($scope.obj.data, params.jsonpath+'.dmnContent', xml);
 			});
 		}
 		renderer.on('commandStack.changed', exportArtifacts);
 
 	});
-	$scope.saveFile = function(){
+	$scope.saveFileTheDMN = function(){
 		console.log("-------saveFile--------");
 		var urlToSave = '/saveCommonContent';
 		if($scope.obj.data.fileName){
@@ -356,7 +387,7 @@ function setBpmnContent(obj, path, xml){
 	}
 }
 
-function jsonPath(obj, path){
+function jsonPath_stop(obj, path){
 	var findObj = obj;
 	var pathList = path.split('.');
 	pathList.forEach(function(key){
