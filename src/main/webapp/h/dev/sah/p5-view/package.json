@@ -36,6 +36,7 @@
     "jsoneditor": "latest",
     "angular": "latest",
 	"dmn-js": "latest",
+	"xmldoc": "latest",
 	"request": "latest",
     "diagram-js": "^0.15.0",
     "bpmn-js": "^0.15.2"

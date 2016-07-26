@@ -78,7 +78,7 @@ var app = angular.module('Protocole5App', [])
 		return maxN;
 	}
 
-	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask){
+	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask, editorBpmnNr){
 //		console.log(dmn.toString());
 		console.log(dmnXmldoc.firstChild.attr.id);
 		console.log(dmnXmldoc.descendantWithPath('decision').toString());
@@ -90,6 +90,12 @@ var app = angular.module('Protocole5App', [])
 		businessRuleTask.attr['camunda:resultVariable'] = dmnId+'__'+outputName;
 		businessRuleTask.attr['camunda:mapDecisionResult'] = 'singleEntry';
 		console.log(businessRuleTask.toString());
+		var bpmnJS = $scope.obj.data.init.camundaAppendix.bpmn[editorBpmnNr];
+		console.log(bpmnJS);
+		var bpmnKey = bpmnJS.path.split('.')[0];
+		var bpmnObj = $scope.obj.data[bpmnKey];
+		bpmnObj.bpmnContent = bpmnJS.xmldoc.toString();
+		console.log(bpmnObj);
 	}
 
 	$scope.createNewDMN = function(){
@@ -202,11 +208,11 @@ function viewerBpmnDmn(protocol){
 	}
 
 	for (var bpmnNr in protocol.init.camundaAppendix.bpmn){
-		console.log(bpmnNr);
+		//console.log(bpmnNr);
 		var bpmnViewerInitData = protocol.init.camundaAppendix.bpmn[bpmnNr];
-		console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc);
-		console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc.descendantWithPath(
-		'bpmn:process').childNamed('bpmn:businessRuleTask').toString());
+		//console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc);
+		//console.log(protocol.init.camundaAppendix.bpmn[bpmnNr].xmldoc
+//		.descendantWithPath('bpmn:process').childNamed('bpmn:businessRuleTask').toString());
 		/*
 		var caElement = angular.element(document.querySelector(bpmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<a id="/'
@@ -256,10 +262,6 @@ function initNewDmn(keyDmn, $scope){
 function addAppendixDmn(key1, dmnNr, dmnContent, camundaAppendix){
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
 	console.log(dmnXmldoc);
-	console.log(dmnXmldoc.children[0]);
-	console.log(dmnXmldoc.firstChild);
-	console.log(dmnXmldoc.firstChild.attr);
-	console.log("------------");
 	console.log(dmnXmldoc.firstChild.attr.id);
 	console.log("------------");
 //	camundaAppendix.dmn.push({path: key1+'.dmnContent'
@@ -267,6 +269,15 @@ function addAppendixDmn(key1, dmnNr, dmnContent, camundaAppendix){
 		, xmldoc: dmnXmldoc
 		, container:{container:'#dmn-canvas-' + dmnNr}
 	});
+}
+
+function initBpmnXml(protocol, key1, bpmnXmldoc){
+	var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
+	console.log(bpmnXmldoc.attr.targetNamespace);
+	bpmnXmldoc.attr.targetNamespace = 'http://camunda.org/schema/1.0/bpmn';
+	bpmnXmldoc.attr['xmlns:camunda'] = 'http://camunda.org/schema/1.0/bpmn';
+	protocol[key1].bpmnContent = bpmnXmldoc.toString();
+	return bpmnXmldoc;
 }
 
 function initBpmnDmnToId(protocol){
@@ -277,6 +288,7 @@ function initBpmnDmnToId(protocol){
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('bpmnContent')>=0){
 					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
+					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
 //					console.log($scope.obj.data.bpmn3.bpmnContent);
 //					xd.attr.newatt1 = "value new attribute 1";
 //					xd.attr['ns:newatt2'] = "value new attribute 2";
@@ -285,7 +297,7 @@ function initBpmnDmnToId(protocol){
 						, xmldoc: bpmnXmldoc
 						, container:
 							{container:'#bpmn-canvas-' + bpmnNr
-								, height: protocol[key1].height
+							, height: protocol[key1].height
 							}
 						}
 					);

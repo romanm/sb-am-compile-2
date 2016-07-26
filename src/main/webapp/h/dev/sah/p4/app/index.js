@@ -122,7 +122,13 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 			options : { mode : 'tree' }
 		};
 		console.log($scope.obj);
+		var key1 = params.jsonpath.split('.')[0];
 		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath)
+		var bpmnXmldoc = new xmldoc.XmlDocument(bpmnContent);
+		bpmnXmldoc = initBpmnXml($scope.obj.data, key1, bpmnXmldoc);
+		console.log("---------------------");
+		console.log($scope.obj.data[key1].bpmnContent);
+		console.log("---------------------");
 		if(bpmnContent === '-'){
 			var newDiagramXML = fs.readFileSync(__dirname + '/../resources/newDiagram.bpmn', 'utf-8');
 			openDiagram(newDiagramXML)
@@ -150,6 +156,17 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 	}
 	
 });
+
+var xmldoc = require('xmldoc');
+
+function initBpmnXml(protocol, key1, bpmnXmldoc){
+	var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
+	console.log(bpmnXmldoc.attr.targetNamespace);
+	bpmnXmldoc.attr.targetNamespace = 'http://camunda.org/schema/1.0/bpmn';
+	bpmnXmldoc.attr['xmlns:camunda'] = 'http://camunda.org/schema/1.0/bpmn';
+	protocol[key1].bpmnContent = bpmnXmldoc.toString();
+	return bpmnXmldoc;
+}
 
 function setBpmnContent(obj, path, xml){
 	var pathList = path.split('.');
