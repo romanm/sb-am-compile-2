@@ -246,8 +246,8 @@ runtimeService.setVariableLocal(execution.getId(), "order", typedObjectValue);
 //		deployProces(processEngine, processName, fileLocation);
 //	}
 
-	void deployDmn(String dmnName, String fileLocation) throws FileNotFoundException {
-		File file = new File(fileLocation);
+	void deployDmn(String dmnName, String longPathToFile) throws FileNotFoundException {
+		File file = new File(longPathToFile);
 		System.out.println(file);
 		FileInputStream inputStream = new FileInputStream(file);
 		DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment(); 

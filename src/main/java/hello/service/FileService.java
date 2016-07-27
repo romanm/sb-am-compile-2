@@ -113,7 +113,12 @@ public class FileService {
 	}
 
 	public void saveCamundaXmlAsFile(String fileName, String bpmnContent, String ext) {
-		File file = new File(protocolDirTmp+fileName+ext);
+		String longPathToFile = protocolDirTmp+fileName+ext;
+		saveCamundaXmlAsFile(bpmnContent, longPathToFile);
+	}
+
+	public void saveCamundaXmlAsFile(String bpmnContent, String longPathToFile) {
+		File file = new File(longPathToFile);
 		try {
 			FileUtils.writeStringToFile(file, bpmnContent);
 		} catch (IOException e) {

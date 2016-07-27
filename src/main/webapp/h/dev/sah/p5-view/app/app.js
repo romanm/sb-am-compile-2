@@ -59,7 +59,7 @@ var app = angular.module('Protocole5App', [])
 			options : { mode : 'tree' }
 		};
 		editor.set($scope.obj.data);
-		initBpmnDmnToId($scope.obj.data);
+		initBpmnDmnToId($scope);
 		viewerBpmnDmn($scope.obj.data);
 		console.log($scope.obj.data);
 	});
@@ -252,20 +252,20 @@ function initNewDmnId(dmnNr, $scope){
 }
 
 function initNewDmn(keyDmn, $scope){
-	var dmnContent = $scope.obj.data[keyDmn].dmnContent;
 	var camundaAppendix = $scope.obj.data.init.camundaAppendix;
 	var dmnNr = camundaAppendix.dmn.length;
-	addAppendixDmn(keyDmn, dmnNr, dmnContent, camundaAppendix);
+	addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope);
 	initNewDmnId(dmnNr, $scope);
 }
 
-function addAppendixDmn(key1, dmnNr, dmnContent, camundaAppendix){
-	var dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
+function addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope){
+	var dmnXmldoc = new xmldoc.XmlDocument($scope.obj.data[keyDmn].dmnContent);
 	console.log(dmnXmldoc);
 	console.log(dmnXmldoc.firstChild.attr.id);
+	$scope.obj.data[keyDmn].dmnName = dmnXmldoc.firstChild.attr.id;
 	console.log("------------");
-//	camundaAppendix.dmn.push({path: key1+'.dmnContent'
-	camundaAppendix.dmn.push({path: key1
+//	camundaAppendix.dmn.push({path: keyDmn+'.dmnContent'
+	camundaAppendix.dmn.push({path: keyDmn
 		, xmldoc: dmnXmldoc
 		, container:{container:'#dmn-canvas-' + dmnNr}
 	});
@@ -280,7 +280,8 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 	return bpmnXmldoc;
 }
 
-function initBpmnDmnToId(protocol){
+function initBpmnDmnToId($scope){
+	var protocol = $scope.obj.data;
 	var camundaAppendix = {bpmn:[],dmn:[]};
 	var bpmnNr = 0;
 	for (var key1 in protocol) {
@@ -313,7 +314,7 @@ function initBpmnDmnToId(protocol){
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
 					var dmnContent = protocol[key1].dmnContent;
-					addAppendixDmn(key1, dmnNr, dmnContent, camundaAppendix);
+					addAppendixDmn(key1, dmnNr, camundaAppendix, $scope);
 					dmnNr++;
 				}
 			}

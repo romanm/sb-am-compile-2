@@ -34,17 +34,31 @@ public class ProtocolRest {
 	@Value("${folder.db.tmp}") public  String protocolDirTmp;
 
 	@RequestMapping(value = "/v/deployProtocol", method = RequestMethod.POST)
-	public  @ResponseBody Map<String, Object> deployProtocol(@RequestBody Map<String, Object> protocol) throws FileNotFoundException {
+	public  @ResponseBody Map<String, Object> deployProtocol(@RequestBody Map<String, Object> clinicalProtocol) 
+			throws FileNotFoundException {
 		DeploymentBuilder createDeployment = processEngine.getRepositoryService().createDeployment();
 		DeploymentBuilder deploymentBuilder = createDeployment.enableDuplicateFiltering(false);
 		logger.debug("-------createDeployment-------------- "+deploymentBuilder);
-		String name = "Hipertension3";
-		if(true)
-			return null;
-		for (String key : protocol.keySet()) {
-			if(key.indexOf("b-pmn")==0){
+//		String name = "Hipertension3";
+		String fileName = (String) clinicalProtocol.get("fileName");
+//		if(true)
+//			return null;
+		for (String key : clinicalProtocol.keySet()) 
+			if(key.indexOf("dmn")==0){
 				System.out.println(key);
-				Map<String,Object> bpmnMap = (Map<String, Object>) protocol.get(key);
+				Map<String,Object> dmnMap = (Map<String, Object>) clinicalProtocol.get(key);
+				String dmnContent = (String) dmnMap.get("dmnContent");
+				String dmnName = (String) dmnMap.get("dmnName");
+				System.out.println(dmnContent.length());
+				System.out.println(dmnContent.substring(38,244));
+				String longPathToFile = protocolDirTmp + fileName + ".dmn";
+				fileService.saveCamundaXmlAsFile(dmnContent, longPathToFile);
+				studyCamunda.deployDmn(dmnName, longPathToFile);
+			}
+		for (String key : clinicalProtocol.keySet()) 
+			if(key.indexOf("bpmn")==0){
+				System.out.println(key);
+				Map<String,Object> bpmnMap = (Map<String, Object>) clinicalProtocol.get(key);
 				String bpmnContent = (String) bpmnMap.get("bpmnContent");
 				System.out.println(bpmnContent.length());
 				System.out.println(bpmnContent.substring(38,244));
@@ -57,18 +71,9 @@ public class ProtocolRest {
 				fileService.saveBpmnAsFile(key, bpmnContent);
 				String bpmFileLongName = protocolDirTmp + key + ".bpmn";
 				preParseProtocol.cleanBpmn(bpmFileLongName);
-				studyCamunda.deployProcess( name, bpmFileLongName);
-			}else
-				if(key.indexOf("dmn")==0){
-					System.out.println(key);
-					Map<String,Object> bpmnMap = (Map<String, Object>) protocol.get(key);
-					String dmnContent = (String) bpmnMap.get("dmnContent");
-					System.out.println(dmnContent.length());
-					System.out.println(dmnContent.substring(38,244));
-					fileService.saveCamundaXmlAsFile(key, dmnContent, ".dmn");
-				}
-		}
-		return protocol;
+				studyCamunda.deployProcess( fileName, bpmFileLongName);
+			}
+		return clinicalProtocol;
 	}
 
 	@RequestMapping(value = "/saveProtocol", method = RequestMethod.POST)
