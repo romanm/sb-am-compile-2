@@ -55,7 +55,8 @@ public class ProtocolRest {
 				fileService.saveCamundaXmlAsFile(dmnContent, longPathToFile);
 				studyCamunda.deployDmn(dmnName, longPathToFile);
 			}
-		for (String key : clinicalProtocol.keySet()) 
+		for (String key : clinicalProtocol.keySet()) {
+			logger.debug(key+"/"+key.indexOf("bpmn"));
 			if(key.indexOf("bpmn")==0){
 				System.out.println(key);
 				Map<String,Object> bpmnMap = (Map<String, Object>) clinicalProtocol.get(key);
@@ -73,6 +74,7 @@ public class ProtocolRest {
 				preParseProtocol.cleanBpmn(bpmFileLongName);
 				studyCamunda.deployProcess( fileName, bpmFileLongName);
 			}
+		}
 		return clinicalProtocol;
 	}
 

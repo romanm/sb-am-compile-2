@@ -114,6 +114,7 @@ public class FileService {
 
 	public void saveCamundaXmlAsFile(String fileName, String bpmnContent, String ext) {
 		String longPathToFile = protocolDirTmp+fileName+ext;
+		logger.debug(longPathToFile);
 		saveCamundaXmlAsFile(bpmnContent, longPathToFile);
 	}
 

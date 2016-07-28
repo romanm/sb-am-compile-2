@@ -276,6 +276,12 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 	console.log(bpmnXmldoc.attr.targetNamespace);
 	bpmnXmldoc.attr.targetNamespace = 'http://camunda.org/schema/1.0/bpmn';
 	bpmnXmldoc.attr['xmlns:camunda'] = 'http://camunda.org/schema/1.0/bpmn';
+	bpmnXmldoc.firstChild.attr.name = protocol.protocolName;
+	bpmnXmldoc.firstChild.attr.id = protocol.fileName + '_' +key1;
+	bpmnXmldoc.firstChild.attr.isExecutable = 'true';
+	/*
+	 * */
+	console.log(bpmnXmldoc.firstChild.attr);
 	protocol[key1].bpmnContent = bpmnXmldoc.toString();
 	return bpmnXmldoc;
 }
