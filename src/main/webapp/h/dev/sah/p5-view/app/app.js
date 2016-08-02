@@ -36,10 +36,25 @@ angular.module('HomeApp', [])
 			var sequenceFlowId = thisTask.valueWithPath('bpmn:outgoing');
 			var sequenceFlow = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlowId);
 			nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
-			console.log(nextTask);
-			console.log(nextTask.toString());
 		});
-		console.log('to:' + nextTask.attr.name)
+		console.log(nextTask);
+		if(nextTask.name == 'bpmn:businessRuleTask'){
+			var dmnName = nextTask.attr['camunda:decisionRef'];
+			console.log(dmnName);
+			var path = 'dmn' + dmnName.split('_dmn')[1];
+			camundaAppendix.dmn.forEach(function(dmn){
+				if(dmn.path == path){
+					console.log(dmn);
+					console.log(dmn.xmldoc.descendantWithPath('decision.decisionTable').toString());
+					var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+					console.log(dmnInputs);
+					$scope.collectData.ask = {};
+					$scope.collectData.ask.dmnInputs = dmnInputs;
+				}
+			});
+		}
+//			console.log(nextTask.toString());
+		console.log('to:' + nextTask.attr.name);
 		return '-> ' + nextTask.attr.name;
 	}
 
