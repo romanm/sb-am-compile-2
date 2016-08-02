@@ -23,13 +23,22 @@ angular.module('HomeApp', [])
 		});
 	}
 
-	$scope.executeTask = function(procInstId){
+	$scope.collectData = function(procInstId, taskId){
+		console.log(procInstId+'/'+taskId);
+		$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
+			$scope.collectData = response;
+			console.log($scope.collectData);
+		});
+		/*
+		 * */
+	}
+
+	$scope.executeTask = function(procInstId, taskId){
 		console.log(procInstId);
 		$http.get("/v/executeTask/"+procInstId).success(function(response) {
 			$scope.processActiviti = response;
 			console.log($scope.processActiviti);
 		});
-		
 	}
 
 	$scope.startProcess = function(key){

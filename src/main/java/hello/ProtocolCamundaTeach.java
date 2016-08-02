@@ -1,6 +1,8 @@
 package hello;
 
 import java.io.FileNotFoundException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +13,20 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import hello.service.FileService;
 
 /**
  * @author roman
@@ -26,17 +36,72 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class ProtocolCamundaTeach {
 	private static final Logger logger = LoggerFactory.getLogger(ProtocolCamundaTeach.class);
+	@Autowired private FileService fileService;
+	@Value("${folder.db.protocol}") public  String protocolDirName;
 	@Autowired ProcessEngine processEngine;
-	@Autowired JdbcTemplate camunda1JdbcTemplate;
 	@Autowired StudyCamunda studyCamunda;
+	@Autowired JdbcTemplate camunda1JdbcTemplate;
+	@Autowired NamedParameterJdbcTemplate camunda1ParamJdbcTemplate;
 
-	@RequestMapping(value = "/v/executeTask/{procInstId}", method = RequestMethod.GET)
-	public  @ResponseBody Map<String, Object> executeTask(@PathVariable Integer procInstId){
-		logger.debug(""+procInstId);
+	@Value("${sql.camunda.ACT_HI_TASKINST.by.ID}") private String sqlCamundaTaskInstById;
+	@RequestMapping(value = "/v/collectData/{procInstId}-{taskId}", method = RequestMethod.GET)
+	public  @ResponseBody Map<String, Object> collectData(
+			@PathVariable Integer procInstId,
+			@PathVariable Integer taskId
+			){
+		logger.debug(""+procInstId+"/"+taskId);
+		Map<String, Object> taskInst = camunda1ParamJdbcTemplate.queryForMap(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
+		Map<String,Object> map = new HashMap<>();
+		map.put("taskInst", taskInst);
+		String procDefKey = (String) taskInst.get("PROC_DEF_KEY_");
+		String protocolFileName = procDefKey.split("_bpmn")[0];
+		logger.debug("protocolFileName = "+protocolFileName);
+		Map<String, Object> protocol = fileService.readFileFromLongName(protocolDirName+protocolFileName+".json");
+		map.put("protocol", protocol);
+		map.put("protocolFileName", protocolFileName);
+		return map;
+	}
+	@Value("${sql.camunda.ACT_GE_BYTEARRAY.by.ACT_HI_PROCINST_ID}") private String sqlCamundaBytearrayByProcInst;
+	@RequestMapping(value = "/v/collec--tData/{procInstId}-{taskId}", method = RequestMethod.GET)
+	public  @ResponseBody Map<String, Object> collectData_stop(
+			@PathVariable Integer procInstId,
+			@PathVariable Integer taskId
+			){
+		logger.debug(""+procInstId+"/"+taskId);
+		Map<String,Object> map = new HashMap<>();
+		map.put("procDefId", procInstId);
+		map.put("taskId", taskId);
+		Map paramMap = new HashMap<>();
+		paramMap.put("procInstId", procInstId);
+		LobHandler lobHandler = new DefaultLobHandler();
+		String sql = sqlCamundaBytearrayByProcInst.replace(":procInstId", ""+ procInstId);
+		System.out.println(sql);
+		List<Map<String, Object>> bytearrayByProcInst 
+		= camunda1ParamJdbcTemplate.query(sql
+				, new RowMapper<Map<String, Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Map<String, Object> results = new HashMap<String, Object>();
+				byte[] blobAsBytes = lobHandler.getBlobAsBytes(rs, "BYTES_");
+				results.put("doc", blobAsBytes);
+				return results;
+			}
+		});
+		map.put("bytearrayByProcInst", bytearrayByProcInst);
+		return map;
+	}
+
+	@RequestMapping(value = "/v/executeTask/{procInstId}-{taskId}", method = RequestMethod.GET)
+	public  @ResponseBody Map<String, Object> executeTask(
+			@PathVariable Integer procInstId,
+			@PathVariable Integer taskId
+			){
+		logger.debug(""+procInstId+"/"+taskId);
 //		List<Task> allTasks = studyCamunda.allTasks(procDefId);
 		studyCamunda.executeTask(procInstId);
 		Map<String,Object> map = new HashMap<>();
 		map.put("procDefId", procInstId);
+		map.put("taskId", taskId);
 //		map.put("list", processInstances);
 		return map;
 	}
@@ -48,6 +113,7 @@ public class ProtocolCamundaTeach {
 		Map<String,Object> map = new HashMap<>();
 		map.put("procDefId", procDefId);
 		map.put("list", processInstances);
+		logger.debug("" + map);
 		return map;
 	}
 	

@@ -15,10 +15,12 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.slf4j.Logger;
@@ -78,24 +80,29 @@ public class StudyCamunda {
 
 	private Execution studyExecutionQuery(String tid) {
 		RuntimeService runtimeService = processEngine.getRuntimeService();
-		List<Execution> list = runtimeService.createExecutionQuery()
+		ExecutionQuery createExecutionQuery = runtimeService.createExecutionQuery();
+		List<Execution> list = createExecutionQuery
 		.processInstanceId(tid)
 		.list();
 		//83	…  hello.StudyCamunda	- [ProcessInstance[415], ProcessInstance[901]]
 		logger.debug(""+list);
-		Execution singleResult = runtimeService.createExecutionQuery()
+		Execution singleResult = createExecutionQuery
 		.processInstanceId(tid).singleResult();
 		logger.debug(""+singleResult);
+		logger.debug(""+singleResult.getId()+"/"+singleResult.getProcessInstanceId()
+		+"/"+singleResult.getTenantId()+"/"+singleResult.isEnded()+"/"+singleResult.isSuspended());
 		
 		return singleResult;
 	}
 
 	public void executeTask(Integer procInstId) {
-		logger.debug(""+procInstId);
-		Execution studyExecutionQuery = studyExecutionQuery(""+procInstId);
-		setVariable(studyExecutionQuery);
+		String processInstanceId = ""+procInstId;
+		logger.debug(processInstanceId);
 		TaskService taskService = processEngine.getTaskService();
 		logger.debug(""+taskService);
+		test(processInstanceId, taskService);
+		Execution studyExecutionQuery = studyExecutionQuery(processInstanceId);
+		setVariable(studyExecutionQuery);
 		if(true)
 			return;
 //		String tid = "UserTask_1:903";
@@ -104,6 +111,17 @@ public class StudyCamunda {
 		taskService.complete(tid);
 		
 		logger.debug("--------------");
+	}
+
+	private void test(String processInstanceId, TaskService taskService) {
+		List<Attachment> processInstanceAttachments = taskService.getProcessInstanceAttachments(processInstanceId);
+		logger.debug(""+processInstanceAttachments);
+		for (Attachment attachment : processInstanceAttachments) {
+			logger.debug(""+attachment);
+			logger.debug(""+attachment.getId()+"/"+attachment.getName()
+			+"/"+attachment.getProcessInstanceId()+"/"+attachment.getTaskId()
+			+"/"+attachment.getType()+"/"+attachment.getUrl()+"/"+attachment.getDescription());
+		}
 	}
 
 	private void setVariable(Execution processInstance) {
@@ -253,8 +271,10 @@ runtimeService.setVariableLocal(execution.getId(), "order", typedObjectValue);
 		DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment(); 
 		DeploymentBuilder deploymentNamed = deploymentBuilder.name(dmnName);
 		DeploymentBuilder addInputStream = deploymentNamed.addInputStream(dmnName + ".dmn", inputStream);
-		Deployment deploy = addInputStream.deploy(); 
+		Deployment deploy = addInputStream.deploy();
 		System.out.println(deploy);
+		System.out.println(deploy.getId()+"/"+deploy.getName()
+		+"/"+deploy.getSource()+"/"+deploy.getTenantId()+"/"+deploy.getDeploymentTime());
 		//SELECT * FROM ACT_RE_DEPLOYMENT (id_DEPLOYMENT -1  = id_BYTEARRAY)
 		//SELECT * FROM ACT_GE_BYTEARRAY
 	}
@@ -268,6 +288,8 @@ runtimeService.setVariableLocal(execution.getId(), "order", typedObjectValue);
 		DeploymentBuilder addInputStream = deploymentNamed.addInputStream(processName + ".bpmn", inputStream);
 		Deployment deploy = addInputStream.deploy(); 
 		System.out.println(deploy);
+		System.out.println(deploy.getId()+"/"+deploy.getName()
+		+"/"+deploy.getSource()+"/"+deploy.getTenantId()+"/"+deploy.getDeploymentTime());
 		//SELECT * FROM ACT_RE_DEPLOYMENT (id_DEPLOYMENT -1  = id_BYTEARRAY)
 		//SELECT * FROM ACT_GE_BYTEARRAY
 	}
