@@ -4,7 +4,7 @@ var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
 angular.module('HomeApp', [])
-.controller('HomeCtrl', function($scope, $http) {
+.controller('HomeCtrl', function($scope, $http, $filter) {
 	console.log('HomeCtrl');
 	$scope.openOtherProtocol = true;
 
@@ -23,14 +23,33 @@ angular.module('HomeApp', [])
 		});
 	}
 
-	$scope.collectData = function(procInstId, taskId){
+	$scope.nextTask = function(taskDefKey){
+		console.log('from:' + taskDefKey)
+		var camundaAppendix = $scope.collectData.protocol.init.camundaAppendix;
+		var thisTask = null, nextTask = null;
+		camundaAppendix.bpmn.forEach(function(bpmn){
+			bpmn.xmldoc.descendantWithPath('bpmn:process').children.forEach(function(bpmnElement){
+				if(bpmnElement.attr.id == taskDefKey){
+					thisTask = bpmnElement;
+				}
+			});
+			var sequenceFlowId = thisTask.valueWithPath('bpmn:outgoing');
+			var sequenceFlow = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlowId);
+			nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
+			console.log(nextTask);
+			console.log(nextTask.toString());
+		});
+		console.log('to:' + nextTask.attr.name)
+		return '-> ' + nextTask.attr.name;
+	}
+
+	$scope.collectMedData = function(procInstId, taskId){
 		console.log(procInstId+'/'+taskId);
 		$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
 			$scope.collectData = response;
 			console.log($scope.collectData);
+			initBpmnDmnToId($scope.collectData.protocol);
 		});
-		/*
-		 * */
 	}
 
 	$scope.executeTask = function(procInstId, taskId){
@@ -68,7 +87,7 @@ var app = angular.module('Protocole5App', [])
 			options : { mode : 'tree' }
 		};
 		editor.set($scope.obj.data);
-		initBpmnDmnToId($scope);
+		initBpmnDmnToId($scope.obj.data);
 		viewerBpmnDmn($scope.obj.data);
 		console.log($scope.obj.data);
 	});
@@ -90,7 +109,6 @@ var app = angular.module('Protocole5App', [])
 	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask, editorBpmnNr){
 //		console.log(dmn.toString());
 		console.log(dmnXmldoc.firstChild.attr.id);
-		console.log(dmnXmldoc.descendantWithPath('decision').toString());
 		console.log(dmnXmldoc.descendantWithPath('decision.decisionTable.output').toString());
 		var dmnId = dmnXmldoc.descendantWithPath('decision').attr.id;
 		console.log(dmnId);
@@ -263,17 +281,14 @@ function initNewDmnId(dmnNr, $scope){
 function initNewDmn(keyDmn, $scope){
 	var camundaAppendix = $scope.obj.data.init.camundaAppendix;
 	var dmnNr = camundaAppendix.dmn.length;
-	addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope);
+	addAppendixDmn(keyDmn, dmnNr, camundaAppendix);
 	initNewDmnId(dmnNr, $scope);
 }
 
-function addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope){
-	var dmnXmldoc = new xmldoc.XmlDocument($scope.obj.data[keyDmn].dmnContent);
-	console.log(dmnXmldoc);
-	console.log(dmnXmldoc.firstChild.attr.id);
-	$scope.obj.data[keyDmn].dmnName = dmnXmldoc.firstChild.attr.id;
-	console.log("------------");
-//	camundaAppendix.dmn.push({path: keyDmn+'.dmnContent'
+function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix){
+	var dmnInProtocol = protocol[keyDmn];
+	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+	dmnInProtocol.dmnName = dmnXmldoc.firstChild.attr.id;
 	camundaAppendix.dmn.push({path: keyDmn
 		, xmldoc: dmnXmldoc
 		, container:{container:'#dmn-canvas-' + dmnNr}
@@ -282,22 +297,18 @@ function addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope){
 
 function initBpmnXml(protocol, key1, bpmnXmldoc){
 	var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
-	console.log(bpmnXmldoc.attr.targetNamespace);
 	bpmnXmldoc.attr.targetNamespace = 'http://camunda.org/schema/1.0/bpmn';
 	bpmnXmldoc.attr['xmlns:camunda'] = 'http://camunda.org/schema/1.0/bpmn';
 	bpmnXmldoc.firstChild.attr.name = protocol.protocolName;
 	bpmnXmldoc.firstChild.attr.id = protocol.fileName + '_' +key1;
 	bpmnXmldoc.firstChild.attr.isExecutable = 'true';
-	/*
-	 * */
-	console.log(bpmnXmldoc.firstChild.attr);
 	protocol[key1].bpmnContent = bpmnXmldoc.toString();
 	return bpmnXmldoc;
 }
 
-function initBpmnDmnToId($scope){
-	var protocol = $scope.obj.data;
+function initBpmnDmnToId(protocol){
 	var camundaAppendix = {bpmn:[],dmn:[]};
+	console.log(camundaAppendix);
 	var bpmnNr = 0;
 	for (var key1 in protocol) {
 		if(key1.indexOf('bpmn')>=0){
@@ -305,9 +316,6 @@ function initBpmnDmnToId($scope){
 				if(key2.indexOf('bpmnContent')>=0){
 					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
 					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
-//					console.log($scope.obj.data.bpmn3.bpmnContent);
-//					xd.attr.newatt1 = "value new attribute 1";
-//					xd.attr['ns:newatt2'] = "value new attribute 2";
 					camundaAppendix.bpmn.push(
 						{path: key1+'.bpmnContent'
 						, xmldoc: bpmnXmldoc
@@ -328,8 +336,7 @@ function initBpmnDmnToId($scope){
 			console.log(key1);
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
-					var dmnContent = protocol[key1].dmnContent;
-					addAppendixDmn(key1, dmnNr, camundaAppendix, $scope);
+					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix);
 					dmnNr++;
 				}
 			}
@@ -431,3 +438,4 @@ function initAngularCommon($scope, $http){
 //console.log("params = " + location.search);
 const params = require('query-string').parse(location.search);
 console.log(params);
+
