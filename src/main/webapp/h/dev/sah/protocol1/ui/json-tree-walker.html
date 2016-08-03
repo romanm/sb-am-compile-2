@@ -1,0 +1,124 @@
+ {{obj.data.protocolName}}
+<div ng-repeat="(key,value) in obj.data">
+	<span ng-click="openChild(value)"> <i ng-if="isObject(value)"
+		class="fa fa-caret-right" aria-hidden="true"></i> {{key}} : <span
+		ng-if="!isObject(value)"> {{value}} </span>
+	</span>
+	<div ng-if="value.openChild">
+		<div ng-repeat="(key2,value2) in value" ng-if="isShowField(key2)">
+			<span ng-click="openChild(value2)"> .<i
+				ng-if="isObject(value2)" class="fa fa-caret-right"
+				aria-hidden="true"></i> {{key2}} : <span ng-if="!isObject(value2)">
+					{{value2}} </span>
+			</span>
+
+			<div ng-if="value2.openChild">
+				<div ng-repeat="(key3,value3) in value2" ng-if="isShowField(key3)">
+					<span ng-click="openChild(value3)"> ..<i
+						ng-if="isObject(value3)" class="fa fa-caret-right"
+						aria-hidden="true"></i> {{key3}} : <span ng-if="!isObject(value3)">
+							{{value3}} </span>
+					</span>
+
+					<div ng-if="value3.openChild">
+						<div ng-repeat="(key4,value4) in value3" ng-if="isShowField(key4)">
+							<span ng-click="openChild(value4)"> ...<i
+								ng-if="isObject(value4)" class="fa fa-caret-right"
+								aria-hidden="true"></i> {{key4}} : <span
+								ng-if="!isObject(value4)"> {{value4}} </span>
+							</span>
+
+							<div ng-if="value4.openChild">
+								<div ng-repeat="(key5,value5) in value4"
+									ng-if="isShowField(key5)">
+									<span ng-click="openChild(value5)"> ....<i
+										ng-if="isObject(value5)" class="fa fa-caret-right"
+										aria-hidden="true"></i> {{key5}} : <span
+										ng-if="!isObject(value5)"> {{value5}} </span>
+									</span>
+
+									<div ng-if="value5.openChild">
+										<div ng-repeat="(key6,value6) in value5"
+											ng-if="isShowField(key6)">
+											<span ng-click="openChild(value6)"> .....<i
+												ng-if="isObject(value6)" class="fa fa-caret-right"
+												aria-hidden="true"></i> {{key6}} : <span
+												ng-if="!isObject(value6)"> {{value6}} </span>
+											</span>
+
+											<div ng-if="value6.openChild">
+												<div ng-repeat="(key7,value7) in value6"
+													ng-if="isShowField(key7)">
+													<span ng-click="openChild(value7)"> ......<i
+														ng-if="isObject(value7)" class="fa fa-caret-right"
+														aria-hidden="true"></i> {{key7}} : <span
+														ng-if="!isObject(value7)"> {{value7}} </span>
+													</span>
+
+													<div ng-if="value7.openChild">
+														<div ng-repeat="(key8,value8) in value7"
+															ng-if="isShowField(key8)">
+															<span ng-click="openChild(value8)"> .......<i
+																ng-if="isObject(value8)" class="fa fa-caret-right"
+																aria-hidden="true"></i> {{key8}} : <span
+																ng-if="!isObject(value8)"> {{value8}} </span>
+															</span>
+
+															<div ng-if="value8.openChild">
+																<div ng-repeat="(key9,value9) in value8"
+																	ng-if="isShowField(key9)">
+																	<span ng-click="openChild(value9)"> ........<i
+																		ng-if="isObject(value9)" class="fa fa-caret-right"
+																		aria-hidden="true"></i> {{key9}} : <span
+																		ng-if="!isObject(value9)"> {{value9}} </span>
+																	</span>
+
+																	<div ng-if="value9.openChild">
+																		<div ng-repeat="(key10,value10) in value9"
+																			ng-if="isShowField(key10)">
+																			<span ng-click="openChild(value10)"> .........<i
+																				ng-if="isObject(value10)" class="fa fa-caret-right"
+																				aria-hidden="true"></i> {{key10}} : <span
+																				ng-if="!isObject(value10)"> {{value10}} </span>
+																			</span>
+
+																		</div>
+																	</div>
+
+																</div>
+															</div>
+
+														</div>
+													</div>
+
+												</div>
+											</div>
+
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+		<div ng-if="value['xmlContent']">
+			. xmlContent <i ng-click="editField(value,'xmlContent')"
+				class="fa fa-pencil-square-o" aria-hidden="true"></i>
+			<div ng-if="value.editField == 'xmlContent'">
+				<textarea ng-model="value.xmlContent" style="width: 100%"></textarea>
+			</div>
+		</div>
+		<div ng-if="value['bpmnContent']">
+			. bpmnContent <i ng-click="editField(value,'bpmnContent')"
+				class="fa fa-pencil-square-o" aria-hidden="true"></i>
+			<div ng-if="value.editField == 'bpmnContent'">
+				<textarea ng-model="value.bpmnContent" style="width: 100%"></textarea>
+			</div>
+		</div>
+	</div>
+</div>

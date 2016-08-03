@@ -1,0 +1,11 @@
+<div
+	ng-repeat="rule in obj.data.dmn.jsonContent.definitions.decision.decisionTable.rule">
+	<b> Якщо </b> : <span ng-repeat="input in rule.inputEntry"
+		ng-if="input.text.length > 0">
+		{{obj.data.dmn.jsonContent.definitions.decision.decisionTable.input[$index]._label}}
+		{{input.text}}, </span> 
+	<b> Тоді </b> : <span
+		ng-repeat="output in rule.outputEntry" ng-if="output.text.length > 0">
+		{{obj.data.dmn.jsonContent.definitions.decision.decisionTable.output[$index]._label}}:
+		{{output.text}}. </span>
+</div>

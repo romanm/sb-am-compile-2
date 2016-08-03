@@ -8,8 +8,6 @@
 	}]);
 })(window.angular);
 
-
-
 var declareBpml2 = function($scope, $http){
 	var BpmnViewer = window.BpmnJS;
 	var bpmnViewer = new BpmnViewer({
@@ -37,7 +35,9 @@ var declareProtocol2 = function($scope, $http){
 			data : response,
 			options : { mode : 'tree' }
 		};
+		/*
 		declareBpml2($scope, $http);
+		 * */
 	});
 	
 	$scope.saveFile = function(){
