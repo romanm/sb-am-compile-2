@@ -2,6 +2,7 @@ package hello;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,12 @@ public class ProtocolRest {
 
 	@Value("${folder.db.protocol}") public  String protocolDirName;
 	@Value("${folder.db.tmp}") public  String protocolDirTmp;
+	
+	@RequestMapping(value = "/v/nextTask", method = RequestMethod.POST)
+	public  @ResponseBody List<Map<String, Object>> saveEpicrise(@RequestBody List<Map<String, Object>> variables, Principal userPrincipal) {
+		logger.debug(""+variables);
+		return variables;
+	}
 
 	@RequestMapping(value = "/v/deployProtocol", method = RequestMethod.POST)
 	public  @ResponseBody Map<String, Object> deployProtocol(@RequestBody Map<String, Object> clinicalProtocol) 

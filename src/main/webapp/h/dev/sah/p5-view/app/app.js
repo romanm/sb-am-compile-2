@@ -6,6 +6,7 @@ var angular = require('angular');
 angular.module('HomeApp', [])
 .controller('HomeCtrl', function($scope, $http, $filter) {
 	console.log('HomeCtrl');
+	initDmnRule($scope);
 	$scope.openOtherProtocol = true;
 
 	readProtocolDir($scope, $http);
@@ -23,10 +24,24 @@ angular.module('HomeApp', [])
 		});
 	}
 
-	$scope.nextTask = function(taskDefKey){
-		console.log('from:' + taskDefKey)
+	$scope.saveProcessVariable = function(){
+		var variables = [];
+		$scope.ask.dmnInputs.forEach(function(dmnInput){
+			var varName = dmnInput.valueWithPath("inputExpression.text");
+			variables.push({varName:varName,value:dmnInput.attr.value});
+		});
+		$http({ method : 'POST', data : variables, url : '/v/nextTask'
+		}).success(function(data, status, headers, config){
+			$scope.variables = variables;
+			console.log($scope.variables);
+		}).error(function(data, status, headers, config) {
+			$scope.error = data;
+		});
+	}
+
+	var seekNextTask = function(taskDefKey){
 		var camundaAppendix = $scope.collectData.protocol.init.camundaAppendix;
-		var thisTask = null, nextTask = null;
+		var thisTask = null;
 		camundaAppendix.bpmn.forEach(function(bpmn){
 			bpmn.xmldoc.descendantWithPath('bpmn:process').children.forEach(function(bpmnElement){
 				if(bpmnElement.attr.id == taskDefKey){
@@ -35,35 +50,31 @@ angular.module('HomeApp', [])
 			});
 			var sequenceFlowId = thisTask.valueWithPath('bpmn:outgoing');
 			var sequenceFlow = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlowId);
-			nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
+			$scope.nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
 		});
-		console.log(nextTask);
-		if(nextTask.name == 'bpmn:businessRuleTask'){
-			var dmnName = nextTask.attr['camunda:decisionRef'];
-			console.log(dmnName);
+		if($scope.nextTask.name == 'bpmn:businessRuleTask'){
+			var dmnName = $scope.nextTask.attr['camunda:decisionRef'];
 			var path = 'dmn' + dmnName.split('_dmn')[1];
 			camundaAppendix.dmn.forEach(function(dmn){
 				if(dmn.path == path){
-					console.log(dmn);
-					console.log(dmn.xmldoc.descendantWithPath('decision.decisionTable').toString());
+					$scope.nextDmn = dmn;
 					var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-					console.log(dmnInputs);
-					$scope.collectData.ask = {};
-					$scope.collectData.ask.dmnInputs = dmnInputs;
+					$scope.ask = {};
+					$scope.ask.dmnInputs = dmnInputs;
 				}
 			});
 		}
-//			console.log(nextTask.toString());
-		console.log('to:' + nextTask.attr.name);
-		return '-> ' + nextTask.attr.name;
+		console.log('from:' + thisTask.attr.name + taskDefKey + ' - > to:' + $scope.nextTask.attr.name);
 	}
 
 	$scope.collectMedData = function(procInstId, taskId){
-		console.log(procInstId+'/'+taskId);
+		console.log('$http.get collectMedData:' + procInstId+'/'+taskId);
 		$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
 			$scope.collectData = response;
+			$scope.inputVariables = [];
 			console.log($scope.collectData);
 			initBpmnDmnToId($scope.collectData.protocol);
+			seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_);
 		});
 	}
 
@@ -323,7 +334,6 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 
 function initBpmnDmnToId(protocol){
 	var camundaAppendix = {bpmn:[],dmn:[]};
-	console.log(camundaAppendix);
 	var bpmnNr = 0;
 	for (var key1 in protocol) {
 		if(key1.indexOf('bpmn')>=0){
@@ -348,7 +358,6 @@ function initBpmnDmnToId(protocol){
 	var dmnNr = 0;
 	for (var key1 in protocol) {
 		if(key1.indexOf('dmn')>=0){
-			console.log(key1);
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
 					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix);
@@ -426,7 +435,6 @@ angular.module('P5DmnApp', [])
 
 });
 
-
 function setBpmnContent(obj, path, xml){
 //	console.log(xml);
 	var pathList = path.split('.');
@@ -454,3 +462,14 @@ function initAngularCommon($scope, $http){
 const params = require('query-string').parse(location.search);
 console.log(params);
 
+function initDmnRule($scope){
+	$scope.evalLogicExp = function(input, inputEntry){
+		var value = input.attr.value;
+		var expr = inputEntry.firstChild.val;
+		var evalLogicExp = false;
+		if(value){
+			evalLogicExp = eval(value+expr)
+		}
+		return evalLogicExp;
+	}
+}
