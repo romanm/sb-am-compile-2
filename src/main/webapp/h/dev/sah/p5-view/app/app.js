@@ -474,6 +474,10 @@ const params = require('query-string').parse(location.search);
 console.log(params);
 
 function initDmnRule($scope){
+	$scope.dictionary = {
+		'ATs':'АТ сіст (mmHg)'
+		,'drug':'ліки'
+	};
 	$scope.evalLogicExp = function(input, inputEntry){
 		var value = input.attr.value;
 		var expr = inputEntry.firstChild.val;

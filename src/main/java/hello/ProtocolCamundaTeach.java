@@ -109,10 +109,9 @@ public class ProtocolCamundaTeach {
 	@RequestMapping(value = "/v/showProcessActiviti/{procDefId}", method = RequestMethod.GET)
 	public  @ResponseBody Map<String, Object> showProcessActiviti(@PathVariable String procDefId){
 //		List<Task> allTasks = studyCamunda.allTasks(procDefId);
-		List<Map<String, Object>> processInstances = studyCamunda.getProcessInstances(procDefId);
-		Map<String,Object> map = new HashMap<>();
+		Map<String,Object> map = studyCamunda.getProcessInstances(procDefId);
 		map.put("procDefId", procDefId);
-		map.put("list", processInstances);
+//		map.put("list", processInstances);
 		logger.debug("" + map);
 		return map;
 	}

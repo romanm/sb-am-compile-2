@@ -198,20 +198,26 @@ runtimeService.setVariableLocal(execution.getId(), "order", typedObjectValue);
 
 	@Autowired JdbcTemplate camunda1JdbcTemplate;
 	@Autowired NamedParameterJdbcTemplate camunda1ParamJdbcTemplate;
-	@Value("${sql.camunda.ACT_HI_ACTINST.by.PROC_DEF_ID_}") private String sqlCamundaActinstByProcDefId;
-	List<Map<String, Object>> getProcessInstances(String procDefId) {
+	@Value("${sql.camunda.ACT_HI_VARINST.by.PROC_DEF_ID_}") private String sqlCamundaVarInstByProcDefId;
+	@Value("${sql.camunda.ACT_HI_ACTINST.by.PROC_DEF_ID_}") private String sqlCamundaActInstByProcDefId;
+	Map<String, Object> getProcessInstances(String procDefId) {
 		logger.debug(""+procDefId);
-		logger.debug(""+sqlCamundaActinstByProcDefId);
-		String sql = sqlCamundaActinstByProcDefId.replace(":procDefId", "'"+procDefId+"'");
+		logger.debug(""+sqlCamundaActInstByProcDefId);
+		String sql = sqlCamundaActInstByProcDefId.replace(":procDefId", "'"+procDefId+"'");
 		logger.debug(""+sql);
-//		List<Map<String, Object>> seekIcdList 
-//		= camunda1JdbcTemplate.queryForList(sql);
-		List<Map<String, Object>> seekIcdList 
-		= camunda1ParamJdbcTemplate.queryForList(sqlCamundaActinstByProcDefId
+		List<Map<String, Object>> actInstList 
+		= camunda1ParamJdbcTemplate.queryForList(sqlCamundaActInstByProcDefId
 				, new MapSqlParameterSource("procDefId", procDefId
 				));
-		logger.debug(""+seekIcdList);
-		return seekIcdList;
+		List<Map<String, Object>> varInstList 
+		= camunda1ParamJdbcTemplate.queryForList(sqlCamundaVarInstByProcDefId
+				, new MapSqlParameterSource("procInstId", procDefId
+				));
+		logger.debug(""+actInstList);
+		Map<String, Object> map = new HashMap<>();
+		map.put("actInstList", actInstList);
+		map.put("varInstList", varInstList);
+		return map;
 	}
 
 	List<Map<String, Object>> getProcessInstances2(String processKey) {
