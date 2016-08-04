@@ -1,0 +1,13 @@
+<div
+	ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')">
+	<b> Якщо </b> : <span
+		ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
+		ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
+		ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
+		{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> 
+	<b> Тоді </b> : 
+	<span
+		ng-repeat="outputEntry in rule.childrenNamed('outputEntry')">
+		{{nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index].attr.label}}:
+		{{outputEntry.firstChild.val}}, </span> 
+</div>
