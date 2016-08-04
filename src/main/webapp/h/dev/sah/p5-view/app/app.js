@@ -24,16 +24,27 @@ angular.module('HomeApp', [])
 		});
 	}
 
-	$scope.saveProcessVariable = function(){
+	$scope.saveProcessVariable = function(procInstId, taskId){
 		var variables = [];
 		$scope.ask.dmnInputs.forEach(function(dmnInput){
+			console.log(dmnInput);
+			console.log(dmnInput.toString());
 			var varName = dmnInput.valueWithPath("inputExpression.text");
-			variables.push({varName:varName,value:dmnInput.attr.value});
+			var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
+			variables.push({varName:varName,value:dmnInput.attr.value,typeRef:typeRef});
 		});
-		$http({ method : 'POST', data : variables, url : '/v/nextTask'
-		}).success(function(data, status, headers, config){
-			$scope.variables = variables;
-			console.log($scope.variables);
+		var nextTaskData = {
+			nextTask:{
+				nextTaskId:$scope.nextTask.attr.id
+				,variables:variables
+			}
+			,procInstId:procInstId
+			,taskId:taskId
+		};
+		$http({ method : 'POST', data : nextTaskData, url : '/v/nextTask'
+		}).success(function(nextTaskData, status, headers, config){
+			$scope.nextTaskData = nextTaskData;
+			console.log($scope.nextTaskData);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});

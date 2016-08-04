@@ -53,8 +53,11 @@
 		</h4>
 		<ul>
 			<li ng-repeat="pA in processActiviti.list">{{pA.START_TIME_ |
-				date:'yyyy-MM-dd HH:mm:ss'}} {{pA.ACT_NAME_}} <span class="showhim">
-					<a href="#"
+				date:'yyyy-MM-dd HH:mm:ss'}} <span ng-if="!pA.END_TIME_">
+					{{pA.ACT_NAME_}} </span> 
+				<span ng-if="pA.END_TIME_" title="Тривалість {{pA.DURATION_ | date:'dd HH:mm:ss'}}"> <b>Закінчено</b>
+					{{pA.END_TIME_ | date:'dd-MMM HH:mm:ss'}}
+			</span> <span class="showhim"> <a href="#"
 					ng-click="executeTask(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">
 						{{pA.PARENT_ACT_INST_ID_}} / {{pA.TASK_ID_}} </a> <i
 					class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
@@ -67,14 +70,15 @@
 					<span title="{{collectData.taskInst.TASK_DEF_KEY_}}">
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-repeat="dmnInput in ask.dmnInputs">
-						{{dmnInput.attr.label}}? 
-						<input ng-model="dmnInput.attr.value" maxlength="3" size="4">
+						{{dmnInput.attr.label}}? <input ng-model="dmnInput.attr.value"
+							maxlength="3" size="4">
 					</div>
-					<button ng-click="saveProcessVariable()">запис даних</button>
+					<button
+						ng-click="saveProcessVariable(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">запис
+						даних</button>
 					<div>
 						Правила:
-						<div
-							ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
+						<div ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
 					</div>
 				</div>
 			</li>

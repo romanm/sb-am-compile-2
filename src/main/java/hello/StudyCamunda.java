@@ -95,6 +95,41 @@ public class StudyCamunda {
 		return singleResult;
 	}
 
+	public void nextTask(Map<String, Object> data) {
+		RuntimeService runtimeService = processEngine.getRuntimeService();
+		String procInstId = ""+data.get("procInstId");
+		String taskId = ""+data.get("taskId");
+		Map nextTask = (Map) data.get("nextTask");
+		String nextTaskId = (String) nextTask.get("nextTaskId");
+
+		Execution processInstance = studyExecutionQuery(procInstId);
+		//				setVariable(processInstance);
+		ProcessInstanceModificationBuilder processInstanceModificationBuilder
+		= runtimeService.createProcessInstanceModification(processInstance.getId());
+		ProcessInstanceModificationInstantiationBuilder 
+		startBeforeActivity = processInstanceModificationBuilder
+		.startBeforeActivity(nextTaskId);
+
+		List<Map<String, Object>> variables = (List) nextTask.get("variables");
+		for (Map<String, Object> map : variables) {
+			String varName = (String) map.get("varName");
+			String typeRef = (String) map.get("typeRef");
+			if(typeRef.equals("integer")){
+				Integer value = Integer.parseInt((String) map.get("value"));
+				logger.debug(varName+"="+value);
+				ProcessInstanceModificationInstantiationBuilder 
+				setVariable = startBeforeActivity.setVariable(varName, value);
+				setVariable.execute();
+			}
+		}
+
+
+		TaskService taskService = processEngine.getTaskService();
+		System.out.println("--------------"
+				+ taskId
+				+ "-------------");
+		taskService.complete(taskId);
+	}
 	public void executeTask(Integer procInstId) {
 		String processInstanceId = ""+procInstId;
 		logger.debug(processInstanceId);

@@ -35,9 +35,10 @@ public class ProtocolRest {
 	@Value("${folder.db.tmp}") public  String protocolDirTmp;
 	
 	@RequestMapping(value = "/v/nextTask", method = RequestMethod.POST)
-	public  @ResponseBody List<Map<String, Object>> saveEpicrise(@RequestBody List<Map<String, Object>> variables, Principal userPrincipal) {
-		logger.debug(""+variables);
-		return variables;
+	public  @ResponseBody Map<String, Object> taskId(@RequestBody Map<String, Object> data, Principal userPrincipal) {
+		logger.debug(""+data);
+		studyCamunda.nextTask(data);
+		return data;
 	}
 
 	@RequestMapping(value = "/v/deployProtocol", method = RequestMethod.POST)
