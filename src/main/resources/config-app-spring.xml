@@ -11,7 +11,7 @@
 		<property name="driverClassName" value="org.h2.Driver" />
 		<property name="url" value="jdbc:h2:tcp://localhost/h2-camunda-130-s4/h2-camunda-130-s4" />
 		<!-- 
-		<property name="url" value="jdbc:h2:tcp://localhost/h2-camunda-130-s/h2-camunda-130-s" />
+		<property name="url" value="jdbc:h2:/home/holweb/db-java/h2-server/h2-camunda-130-s4/h2-camunda-130-s4" />
 		 -->
 		<property name="username" value="sa" />
 		<property name="password" value="" />
@@ -27,6 +27,9 @@
 		destroy-method="close" primary="true">
 		<property name="driverClassName" value="org.h2.Driver" />
 		<property name="url" value="jdbc:h2:tcp://localhost/db-hol2-eih/db-hol2-eih" />
+		<!-- 
+		<property name="url" value="jdbc:h2:tcp://localhost/db-hol2-eih/db-hol2-eih" />
+		 -->
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
@@ -36,6 +39,7 @@
 	</bean>
 	
 	<!-- hol1 mysql hol DB -->
+	<!-- 
 	<bean id="dataSourceHol1Eih" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="jdbc:mysql://localhost/hol?useUnicode=true&amp;characterEncoding=utf-8" />
@@ -50,6 +54,7 @@
 	<bean id="hol1EihJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<constructor-arg ref="dataSourceHol1Eih"/>
 	</bean>
+	 -->
 	
 	<!-- hol1 mysql hol DB  END-->
 	

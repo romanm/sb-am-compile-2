@@ -13,22 +13,17 @@ angular.module('HomeApp', [])
 
 	$http.get("/v/readAllDeployment").success(function(response) {
 		$scope.readAllDeployment = response;
-		console.log($scope.readAllDeployment)
 	});
 
 	$scope.showProcessActiviti = function(procDefId){
-		console.log(procDefId);
 		$http.get("/v/showProcessActiviti/"+procDefId).success(function(response) {
 			$scope.processActiviti = response;
-			console.log($scope.processActiviti);
 		});
 	}
 
 	$scope.saveProcessVariable = function(procInstId, taskId){
 		var variables = [];
 		$scope.ask.dmnInputs.forEach(function(dmnInput){
-			console.log(dmnInput);
-			console.log(dmnInput.toString());
 			var varName = dmnInput.valueWithPath("inputExpression.text");
 			var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
 			variables.push({varName:varName,value:dmnInput.attr.value,typeRef:typeRef});
@@ -50,7 +45,25 @@ angular.module('HomeApp', [])
 		});
 	}
 
-	var seekNextTask = function(taskDefKey){
+	var setVariableValueToDmn = function(taskId){
+		var values = {};
+		$scope.processActiviti.varInstList.forEach(function(variable){
+			if(variable.AITASKID == taskId){
+				values[variable.NAME_] = variable.TEXT_;
+			}
+		});
+		$scope.dmnsToTask.forEach(function(dmn){
+			var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+			dmnInputs.forEach(function(dmnInput){
+				var varName = dmnInput.valueWithPath("inputExpression.text");
+				if(values[varName]){
+					dmnInput.attr.value = values[varName];
+				}
+			});
+		});
+	}
+
+	var seekNextTask = function(taskDefKey, $scope){
 		var camundaAppendix = $scope.collectData.protocol.init.camundaAppendix;
 		var thisTask = null;
 		camundaAppendix.bpmn.forEach(function(bpmn){
@@ -66,11 +79,13 @@ angular.module('HomeApp', [])
 		if($scope.nextTask.name == 'bpmn:businessRuleTask'){
 			var dmnName = $scope.nextTask.attr['camunda:decisionRef'];
 			var path = 'dmn' + dmnName.split('_dmn')[1];
+			$scope.ask = {};
+			$scope.dmnsToTask = [];
 			camundaAppendix.dmn.forEach(function(dmn){
 				if(dmn.path == path){
 					$scope.nextDmn = dmn;
+					$scope.dmnsToTask.push(dmn);
 					var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-					$scope.ask = {};
 					$scope.ask.dmnInputs = dmnInputs;
 				}
 			});
@@ -82,10 +97,10 @@ angular.module('HomeApp', [])
 		console.log('$http.get collectMedData:' + procInstId+'/'+taskId);
 		$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
 			$scope.collectData = response;
-			$scope.inputVariables = [];
 			console.log($scope.collectData);
 			initBpmnDmnToId($scope.collectData.protocol);
-			seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_);
+			seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_, $scope);
+	 		setVariableValueToDmn(taskId);
 		});
 	}
 
@@ -237,11 +252,42 @@ var app = angular.module('Protocole5App', [])
 	readProtocolDir($scope, $http);
 });
 
+function initDictionary($scope, $http){
+	if(!$scope.dictionary){
+		$scope.dictionary = {
+			'drug':{'label':'ліки','typeRef':'string'}
+		};
+		$scope.protocolList.forEach(function(protocolFileName){
+			console.log(protocolFileName);
+			$http.get('/v/readProtocol/' + protocolFileName).success(function(protocol) {
+				for (var keyDmn in protocol) {
+					if(keyDmn.indexOf('dmn')>=0){
+						for (var key2 in protocol[keyDmn]) {
+							if(key2.indexOf('dmnContent')>=0){
+								var dmnInProtocol = protocol[keyDmn];
+								var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+								var dmnInputs = dmnXmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+								dmnInputs.forEach(function(dmnInput){
+									var varName = dmnInput.valueWithPath("inputExpression.text");
+									var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
+									$scope.dictionary[varName] ={label:dmnInput.attr.label, typeRef:typeRef}; 
+									//console.log($scope.dictionary);
+								});
+							}
+						}
+					}
+				}
+			});
+		});
+	}
+}
+
 function readProtocolDir($scope, $http){
 	$http.get("/v/readProtocolDir").success(function(response) {
 		$scope.protocolList = response;
 		//console.log($scope.protocolList)
 		$scope.openOtherProtocol = true;
+		initDictionary($scope, $http);
 	});
 }
 
@@ -474,10 +520,7 @@ const params = require('query-string').parse(location.search);
 console.log(params);
 
 function initDmnRule($scope){
-	$scope.dictionary = {
-		'ATs':'АТ сіст (mmHg)'
-		,'drug':'ліки'
-	};
+	console.log($scope.dictionary);
 	$scope.evalLogicExp = function(input, inputEntry){
 		var value = input.attr.value;
 		var expr = inputEntry.firstChild.val;

@@ -82,8 +82,10 @@ public class ProtocolCamundaTeach {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Map<String, Object> results = new HashMap<String, Object>();
+				/*
 				byte[] blobAsBytes = lobHandler.getBlobAsBytes(rs, "BYTES_");
 				results.put("doc", blobAsBytes);
+				 * */
 				return results;
 			}
 		});
