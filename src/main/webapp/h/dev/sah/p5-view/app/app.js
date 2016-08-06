@@ -3,8 +3,9 @@ var BpmnViewer = require('bpmn-js');
 var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
-angular.module('HomeApp', [])
-.controller('HomeCtrl', function($scope, $http, $filter) {
+angular.module('HomeApp', ['pascalprecht.translate'])
+.config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
+.controller('HomeCtrl', function($scope, $http, $filter, $translate) {
 	console.log('HomeCtrl');
 	initDmnRule($scope);
 	$scope.openOtherProtocol = true;
@@ -121,8 +122,10 @@ angular.module('HomeApp', [])
 
 });
 
-var app = angular.module('Protocole5App', [])
-.controller('Protocole5Ctrl', function($scope, $http) {
+//angular.module('Protocole5App', ['ngCookies', 'pascalprecht.translate'])
+angular.module('Protocole5App', ['pascalprecht.translate'])
+.config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
+.controller('Protocole5Ctrl', function($scope, $http, $translate) {
 	console.log('Protocole5Ctrl');
 	initAngularCommon($scope, $http);
 
@@ -531,3 +534,12 @@ function initDmnRule($scope){
 		return evalLogicExp;
 	}
 }
+
+function configTranslation($translateProvider){
+	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
+	//$translateProvider.useLocalStorage();
+	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
+	$translateProvider.preferredLanguage(springCookieLocale);
+//	$translateProvider.preferredLanguage('en');
+}
+

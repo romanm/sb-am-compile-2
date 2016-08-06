@@ -20,7 +20,8 @@
 		<button ng-click="saveFile()">save</button>
 		<button ng-click="deployFile()">deploy</button>
 		<input type="text" ng-model="obj.data.protocolName" /> <a href="#"></a>
-		<label>json <input type="checkbox" ng-model="useJsonEditor" ng-click="editJson()"/>
+		<label>json <input type="checkbox" ng-model="useJsonEditor"
+			ng-click="editJson()" />
 		</label>
 	</div>
 
@@ -29,8 +30,7 @@
 			<div ng-switch on="k">
 				<p ng-switch-when="p">{{v}}</p>
 				<div ng-switch-when="home">Home Span</div>
-				<div class="animate-switch" ng-switch-default>
-				</div>
+				<div class="animate-switch" ng-switch-default></div>
 			</div>
 		</div>
 		<div class="container">
@@ -70,5 +70,6 @@
 	<div id="jsoneditor" ng-show="useJsonEditor"></div>
 
 	<script src="./app.js"></script>
+	<script src="/v/lib/js/angular-translate-my.min.js"></script>
 </body>
 </html>

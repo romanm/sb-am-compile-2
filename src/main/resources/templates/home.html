@@ -21,7 +21,7 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 </head>
 <body>
 	<div class="container-fluid">
-		<h1>Спілка анестезіологів Хмельниччини</h1>
+		<h1 th:text="#{SAH}">Спілка анестезіологів Хмельниччини</h1>
 		<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolList.html'"></div>
 	</div>
 
@@ -42,5 +42,6 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 	</p>
 	<script src="/h/dev/sah/p5-view/dist/app.js"></script>
 	<script src="/v/lib/js/angular-locale_uk.js"></script>
+	<script src="/v/lib/js/angular-translate-my.min.js"></script>
 </body>
 </html>
