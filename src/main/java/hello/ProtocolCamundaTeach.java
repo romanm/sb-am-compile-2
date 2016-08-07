@@ -113,6 +113,10 @@ public class ProtocolCamundaTeach {
 //		List<Task> allTasks = studyCamunda.allTasks(procDefId);
 		Map<String,Object> map = studyCamunda.getProcessInstances(procDefId);
 		map.put("procDefId", procDefId);
+		List<Map<String, Object>> actReProcdef = camunda1JdbcTemplate.queryForList("SELECT * FROM ACT_RE_PROCDEF WHERE ID_='"
+				+ procDefId
+				+ "'");
+		map.put("ACT_RE_PROCDEF", actReProcdef.get(0));
 //		map.put("list", processInstances);
 		logger.debug("" + map);
 		return map;

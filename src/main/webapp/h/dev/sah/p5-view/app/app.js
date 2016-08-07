@@ -3,40 +3,6 @@ var BpmnViewer = require('bpmn-js');
 var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
-var initUserState = function($scope, $http){
-	$scope.$watch("userState.taskId", function handleChange( newValue, oldValue ) {
-		saveUserState(oldValue);
-	});
-	$scope.$watch("userState.tabs1", function handleChange( newValue, oldValue ) {
-		saveUserState(oldValue);
-	});
-	function saveUserState(oldValue){
-		if($scope.userPrincipal && oldValue){
-			$http.post('/saveProtocol', $scope.userState).success(function(response) {
-				console.log(response);
-			});
-		}
-	}
-	$scope.userState = {tabs1:'home_writing_file',fileName:'userState'};
-	//
-	//read user state onload
-	//
-	$http.get('/v/readProtocol/userState').success(function(userState) {
-		console.log(userState);
-		$scope.userState = userState;
-		if($scope.userState.procDefId){
-			$http.get("/v/showProcessActiviti/"+$scope.userState.procDefId).success(function(response) {
-				$scope.processActiviti = response;
-			});
-			if($scope.userState.taskId){
-				console.log(userState);
-				readCollectMedData($scope, $http, $scope.userState.procDefId, $scope.userState.taskId);
-			}
-		}
-	});
-
-};
-
 angular.module('HomeApp', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('HomeCtrl', function($scope, $http, $filter, $translate) {
@@ -55,9 +21,27 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 	$scope.setTabs1 = function(tabs1){
 		$scope.userState.tabs1 = tabs1;
 	}
+
+	$scope.getVarValText = function(varInst){
+		var varName = varInst.NAME_;
+		if(varInst.NAME_.indexOf('__')>0){
+			var vnSplit = varInst.NAME_.split('__');
+			varName = vnSplit[vnSplit.length - 1];
+		}
+		
+		var varVal = setVarValue(varInst);
+
+		var varLabel = $scope.dictionary[varName]?$scope.dictionary[varName].label:varName;
+		if(varLabel.indexOf('(')>0){
+			return varLabel.replace('(',varVal + ' (');
+		}
+		return varLabel + ' ' + varVal;
+	}
+
 	$scope.showProcessActiviti = function(procDefId){
 		$scope.userState.tabs1 = 'home_performed';
 		$scope.userState.procDefId = procDefId;
+		console.log(procDefId);
 		$http.get("/v/showProcessActiviti/"+procDefId).success(function(response) {
 			$scope.processActiviti = response;
 		});
@@ -251,8 +235,12 @@ function initDictionary($scope, $http){
 		$scope.dictionary = {
 			'drug':{'label':'ліки','typeRef':'string'}
 		};
+		$scope.protocolListMap = {};
 		$scope.protocolList.forEach(function(protocolFileName){
 			$http.get('/v/readProtocol/' + protocolFileName).success(function(protocol) {
+				if(protocol.protocolName){
+					$scope.protocolListMap[protocolFileName]={protocolName:protocol.protocolName};
+				}
 				for (var keyDmn in protocol) {
 					if(keyDmn.indexOf('dmn')>=0){
 						for (var key2 in protocol[keyDmn]) {
@@ -264,7 +252,6 @@ function initDictionary($scope, $http){
 									var varName = dmnInput.valueWithPath("inputExpression.text");
 									var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
 									$scope.dictionary[varName] ={label:dmnInput.attr.label, typeRef:typeRef}; 
-									//console.log($scope.dictionary);
 								});
 							}
 						}
@@ -278,7 +265,6 @@ function initDictionary($scope, $http){
 function readProtocolDir($scope, $http){
 	$http.get("/v/readProtocolDir").success(function(response) {
 		$scope.protocolList = response;
-		//console.log($scope.protocolList)
 		$scope.openOtherProtocol = true;
 		initDictionary($scope, $http);
 	});
@@ -509,18 +495,19 @@ function initAngularCommon($scope, $http){
 	$scope.params = params;
 	$http.get("/v/read_user").success(function(response) {
 		$scope.userPrincipal = response;
-		console.log($scope.userPrincipal);
+		//console.log($scope.userPrincipal);
 	});
 }
 
 //console.log("params = " + location.search);
 const params = require('query-string').parse(location.search);
-console.log(params);
+//console.log(params);
 
 var Regex = require("regex");
 var regex = new Regex(/[(\d+)..(\d+)]/);
 function initDmnRule($scope){
 	console.log($scope.dictionary);
+
 	$scope.evalLogicExp = function(input, inputEntry){
 		var value = input.attr.value;
 		var expr = inputEntry.firstChild.val;
@@ -550,12 +537,13 @@ function configTranslation($translateProvider){
 }
 
 function readCollectMedData($scope, $http, procInstId, taskId){
-	console.log(procInstId + '/' + taskId);
+	//console.log(procInstId + '/' + taskId);
 	if(procInstId.indexOf(':')>0){
 		procInstId = procInstId.split(':')[2];
 	}
-	console.log(procInstId + '/' + taskId);
-	$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
+	var url = '/v/collectData/'+procInstId+'-'+taskId;
+	console.log(url);
+	$http.get(url).success(function(response) {
 		$scope.collectData = response;
 		console.log($scope.collectData);
 		$scope.openDmnVariable = taskId;
@@ -565,11 +553,22 @@ function readCollectMedData($scope, $http, procInstId, taskId){
 	});
 }
 
+function setVarValue(varInst){
+	var varVal = varInst.TEXT_;
+	if(varInst.DOUBLE_){
+		varVal = varInst.DOUBLE_;
+	}else if(varInst.LONG_){
+		varVal = varInst.LONG_;
+	}
+	return varVal;
+}
+
 function setVariableValueToDmn(taskId, $scope){
 	var values = {};
 	$scope.processActiviti.varInstList.forEach(function(variable){
 		if(variable.AITASKID == taskId){
-			values[variable.NAME_] = variable.TEXT_;
+			var varVal = setVarValue(variable);
+			values[variable.NAME_] = varVal;
 		}
 	});
 	$scope.dmnsToTask.forEach(function(dmn){
@@ -613,3 +612,36 @@ function seekNextTask(taskDefKey, $scope){
 	}
 	console.log('from:' + thisTask.attr.name + taskDefKey + ' - > to:' + $scope.nextTask.attr.name);
 }
+
+
+var initUserState = function($scope, $http){
+	$scope.$watch("userState.taskId", function handleChange( newValue, oldValue ) {
+		saveUserState(oldValue);
+	});
+	$scope.$watch("userState.tabs1", function handleChange( newValue, oldValue ) {
+		saveUserState(oldValue);
+	});
+	function saveUserState(oldValue){
+		if($scope.userPrincipal && oldValue){
+			$http.post('/saveProtocol', $scope.userState);
+		}
+	}
+	$scope.userState = {tabs1:'home_writing_file',fileName:'userState'};
+	//
+	//read user state onload
+	//
+	$http.get('/v/readProtocol/userState').success(function(userState) {
+		$scope.userState = userState;
+		if($scope.userState.procDefId){
+			$http.get("/v/showProcessActiviti/"+$scope.userState.procDefId).success(function(response) {
+				$scope.processActiviti = response;
+				console.log($scope.processActiviti);
+				console.log($scope.processActiviti.varInstList);
+			});
+			if($scope.userState.taskId){
+				readCollectMedData($scope, $http, $scope.userState.procDefId, $scope.userState.taskId);
+			}
+		}
+	});
+
+};

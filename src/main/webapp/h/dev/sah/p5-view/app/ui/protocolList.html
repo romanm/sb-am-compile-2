@@ -17,16 +17,20 @@
 	<div ng-if="userState.tabs1 == 'home_deploy_test'">
 		<h5>Процеси</h5>
 		<ul>
-			<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF"><span
-				class="showhim"> <b> {{procDef.KEY_}} </b> : 
-				<i class="fa fa-bars" aria-hidden="true"></i>
-				<span
-					class="showme"> <a href="#" ng-click="showProcessActiviti(procDef.ID_)"> <i
+			<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF">
+			<div>
+			{{protocolListMap[procDef.RESOURCE_NAME_.split('.')[0]].protocolName}}
+			</div>
+			<span
+				class="showhim"> <b> {{procDef.KEY_}} </b> : <i
+					class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
+						<a href="#" ng-click="showProcessActiviti(procDef.ID_)"> <i
 							class="fa fa-folder-open-o" aria-hidden="true"></i> активності
 					</a> <a href="#" ng-click="startProcess(procDef.KEY_)"
 						title="старт процес"> <i class="fa fa-cog" aria-hidden="true"></i>
 							старт
-					</a></span>
+					</a>
+				</span>
 			</span>
 			</li>
 		</ul>
@@ -42,7 +46,8 @@
 					<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF"
 						ng-if="procDef.DEPLOYMENT_ID_ == deployment.ID_"><span>
 							<b> {{procDef.KEY_}} </b> : {{procDef.RESOURCE_NAME_}}
-					</span></li>
+					</span>
+					</li>
 				</ul>
 				<ul>
 					<li
@@ -56,9 +61,11 @@
 	</div>
 	<div ng-if="userState.tabs1 == 'home_performed'">
 		<h4>
-			Виконуються <small> <b> {{processActiviti.procDefId}} </b>
-			</small>
+			<small> Стани виконання процесів </small> <b
+				title=" {{processActiviti.procDefId}}">
+				{{processActiviti.ACT_RE_PROCDEF.NAME_}} </b>
 		</h4>
+
 		<ul>
 			<li ng-repeat="pA in processActiviti.actInstList">{{pA.START_TIME_
 				| date:'yyyy-MM-dd HH:mm:ss'}} <span ng-if="!pA.END_TIME_">
@@ -81,10 +88,9 @@
 						ng-if="pA.TASK_ID_==varInst.AITASKID"> <span
 						ng-if="varInst.NAME_.indexOf('__')>0 && varInst.TEXT_.length>0">
 							<b> Рекомендовано </b>
-					</span> <span
-						ng-init="labelKey = varInst.NAME_.indexOf('__')>0?varInst.NAME_.split('__')[1]:varInst.NAME_;
-					variable=!dictionary[labelKey]?labelKey:dictionary[labelKey].label">
-							{{!varInst.TEXT_?'':variable + ': ' + varInst.TEXT_}} </span> <span
+					</span> 
+					{{getVarValText(varInst)}}
+					<span
 						ng-if="!$last">,</span> <span ng-if="$last">.</span>
 					</span>
 				</div>

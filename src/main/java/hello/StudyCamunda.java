@@ -216,11 +216,13 @@ runtimeService.setVariableLocal(execution.getId(), "order", typedObjectValue);
 		List<Map<String, Object>> actInstList 
 		= camunda1ParamJdbcTemplate.queryForList(sqlCamundaActInstByProcDefId
 				, new MapSqlParameterSource("procDefId", procDefId
-				));
+						));
+		String sql2 = sqlCamundaVarInstByProcDefId.replace(":procInstId", "'"+procDefId+"'");
+		logger.debug(""+sql2);
 		List<Map<String, Object>> varInstList 
 		= camunda1ParamJdbcTemplate.queryForList(sqlCamundaVarInstByProcDefId
 				, new MapSqlParameterSource("procInstId", procDefId
-				));
+						));
 		logger.debug(""+actInstList);
 		Map<String, Object> map = new HashMap<>();
 		map.put("actInstList", actInstList);
