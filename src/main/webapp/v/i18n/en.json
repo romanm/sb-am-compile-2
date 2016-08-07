@@ -2,6 +2,9 @@
 	"greeting": "Hi",
 	"login": "login",
 	"logout": "logout",
+	"home_writing_file": "Preparation / Writing",
+	"home_deploy_test": "Deploy / Testing",
+	"home_performed": "Performed",
 	"deployed": "deployed",
 	"clinicalProtocols": "Clinical protocols",
 	"text": "Here is some text."

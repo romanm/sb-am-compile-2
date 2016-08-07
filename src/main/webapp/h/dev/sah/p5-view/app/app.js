@@ -3,6 +3,34 @@ var BpmnViewer = require('bpmn-js');
 var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
+var initUserState = function($scope, $http){
+	$scope.$watch("userState.tabs1", function handleChange( newValue, oldValue ) {
+		console.log(newValue);
+		console.log(oldValue);
+		console.log($scope.userState);
+		if($scope.userPrincipal){
+			console.log($scope.userPrincipal.name);
+			$http.post('/saveProtocol', $scope.userState).success(function(response) {
+				console.log(response);
+			});
+		}
+	});
+	$scope.userState = {tabs1:'home_writing_file',fileName:'userState'};
+	console.log($scope.userPrincipal);
+	$http.get('/v/readProtocol/userState').success(function(userState) {
+		console.log(userState);
+		$scope.userState = userState;
+		if($scope.userState.procDefId){
+			$http.get("/v/showProcessActiviti/"+$scope.userState.procDefId).success(function(response) {
+				$scope.processActiviti = response;
+			});
+		}
+	});
+
+	console.log($scope.userState);
+	console.log($scope.userState.tabs1);
+};
+
 angular.module('HomeApp', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('HomeCtrl', function($scope, $http, $filter, $translate) {
@@ -11,13 +39,19 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 	initDmnRule($scope);
 	$scope.openOtherProtocol = true;
 
+	initUserState($scope, $http);
 	readProtocolDir($scope, $http);
 
 	$http.get("/v/readAllDeployment").success(function(response) {
 		$scope.readAllDeployment = response;
 	});
 
+	$scope.setTabs1 = function(tabs1){
+		$scope.userState.tabs1 = tabs1;
+	}
 	$scope.showProcessActiviti = function(procDefId){
+		$scope.userState.tabs1 = 'home_performed';
+		$scope.userState.procDefId = procDefId;
 		$http.get("/v/showProcessActiviti/"+procDefId).success(function(response) {
 			$scope.processActiviti = response;
 		});
@@ -518,7 +552,6 @@ function jsonPath_stop(obj, path){
 
 function initAngularCommon($scope, $http){
 	$scope.params = params;
-	console.log('Protocole5Ctrl');
 	$http.get("/v/read_user").success(function(response) {
 		$scope.userPrincipal = response;
 		console.log($scope.userPrincipal);

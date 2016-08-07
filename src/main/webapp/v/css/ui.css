@@ -28,6 +28,7 @@ display : inline;
 
 .tooltip2 {
 	display: inline-block;
+	z-index: 1000;
 }
 .tooltip2 .tooltiptext {
 	visibility: hidden;

@@ -2,6 +2,9 @@
 	"greeting": "Hallo",
 	"login": "Anmeldung",
 	"logout": "Ausloggen",
+	"home_writing_file": "Vorbereitung / Schreiben",
+	"home_deploy_test": "Verteilen / Testing",
+	"home_performed": "Durchgeführt ",
 	"deployed": "deployed",
 	"clinicalProtocols": "Klinisches Protokols",
 	"text": "Hier ist einiges Text."

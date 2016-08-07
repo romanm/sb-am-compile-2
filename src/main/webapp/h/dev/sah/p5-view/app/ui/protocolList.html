@@ -1,13 +1,20 @@
 <h3>
 {{'clinicalProtocols' | translate}}
 </h3>
-<div class="row">
-	<div class="col-md-2">
+
+<div>
+	<ul class="nav nav-tabs">
+		<li ng-class="{'active':userState.tabs1 == 'home_writing_file'}"><a
+			href="#" ng-click="setTabs1('home_writing_file')">{{'home_writing_file' | translate}}</a></li>
+		<li ng-class="{'active':userState.tabs1 == 'home_deploy_test'}"><a href="#"
+			ng-click="setTabs1('home_deploy_test')">{{'home_deploy_test' | translate}}</a></li>
+		<li ng-class="{'active':userState.tabs1 == 'home_performed'}"><a href="#"
+			ng-click="setTabs1('home_performed')">{{'home_performed' | translate}}</a></li>
+	</ul>
+	<div ng-if="userState.tabs1 == 'home_writing_file'">
 		<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
 	</div>
-
-	<div class="col-md-4">
-		<h4>Тестування/Розгорнуті</h4>
+	<div ng-if="userState.tabs1 == 'home_deploy_test'">
 		<h5>Процеси</h5>
 		<ul>
 			<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF"><span
@@ -24,10 +31,9 @@
 			</li>
 		</ul>
 		<h5>
-		{{'deployed' | translate}}
-		<small>
-		<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span class="glyphicon-class">
-		</small>
+			{{'deployed' | translate}} <small> <span
+				class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span
+				class="glyphicon-class"></small>
 		</h5>
 		<ul>
 			<li ng-repeat="deployment in readAllDeployment.ACT_RE_DEPLOYMENT">
@@ -48,8 +54,7 @@
 			</li>
 		</ul>
 	</div>
-
-	<div class="col-md-6">
+	<div ng-if="userState.tabs1 == 'home_performed'">
 		<h4>
 			Виконуються <small> <b> {{processActiviti.procDefId}} </b>
 			</small>
@@ -91,9 +96,14 @@
 					<span title="{{collectData.taskInst.TASK_DEF_KEY_}}">
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-if="!pA.END_TIME_">
-						<div ng-repeat="dmnInput in ask.dmnInputs">
-							{{dmnInput.attr.label}}? <input ng-model="dmnInput.attr.value" maxlength="3" size="4">
-						</div>
+						<span ng-repeat="dmnInput in ask.dmnInputs"> 
+						<!-- 
+						<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+						 -->
+						<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							{{dmnInput.attr.label}}? <input ng-model="dmnInput.attr.value"
+							maxlength="3" size="4">
+						</span>
 						<button
 							ng-click="saveProcessVariable(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">запис
 							даних</button>
@@ -109,8 +119,9 @@
 			</li>
 		</ul>
 	</div>
-
 </div>
+
+<hr/>
 Навчання:
 <a href="/h/dev/sah/protocol1/protocol2.html">
 /h/dev/sah/protocol1/protocol2.html

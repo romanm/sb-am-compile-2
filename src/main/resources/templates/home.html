@@ -22,10 +22,10 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 <body>
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-10">
+			<div class="col-md-9">
 				<h1 th:text="#{SAH}">Спілка анестезіологів Хмельниччини</h1>
 			</div>
-			<div class="col-md-2  pull-right">
+			<div class="col-md-3  pull-right">
 				<div ng-include="'/h/dev/sah/p5-view/app/ui/loginLink.html'"></div>
 			</div>
 		</div>
@@ -33,20 +33,15 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 	</div>
 
 
-	<hr/>
+	<hr />
 	<p>
-		Click <a th:href="@{/hello}">here</a> to see a greeting.
+		locale : <a href="?locale=ua">Ukrainish</a>|<a href="?locale=en">English</a>|<a
+			href="?locale=de">German</a> || <a href="/home">home</a>
 	</p>
 	--
 	<span th:text="#{global_language}"></span> --
 	<span th:text="#{welcome_text}"></span>
 
-	<p>
-		locale : <a href="?locale=ua">Ukrainish</a>|<a href="?locale=en">English</a>|<a
-			href="?locale=de">German</a>
-			||
-			<a href="/home">home</a>
-	</p>
 	<script src="/h/dev/sah/p5-view/dist/app.js"></script>
 	<script src="/v/lib/js/angular-locale_uk.js"></script>
 	<script src="/v/lib/js/angular-translate-my.min.js"></script>

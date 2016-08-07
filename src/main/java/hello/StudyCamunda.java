@@ -111,17 +111,25 @@ public class StudyCamunda {
 		.startBeforeActivity(nextTaskId);
 
 		List<Map<String, Object>> variables = (List) nextTask.get("variables");
+		logger.debug(""+variables);
 		for (Map<String, Object> map : variables) {
+			logger.debug(""+map);
 			String varName = (String) map.get("varName");
 			String typeRef = (String) map.get("typeRef");
-			if(typeRef.equals("integer")){
+			logger.debug(varName+"="+map.get("value") + "/"+typeRef);
+			if(typeRef.equals("double")){
+				Double value = Double.parseDouble((String) map.get("value"));
+				logger.debug(varName+"="+value);
+				ProcessInstanceModificationInstantiationBuilder 
+				setVariable = startBeforeActivity.setVariable(varName, value);
+			}else if(typeRef.equals("integer")){
 				Integer value = Integer.parseInt((String) map.get("value"));
 				logger.debug(varName+"="+value);
 				ProcessInstanceModificationInstantiationBuilder 
 				setVariable = startBeforeActivity.setVariable(varName, value);
-				setVariable.execute();
 			}
 		}
+		startBeforeActivity.execute();
 
 
 		TaskService taskService = processEngine.getTaskService();

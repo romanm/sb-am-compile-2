@@ -1,5 +1,13 @@
 {
 	"greeting": "Привіт",
+	"login": "Ввійти",
+	"logout": "Вийти",
+	"home_writing_file": "Підготовка/Написання",
+	"home_deploy_test": "Тестування/Розгорнуті",
+	"home_performed": "Виконуються",
+	"page":{
+		"home":"домашня"
+	},
 	"deployed": "розгорнуто",
 	"clinicalProtocols": "Клінічні протоколи",
 	"text": "Тут знаходиться який-небудь текст"

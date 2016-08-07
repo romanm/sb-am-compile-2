@@ -58,9 +58,14 @@
 					<hr />
 				</div>
 				<div class="col-md-2">
+					<h3 ng-click="openMarkers = !openMarkers">
+						<small> <i class="fa fa-bars" aria-hidden="true"></i>
+						</small>Маркери
+					</h3>
+					<div ng-if="openMarkers">---</div>
 					<h3 ng-click="openOtherProtocol = !openOtherProtocol">
 						<small> <i class="fa fa-bars" aria-hidden="true"></i>
-						</small> Протоколи <small ng-if="!openOtherProtocol"> відкрити </small>
+						</small> Протоколи
 					</h3>
 					<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
 				</div>
