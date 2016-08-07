@@ -35,6 +35,7 @@
     "query-string": "latest",
     "jsoneditor": "latest",
     "angular": "latest",
+    "regex": "latest",
 	"dmn-js": "latest",
 	"xmldoc": "latest",
 	"request": "latest",

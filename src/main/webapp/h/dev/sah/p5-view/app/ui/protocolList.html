@@ -72,8 +72,7 @@
 				</small> <i
 					class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
 						<a href="#"
-						ng-click="collectMedData(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_);
-						openDmnVariable = pA.TASK_ID_==openDmnVariable?0:pA.TASK_ID_">
+						ng-click="collectMedData(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">
 							Зібрати дані </a>
 				</span>
 			</span>
@@ -91,15 +90,13 @@
 				</div>
 				<!-- 
 				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && openDmnVariable" class="alert alert-success">
-				 -->
 				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && openDmnVariable" class="alert alert-info">
+				 -->
+				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && pA.TASK_ID_ == openDmnVariable" class="alert alert-info">
 					<span title="{{collectData.taskInst.TASK_DEF_KEY_}}">
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-if="!pA.END_TIME_">
 						<span ng-repeat="dmnInput in ask.dmnInputs"> 
-						<!-- 
-						<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
-						 -->
 						<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
 							{{dmnInput.attr.label}}? <input ng-model="dmnInput.attr.value"
 							maxlength="3" size="4">

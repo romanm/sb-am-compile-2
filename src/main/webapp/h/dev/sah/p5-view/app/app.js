@@ -4,19 +4,23 @@ var DmnViewer = require('dmn-js/lib/Viewer');
 var angular = require('angular');
 
 var initUserState = function($scope, $http){
+	$scope.$watch("userState.taskId", function handleChange( newValue, oldValue ) {
+		saveUserState(oldValue);
+	});
 	$scope.$watch("userState.tabs1", function handleChange( newValue, oldValue ) {
-		console.log(newValue);
-		console.log(oldValue);
-		console.log($scope.userState);
-		if($scope.userPrincipal){
-			console.log($scope.userPrincipal.name);
+		saveUserState(oldValue);
+	});
+	function saveUserState(oldValue){
+		if($scope.userPrincipal && oldValue){
 			$http.post('/saveProtocol', $scope.userState).success(function(response) {
 				console.log(response);
 			});
 		}
-	});
+	}
 	$scope.userState = {tabs1:'home_writing_file',fileName:'userState'};
-	console.log($scope.userPrincipal);
+	//
+	//read user state onload
+	//
 	$http.get('/v/readProtocol/userState').success(function(userState) {
 		console.log(userState);
 		$scope.userState = userState;
@@ -24,11 +28,13 @@ var initUserState = function($scope, $http){
 			$http.get("/v/showProcessActiviti/"+$scope.userState.procDefId).success(function(response) {
 				$scope.processActiviti = response;
 			});
+			if($scope.userState.taskId){
+				console.log(userState);
+				readCollectMedData($scope, $http, $scope.userState.procDefId, $scope.userState.taskId);
+			}
 		}
 	});
 
-	console.log($scope.userState);
-	console.log($scope.userState.tabs1);
 };
 
 angular.module('HomeApp', ['pascalprecht.translate'])
@@ -81,63 +87,12 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 		});
 	}
 
-	var setVariableValueToDmn = function(taskId){
-		var values = {};
-		$scope.processActiviti.varInstList.forEach(function(variable){
-			if(variable.AITASKID == taskId){
-				values[variable.NAME_] = variable.TEXT_;
-			}
-		});
-		$scope.dmnsToTask.forEach(function(dmn){
-			var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-			dmnInputs.forEach(function(dmnInput){
-				var varName = dmnInput.valueWithPath("inputExpression.text");
-				if(values[varName]){
-					dmnInput.attr.value = values[varName];
-				}
-			});
-		});
-	}
-
-	var seekNextTask = function(taskDefKey, $scope){
-		var camundaAppendix = $scope.collectData.protocol.init.camundaAppendix;
-		var thisTask = null;
-		camundaAppendix.bpmn.forEach(function(bpmn){
-			bpmn.xmldoc.descendantWithPath('bpmn:process').children.forEach(function(bpmnElement){
-				if(bpmnElement.attr.id == taskDefKey){
-					thisTask = bpmnElement;
-				}
-			});
-			var sequenceFlowId = thisTask.valueWithPath('bpmn:outgoing');
-			var sequenceFlow = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlowId);
-			$scope.nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
-		});
-		if($scope.nextTask.name == 'bpmn:businessRuleTask'){
-			var dmnName = $scope.nextTask.attr['camunda:decisionRef'];
-			var path = 'dmn' + dmnName.split('_dmn')[1];
-			$scope.ask = {};
-			$scope.dmnsToTask = [];
-			camundaAppendix.dmn.forEach(function(dmn){
-				if(dmn.path == path){
-					$scope.nextDmn = dmn;
-					$scope.dmnsToTask.push(dmn);
-					var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-					$scope.ask.dmnInputs = dmnInputs;
-				}
-			});
-		}
-		console.log('from:' + thisTask.attr.name + taskDefKey + ' - > to:' + $scope.nextTask.attr.name);
-	}
 
 	$scope.collectMedData = function(procInstId, taskId){
+		$scope.openDmnVariable = taskId == $scope.openDmnVariable?0:taskId;
 		console.log('$http.get collectMedData:' + procInstId+'/'+taskId);
-		$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
-			$scope.collectData = response;
-			console.log($scope.collectData);
-			initBpmnDmnToId($scope.collectData.protocol);
-			seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_, $scope);
-	 		setVariableValueToDmn(taskId);
-		});
+		$scope.userState.taskId = taskId;
+		readCollectMedData($scope, $http, procInstId, taskId);
 	}
 
 	$scope.executeTask = function(procInstId, taskId){
@@ -594,3 +549,67 @@ function configTranslation($translateProvider){
 //	$translateProvider.preferredLanguage('en');
 }
 
+function readCollectMedData($scope, $http, procInstId, taskId){
+	console.log(procInstId + '/' + taskId);
+	if(procInstId.indexOf(':')>0){
+		procInstId = procInstId.split(':')[2];
+	}
+	console.log(procInstId + '/' + taskId);
+	$http.get('/v/collectData/'+procInstId+'-'+taskId).success(function(response) {
+		$scope.collectData = response;
+		console.log($scope.collectData);
+		$scope.openDmnVariable = taskId;
+		initBpmnDmnToId($scope.collectData.protocol);
+		seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_, $scope);
+		setVariableValueToDmn(taskId, $scope);
+	});
+}
+
+function setVariableValueToDmn(taskId, $scope){
+	var values = {};
+	$scope.processActiviti.varInstList.forEach(function(variable){
+		if(variable.AITASKID == taskId){
+			values[variable.NAME_] = variable.TEXT_;
+		}
+	});
+	$scope.dmnsToTask.forEach(function(dmn){
+		var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		dmnInputs.forEach(function(dmnInput){
+			var varName = dmnInput.valueWithPath("inputExpression.text");
+			if(values[varName]){
+				dmnInput.attr.value = values[varName];
+			}
+		});
+	});
+}
+
+
+function seekNextTask(taskDefKey, $scope){
+	var camundaAppendix = $scope.collectData.protocol.init.camundaAppendix;
+	var thisTask = null;
+	camundaAppendix.bpmn.forEach(function(bpmn){
+		bpmn.xmldoc.descendantWithPath('bpmn:process').children.forEach(function(bpmnElement){
+			if(bpmnElement.attr.id == taskDefKey){
+				thisTask = bpmnElement;
+			}
+		});
+		var sequenceFlowId = thisTask.valueWithPath('bpmn:outgoing');
+		var sequenceFlow = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlowId);
+		$scope.nextTask = bpmn.xmldoc.descendantWithPath('bpmn:process').childWithAttribute('id',sequenceFlow.attr.targetRef);
+	});
+	if($scope.nextTask.name == 'bpmn:businessRuleTask'){
+		var dmnName = $scope.nextTask.attr['camunda:decisionRef'];
+		var path = 'dmn' + dmnName.split('_dmn')[1];
+		$scope.ask = {};
+		$scope.dmnsToTask = [];
+		camundaAppendix.dmn.forEach(function(dmn){
+			if(dmn.path == path){
+				$scope.nextDmn = dmn;
+				$scope.dmnsToTask.push(dmn);
+				var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+				$scope.ask.dmnInputs = dmnInputs;
+			}
+		});
+	}
+	console.log('from:' + thisTask.attr.name + taskDefKey + ' - > to:' + $scope.nextTask.attr.name);
+}
