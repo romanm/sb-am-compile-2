@@ -41,7 +41,7 @@ public class FileService {
 
 	public Map<String, Object> readFileFromLongName(String fileLongName) {
 		File file = new File(fileLongName);
-		logger.debug(file.toString());
+//		logger.debug(file.toString());
 		return readJsonFromFullFileName(file);
 	}
 

@@ -7,6 +7,7 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('HomeCtrl', function($scope, $http, $filter, $translate) {
 	console.log('HomeCtrl');
+	initAngularCommon($scope, $http);
 	initDmnRule($scope);
 	$scope.openOtherProtocol = true;
 
@@ -128,6 +129,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 .controller('Protocole5Ctrl', function($scope, $http, $translate) {
 	console.log('Protocole5Ctrl');
 	initAngularCommon($scope, $http);
+	console.log('Protocole5Ctrl');
 
 	var urlForContent = '/v/readContent';
 	if($scope.params.p){
@@ -261,7 +263,6 @@ function initDictionary($scope, $http){
 			'drug':{'label':'ліки','typeRef':'string'}
 		};
 		$scope.protocolList.forEach(function(protocolFileName){
-			console.log(protocolFileName);
 			$http.get('/v/readProtocol/' + protocolFileName).success(function(protocol) {
 				for (var keyDmn in protocol) {
 					if(keyDmn.indexOf('dmn')>=0){
@@ -451,7 +452,7 @@ angular.module('P5DmnApp', [])
 			options : { mode : 'tree' }
 		};
 		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
-		console.log(dmnContent);
+//		console.log(dmnContent);
 		renderer.importXML(dmnContent, function(err) {
 			if (err) {
 				console.log('error rendering', err);
@@ -473,6 +474,7 @@ angular.module('P5DmnApp', [])
 		renderer.on('commandStack.changed', exportArtifacts);
 
 	});
+
 	$scope.saveFileTheDMN = function(){
 		console.log("-------saveFile--------");
 		var urlToSave = '/saveCommonContent';
@@ -485,7 +487,7 @@ angular.module('P5DmnApp', [])
 			console.log(response.length);
 		});
 	}
-	
+
 	$scope.addProtocolUrl = function(){
 		if(params.p){
 			return '?p='+params.p;
@@ -516,12 +518,19 @@ function jsonPath_stop(obj, path){
 
 function initAngularCommon($scope, $http){
 	$scope.params = params;
+	console.log('Protocole5Ctrl');
+	$http.get("/v/read_user").success(function(response) {
+		$scope.userPrincipal = response;
+		console.log($scope.userPrincipal);
+	});
 }
 
 //console.log("params = " + location.search);
 const params = require('query-string').parse(location.search);
 console.log(params);
 
+var Regex = require("regex");
+var regex = new Regex(/[(\d+)..(\d+)]/);
 function initDmnRule($scope){
 	console.log($scope.dictionary);
 	$scope.evalLogicExp = function(input, inputEntry){
@@ -529,7 +538,13 @@ function initDmnRule($scope){
 		var expr = inputEntry.firstChild.val;
 		var evalLogicExp = false;
 		if(value){
-			evalLogicExp = eval(value+expr)
+			if(expr.indexOf('..') > 0){
+				var endExpr = expr.replace('[',value + ' >= ').replace('..',' && ').replace(']',' >= ' + value);
+				console.log(endExpr);
+				evalLogicExp = eval(endExpr)
+			}else{
+				evalLogicExp = eval(value+expr)
+			}
 		}
 		return evalLogicExp;
 	}
@@ -539,6 +554,9 @@ function configTranslation($translateProvider){
 	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
 	//$translateProvider.useLocalStorage();
 	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
+	if(springCookieLocale.indexOf(';') > 0){
+		springCookieLocale = springCookieLocale.split(';')[0];
+	}
 	$translateProvider.preferredLanguage(springCookieLocale);
 //	$translateProvider.preferredLanguage('en');
 }

@@ -1,5 +1,7 @@
 {
 	"greeting": "Hallo",
+	"login": "Anmeldung",
+	"logout": "Ausloggen",
 	"deployed": "deployed",
 	"clinicalProtocols": "Klinisches Protokols",
 	"text": "Hier ist einiges Text."

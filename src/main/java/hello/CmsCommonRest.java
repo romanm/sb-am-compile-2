@@ -53,7 +53,7 @@ public class CmsCommonRest {
 	@RequestMapping(value = "/v", method = RequestMethod.GET)
 	public String view() { return "redirect:/"; }
 
-	@RequestMapping(value = "/read_user", method = RequestMethod.GET)
+	@RequestMapping(value = "/v/read_user", method = RequestMethod.GET)
 	public  @ResponseBody Principal getRoleTypes(Principal userPrincipal) {
 		return userPrincipal;
 	}
