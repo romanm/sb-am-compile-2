@@ -109,8 +109,14 @@ public class ProtocolRest {
 	public  @ResponseBody List<String> readProtocolDir() {
 		List<String> fl = new ArrayList<>();
 		for (File file : new File(protocolDirName).listFiles()) {
-			String[] split = file.toString().split("/");
-			fl.add(split[split.length-1].replace(".json", ""));
+			String name = file.getName();
+			System.out.println(name);
+			System.out.println(name.replace(".json", ""));
+			fl.add(name.replace(".json", ""));
+//			System.out.println(file.toString().replaceAll("\\", "/"));
+			
+//			String[] split = file.toString().split("/");
+//			fl.add(split[split.length-1].replace(".json", ""));
 		}
 		return fl;
 	}

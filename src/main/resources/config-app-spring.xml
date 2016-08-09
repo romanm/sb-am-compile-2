@@ -9,8 +9,9 @@
 
 	<bean id="dataSourceCamunda1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
 		<property name="driverClassName" value="org.h2.Driver" />
-		<property name="url" value="jdbc:h2:tcp://localhost/h2-camunda-130-s4/h2-camunda-130-s4" />
+		<property name="url" value="${jdbc.camunda}" />
 		<!-- 
+		<property name="url" value="jdbc:h2:tcp://localhost/h2-camunda-130-s4/h2-camunda-130-s4" />
 		<property name="url" value="jdbc:h2:/home/holweb/db-java/h2-server/h2-camunda-130-s4/h2-camunda-130-s4" />
 		 -->
 		<property name="username" value="sa" />
@@ -26,8 +27,9 @@
 	<bean id="dataSourceHol2Eih" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close" primary="true">
 		<property name="driverClassName" value="org.h2.Driver" />
-		<property name="url" value="jdbc:h2:tcp://localhost/db-hol2-eih/db-hol2-eih" />
+		<property name="url" value="${jdbc.hol2}" />
 		<!-- 
+		<property name="url" value="jdbc:h2:tcp://localhost/db-hol2-eih/db-hol2-eih" />
 		<property name="url" value="jdbc:h2:tcp://localhost/db-hol2-eih/db-hol2-eih" />
 		 -->
 		<property name="username" value="sa" />

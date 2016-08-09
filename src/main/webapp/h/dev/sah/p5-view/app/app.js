@@ -42,8 +42,10 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 		$scope.userState.tabs1 = 'home_performed';
 		$scope.userState.procDefId = procDefId;
 		console.log(procDefId);
-		$http.get("/v/showProcessActiviti/"+procDefId).success(function(response) {
+		var url = '/v/showProcessActiviti/' + procDefId;
+		$http.get(url).success(function(response) {
 			$scope.processActiviti = response;
+			console.log($scope.processActiviti);
 		});
 	}
 
@@ -529,10 +531,13 @@ function configTranslation($translateProvider){
 	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
 	//$translateProvider.useLocalStorage();
 	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
-	if(springCookieLocale.indexOf(';') > 0){
-		springCookieLocale = springCookieLocale.split(';')[0];
+	var myLocale = 'ua'
+	if(springCookieLocale){
+		if(springCookieLocale.indexOf(';') > 0){
+			myLocale = springCookieLocale.split(';')[0];
+		}
 	}
-	$translateProvider.preferredLanguage(springCookieLocale);
+	$translateProvider.preferredLanguage(myLocale);
 //	$translateProvider.preferredLanguage('en');
 }
 
