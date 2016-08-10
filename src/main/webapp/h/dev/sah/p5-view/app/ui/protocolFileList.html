@@ -1,24 +1,17 @@
 <div ng-if="openOtherProtocol">
-<!-- 
-	<h4>Підготовка/Написання</h4>
- -->
- <!-- 
-	<div ng-repeat="p in protocolList">
-		<a href="/h/dev/sah/p5-view/dist/protocol5.html?p={{p}}"> {{p}} </a>
+	<div class="input-group">
+		<div class="input-group-addon">
+			<span class="glyphicon glyphicon-search"></span>
+		</div>
+		<input ng-model="seekProtocol" placeholder="Пошук по ім'ям файлів латинецею" class="form-control" >
 	</div>
-  -->
-	<span class="glyphicon glyphicon-search"></span>
-	<input ng-model="seekProtocol">
-	<table class="table">
-		<tr ng-repeat="protocolFileName in protocolList | filter:seekProtocol"
-		ng-if="protocolListMap[protocolFileName].protocolName"
-		>
-			<td><a href="/h/dev/sah/p5-view/dist/protocol5.html?p={{protocolFileName}}">
-					{{protocolFileName}} </a></td>
-			<td><a href="/h/dev/sah/p5-view/dist/protocol5.html?p={{protocolFileName}}">
-					{{protocolListMap[protocolFileName].protocolName}} </a></td>
-		</tr>
-	</table>
-</div>
+	<ul>
+		<li ng-repeat="protocolFileName in protocolList | filter:seekProtocol"
+			ng-if="protocolListMap[protocolFileName].protocolName"><a
+			href="/h/dev/sah/p5-view/dist/protocol5.html?p={{protocolFileName}}">
+				{{protocolListMap[protocolFileName].protocolName}}<br /> <b>
+					{{protocolFileName}} </b>
+		</a></li>
+	</ul>
 </div>
 
