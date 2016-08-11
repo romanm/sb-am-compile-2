@@ -1,0 +1,21 @@
+<table class="table table-bordered">
+	<tr ng-repeat="flowTableElement in nodeTree" ng-init="nr1 = $index + 1">
+		<td ng-if="flowTableElement.node.name == 'bpmn:sequenceFlow'">
+		{{nr1}})
+				{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].processElements[flowTableElement.node.attr.sourceRef].obj.attr.name}}
+		 </td>
+		<td ng-if="flowTableElement.children.length > 1">
+		{{nr1}})
+<table class="table table-bordered">
+			<tr>
+				<td ng-repeat="c in flowTableElement.children"
+				ng-init="nodeTree = c.nodeTree"
+				>
+				-{{$index}}-
+					<div ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
+				</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+</table>

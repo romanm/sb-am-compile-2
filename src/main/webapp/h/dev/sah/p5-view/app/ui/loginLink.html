@@ -1,0 +1,10 @@
+<div ng-if="userPrincipal">
+	<form method="post" action="/logout">
+		{{'greeting' | translate}} <b> {{userPrincipal.name}}!</b> <input
+			value="{{'logout' | translate}}" type="submit" class="btn btn-default btn-xs">
+	</form>
+</div>
+<div ng-if="!userPrincipal">
+	<a href="/hello" class="btn btn-default btn-xs"> {{'login' | translate}} </a>
+</div>
+
