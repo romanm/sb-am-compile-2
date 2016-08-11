@@ -98,11 +98,21 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 
 });
 
+
+/*
+function initEditorBpmn($scope, $http){
+	$scope.getFlowVerticalTable = function(editorBpmnNr){
+		var bpmnInit = $scope.obj.data.init.camundaAppendix.bpmn[editorBpmnNr];
+	}
+}
+ * */
+
 //angular.module('Protocole5App', ['ngCookies', 'pascalprecht.translate'])
 angular.module('Protocole5App', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('Protocole5Ctrl', function($scope, $http, $translate) {
 	console.log('Protocole5Ctrl');
+	//initEditorBpmn($scope, $http);
 	initAngularCommon($scope, $http);
 	console.log('Protocole5Ctrl');
 
@@ -370,6 +380,57 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 	return bpmnXmldoc;
 }
 
+function walkIds(bpmnInit, nodeTree, elementId, parentIds){
+	if(!parentIds) parentIds = '';
+	var walkElement = {node:bpmnInit.processElements[elementId].obj, parentIds:parentIds};
+	if(walkElement.node.name == 'bpmn:sequenceFlow'){
+		if(walkElement.node.attr.sourceRef.indexOf('UserTask')==0 
+		&& walkElement.node.attr.targetRef.indexOf('BusinessRuleTask')==0){
+			nodeTree.push(walkElement);
+		}
+		var targetRef = walkElement.node.attr.targetRef;
+		walkIds(bpmnInit, nodeTree, targetRef, parentIds);
+	}else
+	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
+		nodeTree.push(walkElement);
+	}
+	var outgoings = walkElement.node.childrenNamed('bpmn:outgoing');
+	if(outgoings.length > 1){
+		walkElement.children = [];
+		parentIds += ' ';
+		outgoings.forEach(function(outgoing, idx){
+			var sequenceFlowId = outgoing.val;
+			var childParentIds = parentIds + sequenceFlowId;
+			var childElement = {parentIds:childParentIds,nodeTree:[]};
+			walkElement.children.push(childElement);
+			walkIds(bpmnInit, childElement.nodeTree, sequenceFlowId, childParentIds);
+		});
+	}else
+	if(outgoings.length == 1){
+		outgoings.forEach(function(outgoing, idx){
+			var sequenceFlowId = outgoing.val;
+			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
+		});
+	}
+}
+
+function initBpmnVerticalTable(bpmnInit){
+	bpmnInit.nodeTree = [];
+	bpmnInit.processElements = {};
+	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
+	bpmnInit.startId = null;
+	bpmnProcess.children.forEach(function(processElement){
+		var elementId = processElement.attr.id;
+		if(elementId.indexOf('StartEvent')==0){
+			bpmnInit.startId = elementId;
+		}
+		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
+	});
+	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.startId);
+	console.log(bpmnInit.nodeTree);
+	console.log(bpmnInit.processElements);
+}
+
 function initBpmnDmnToId(protocol){
 	var camundaAppendix = {bpmn:[],dmn:[]};
 	var bpmnNr = 0;
@@ -379,15 +440,15 @@ function initBpmnDmnToId(protocol){
 				if(key2.indexOf('bpmnContent')>=0){
 					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
 					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
-					camundaAppendix.bpmn.push(
-						{path: key1+'.bpmnContent'
-						, xmldoc: bpmnXmldoc
-						, container:
-							{container:'#bpmn-canvas-' + bpmnNr
-							, height: protocol[key1].height
-							}
-						}
-					);
+					var bpmnInit = {path: key1+'.bpmnContent'
+							, xmldoc: bpmnXmldoc
+							, container:
+								{container:'#bpmn-canvas-' + bpmnNr
+								, height: protocol[key1].height
+								}
+							};
+					initBpmnVerticalTable(bpmnInit);
+					camundaAppendix.bpmn.push(bpmnInit);
 					bpmnNr++;
 				}
 			}
@@ -513,12 +574,15 @@ function initDmnRule($scope){
 	$scope.evalLogicExp = function(input, inputEntry){
 		var value = input.attr.value;
 		var expr = inputEntry.firstChild.val;
+//		console.log(input.firstChild.attr.typeRef+'/'+value+'/'+expr);
 		var evalLogicExp = false;
 		if(value){
 			if(expr.indexOf('..') > 0){
 				var endExpr = expr.replace('[',value + ' >= ').replace('..',' && ').replace(']',' >= ' + value);
 				console.log(endExpr);
 				evalLogicExp = eval(endExpr)
+			}else if(input.firstChild.attr.typeRef == 'boolean'){
+				evalLogicExp = eval(value+'=='+expr)
 			}else{
 				evalLogicExp = eval(value+expr)
 			}
@@ -570,12 +634,14 @@ function setVarValue(varInst){
 
 function setVariableValueToDmn(taskId, $scope){
 	var values = {};
-	$scope.processActiviti.varInstList.forEach(function(variable){
-		if(variable.AITASKID == taskId){
-			var varVal = setVarValue(variable);
-			values[variable.NAME_] = varVal;
-		}
-	});
+	if($scope.processActiviti){
+		$scope.processActiviti.varInstList.forEach(function(variable){
+			if(variable.AITASKID == taskId){
+				var varVal = setVarValue(variable);
+				values[variable.NAME_] = varVal;
+			}
+		});
+	}
 	$scope.dmnsToTask.forEach(function(dmn){
 		var dmnInputs = dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
 		dmnInputs.forEach(function(dmnInput){

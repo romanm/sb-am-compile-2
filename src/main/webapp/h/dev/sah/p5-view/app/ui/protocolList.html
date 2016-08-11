@@ -103,9 +103,16 @@
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-if="!pA.END_TIME_">
 						<span ng-repeat="dmnInput in ask.dmnInputs"> 
-						<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-							{{dmnInput.attr.label}}? <input ng-model="dmnInput.attr.value"
-							maxlength="3" size="4">
+						<span
+							ng-if="dmnInput.firstChild.attr.typeRef == 'boolean'">
+								<label> <input ng-model="dmnInput.attr.value"
+									type="checkbox"> {{dmnInput.attr.label}}?
+							</label>
+						</span> <span ng-if="dmnInput.firstChild.attr.typeRef == 'integer'">
+								<span class="glyphicon glyphicon-chevron-right"
+								aria-hidden="true"></span> {{dmnInput.attr.label}}? <input
+								ng-model="dmnInput.attr.value" maxlength="3" size="4">
+						</span> 
 						</span>
 						<button
 							ng-click="saveProcessVariable(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">запис

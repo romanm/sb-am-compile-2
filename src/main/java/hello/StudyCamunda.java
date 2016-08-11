@@ -122,6 +122,12 @@ public class StudyCamunda {
 				logger.debug(varName+"="+value);
 				ProcessInstanceModificationInstantiationBuilder 
 				setVariable = startBeforeActivity.setVariable(varName, value);
+			}else if(typeRef.equals("boolean")){
+//				boolean value = Boolean.parseBoolean((String) map.get("value"));
+				boolean value = (boolean) map.get("value");
+				logger.debug(varName+"="+value);
+				ProcessInstanceModificationInstantiationBuilder 
+				setVariable = startBeforeActivity.setVariable(varName, value);
 			}else if(typeRef.equals("integer")){
 				Integer value = Integer.parseInt((String) map.get("value"));
 				logger.debug(varName+"="+value);
