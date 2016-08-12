@@ -1,16 +1,21 @@
 <div>
-	Редактор: <a
+<b>
+	Редактор: </b><a
 		id="/{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].path}}"
 		href="/h/dev/sah/p4/dist/index.html?jsonpath=
 		{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].path}}&p={{params.p}}">
-		{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].path}} </a> <span
+		{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].path}} </a> 
+		<!-- 
+	<span
 		class="showhim"> <i class="fa fa-bars" aria-hidden="true"></i>
 		<span class="showme">--</span>
 	</span>
+		 -->
 
 </div>
 <div>
 	<!-- перевірка правильності BPMN -->
+	<!-- 
 	<div class="row">
 		<div class="col-md-4">
 			<h4> модель вибору рішення <small>(DMN)</small> </h4>
@@ -18,26 +23,15 @@
 				ng-repeat="businessRuleTask 
 		in obj.data.init.camundaAppendix.bpmn[editorBpmnNr].xmldoc.descendantWithPath(
 			'bpmn:process').childrenNamed('bpmn:businessRuleTask')">
-				<span class="h5">{{businessRuleTask.attr.name}}: </span>
-				DMN <span
-					ng-repeat="dmn in obj.data.init.camundaAppendix.dmn">
-					<a href="#" ng-click="addDmnToBpmn(dmn.xmldoc, businessRuleTask, editorBpmnNr)">
-						<span
-						ng-if="businessRuleTask.attr['camunda:decisionRef']!=dmn.xmldoc.firstChild.attr.id">
-							{{dmn.xmldoc.firstChild.attr.name}} </span> 
-						<b
-						ng-if="businessRuleTask.attr['camunda:decisionRef']==dmn.xmldoc.firstChild.attr.id">
-							{{dmn.xmldoc.firstChild.attr.name}} 
-					</b>
-				</a>,
+				<div ng-include="'/h/dev/sah/p5-view/app/ui/choiceDmnToBusinessRule.html'"></div>
 			</div>
-			</span>
 		</div>
 		<div class="col-md-8">
+		</div>
+	</div>
+	 -->
 			<div
 				ng-init="nodeTree = obj.data.init.camundaAppendix.bpmn[editorBpmnNr].nodeTree">
 				<div ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
 			</div>
-		</div>
-	</div>
 </div>

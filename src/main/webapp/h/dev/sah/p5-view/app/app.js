@@ -114,7 +114,6 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	console.log('Protocole5Ctrl');
 	//initEditorBpmn($scope, $http);
 	initAngularCommon($scope, $http);
-	console.log('Protocole5Ctrl');
 
 	var urlForContent = '/v/readContent';
 	if($scope.params.p){
@@ -418,6 +417,7 @@ function initBpmnVerticalTable(bpmnInit){
 	bpmnInit.nodeTree = [];
 	bpmnInit.processElements = {};
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
+	//console.log(bpmnProcess.toString());
 	bpmnInit.startId = null;
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
@@ -428,7 +428,6 @@ function initBpmnVerticalTable(bpmnInit){
 	});
 	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.startId);
 	console.log(bpmnInit.nodeTree);
-	console.log(bpmnInit.processElements);
 }
 
 function initBpmnDmnToId(protocol){

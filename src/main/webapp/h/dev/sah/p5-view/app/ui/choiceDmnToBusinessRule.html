@@ -1,0 +1,20 @@
+
+<span class="h5"> 
+<i class="fa fa-list-alt" aria-hidden="true"></i>
+<!-- 
+<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> 
+ -->
+	{{businessRuleTask.attr.name}}:
+</span>
+DMN
+
+<span ng-repeat="dmn in obj.data.init.camundaAppendix.dmn"> , <a
+	href="#"
+	ng-click="addDmnToBpmn(dmn.xmldoc, businessRuleTask, editorBpmnNr)">
+		<span
+		ng-if="businessRuleTask.attr['camunda:decisionRef']!=dmn.xmldoc.firstChild.attr.id">
+			{{dmn.xmldoc.firstChild.attr.name}} </span> <b
+		ng-if="businessRuleTask.attr['camunda:decisionRef']==dmn.xmldoc.firstChild.attr.id">
+			{{dmn.xmldoc.firstChild.attr.name}} </b>
+</a>
+</span>

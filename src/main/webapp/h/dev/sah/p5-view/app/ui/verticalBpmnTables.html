@@ -1,21 +1,37 @@
 <table class="table table-bordered">
-	<tr ng-repeat="flowTableElement in nodeTree" ng-init="nr1 = $index + 1">
+	<tr ng-repeat="flowTableElement in nodeTree" ng-init="nr1 = nr0 + ($index + 1)">
 		<td ng-if="flowTableElement.node.name == 'bpmn:sequenceFlow'">
-		{{nr1}})
-				{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].processElements[flowTableElement.node.attr.sourceRef].obj.attr.name}}
-		 </td>
-		<td ng-if="flowTableElement.children.length > 1">
-		{{nr1}})
-<table class="table table-bordered">
-			<tr>
-				<td ng-repeat="c in flowTableElement.children"
-				ng-init="nodeTree = c.nodeTree"
-				>
-				-{{$index}}-
-					<div ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
-				</td>
-			</tr>
-		</table>
+			{{nr1}})
+			{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].processElements[flowTableElement.node.attr.sourceRef].obj.attr.name}}
+			<a ng-click="openTaskEditor = openTaskEditor!=nr1?nr1:'close'">
+			<i class="fa fa-bars" aria-hidden="true"></i>
+			</a>
+			<div ng-if="openTaskEditor == nr1"
+				ng-init="targetRef = flowTableElement.node.attr.targetRef;
+			businessRuleTask = obj.data.init.camundaAppendix.bpmn[editorBpmnNr].processElements[targetRef].obj;
+			">
+				<div
+					ng-include="'/h/dev/sah/p5-view/app/ui/choiceDmnToBusinessRule.html'"></div>
+				<div ng-repeat="nextDmn in obj.data.init.camundaAppendix.dmn"
+					ng-if="businessRuleTask.attr['camunda:decisionRef']==nextDmn.xmldoc.firstChild.attr.id">
+					<hr/>
+					<div ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
+				</div>
+			</div>
+		</td>
+		<td ng-if="flowTableElement.children.length > 1"><!-- {{nr1}}) -->
+			<table class="table table-bordered">
+				<tr>
+					<td ng-repeat="c in flowTableElement.children"
+						ng-init="nodeTree = c.nodeTree; 
+						parentIds = c.parentIds.split(' '); 
+						sequenceFlowId = parentIds[parentIds.length - 1]; 
+						nr0 = nr1 + '.' + ($index + 1) + '.'">{{nr0}})
+			{{obj.data.init.camundaAppendix.bpmn[editorBpmnNr].processElements[sequenceFlowId].obj.attr.name}}
+						<div ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
+					</td>
+				</tr>
+			</table>
 		</td>
 	</tr>
 </table>
