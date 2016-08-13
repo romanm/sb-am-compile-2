@@ -1,5 +1,5 @@
 <div id="menu-fix-top" class="no-print">
-	<div >
+	<div>
 		<ul>
 			<li class="pull-right">
 				<div ng-include="'/h/dev/sah/p5-view/app/ui/loginLink.html'"></div>
@@ -10,8 +10,8 @@
 					<span ng-bind="obj.data.protocolMenuName">doc</span></a></li>
 			<li>
 				<div class="tooltip2">
-					<a href="#"> <i
-						class="fa fa-angle-double-down" aria-hidden="true"></i> індекс
+					<a href="#"> <i class="fa fa-angle-double-down"
+						aria-hidden="true"></i> індекс
 					</a>
 					<div class="tooltiptext">
 						<div ng-repeat="path in obj.data.init.camundaAppendix.bpmn">
@@ -24,12 +24,26 @@
 				</div>
 			</li>
 			<li><a href="#" ng-click="createNewBpmn()">нова блоксхема</a>
-			<li><a href="#" ng-click="createNewDMN()">нові правила</a>
+			<li><a href="#" ng-click="createNewDMN()">нові правила</a></li>
+			<li><h3
+					ng-click="openPanel = openPanel!='openMarkers'?'openMarkers':''">
+					<small> <i class="fa fa-bars" aria-hidden="true"></i>
+					</small>Маркери
+				</h3>
+				<div ng-if="openPanel == 'openMarkers'">---</div></li>
+			<li>
+				<h3
+					ng-click="openPanel = openPanel!='openOtherProtocol'?'openOtherProtocol':'' ">
+					<small> <i class="fa fa-bars" aria-hidden="true"></i>
+					</small> Протоколи
+				</h3>
+				<div ng-if="openPanel == 'openOtherProtocol'">
+					<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
+				</div>
 			</li>
 		</ul>
 		<div class="row">
-			<div class="col-md-2  pull-right">
-			</div>
+			<div class="col-md-2  pull-right"></div>
 		</div>
 	</div>
 </div>

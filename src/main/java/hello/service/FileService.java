@@ -126,7 +126,7 @@ public class FileService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Map<String, Object> readJsonFromFile(String fileName) {
 		File file = new File(folderDb + fileName);
 		Map<String, Object> readJsonFileToJavaObject = null;

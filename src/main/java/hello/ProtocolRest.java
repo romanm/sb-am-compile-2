@@ -110,8 +110,8 @@ public class ProtocolRest {
 		List<String> fl = new ArrayList<>();
 		for (File file : new File(protocolDirName).listFiles()) {
 			String name = file.getName();
-			System.out.println(name);
-			System.out.println(name.replace(".json", ""));
+//			System.out.println(name);
+//			System.out.println(name.replace(".json", ""));
 			fl.add(name.replace(".json", ""));
 //			System.out.println(file.toString().replaceAll("\\", "/"));
 			

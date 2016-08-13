@@ -9,7 +9,6 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 	console.log('HomeCtrl');
 	initAngularCommon($scope, $http);
 	initDmnRule($scope);
-	$scope.openOtherProtocol = true;
 
 	initUserState($scope, $http);
 	readProtocolDir($scope, $http);
@@ -72,7 +71,6 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 			$scope.error = data;
 		});
 	}
-
 
 	$scope.collectMedData = function(procInstId, taskId){
 		$scope.openDmnVariable = taskId == $scope.openDmnVariable?0:taskId;
@@ -147,6 +145,52 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 		return maxN;
 	}
 
+	$scope.lastParentId = function(parentIds){
+		var parentIds = parentIds.split(' '); 
+		var lastParentId = parentIds[parentIds.length - 1];
+		return lastParentId;
+	}
+
+	$scope.getParallelOneTable = function(flowTableElement, bpmnInit){
+		var parentId = $scope.lastParentId(flowTableElement.parentIds);
+		var flowElementConfig = bpmnInit.config[parentId];
+		if(!flowElementConfig.parallelOneTable){
+			flowElementConfig.parallelOneTable = [];
+			flowTableElement.children.forEach(function(c){
+				c.nodeTree.forEach(function(flowTableElement2){
+					if(flowTableElement2.node.name == 'bpmn:sequenceFlow'){
+						var parallelOneTableElement = {flowTableElement:flowTableElement2};
+						var parallelOneTableElement2 = {flowTableElement:flowTableElement2};
+						var businessRuleTask = bpmnInit.processElements[flowTableElement2.node.attr.targetRef].obj;
+						$scope.obj.data.init.camundaAppendix.dmn.forEach(function(nextDmn){
+							if(businessRuleTask.attr['camunda:decisionRef'] == nextDmn.xmldoc.firstChild.attr.id){
+								parallelOneTableElement.dmn = nextDmn;
+								parallelOneTableElement2.dmn = nextDmn;
+							}
+						});
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement);
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement2);
+					}
+				});
+			});
+		}
+		console.log(flowElementConfig.parallelOneTable);
+		return flowElementConfig.parallelOneTable;
+	}
+
+	$scope.showAsOneTable = function(flowTableElement, editorBpmnNr){
+		var parentId = $scope.lastParentId(flowTableElement.parentIds);
+		var bpmnInit = $scope.obj.data.init.camundaAppendix.bpmn[editorBpmnNr];
+		console.log(bpmnInit.config[parentId]);
+		if(!bpmnInit.config[parentId]){
+			bpmnInit.config[parentId] = {showAs:''};
+		}
+		console.log(bpmnInit.config[parentId]);
+		bpmnInit.config[parentId].showAs = bpmnInit.config[parentId].showAs != 'oneTable'?'oneTable':'';
+		console.log(bpmnInit.config[parentId]);
+	}
+
+	
 	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask, editorBpmnNr){
 //		console.log(dmn.toString());
 		console.log(dmnXmldoc.firstChild.attr.id);
@@ -276,7 +320,6 @@ function initDictionary($scope, $http){
 function readProtocolDir($scope, $http){
 	$http.get("/v/readProtocolDir").success(function(response) {
 		$scope.protocolList = response;
-		$scope.openOtherProtocol = true;
 		initDictionary($scope, $http);
 	});
 }
@@ -361,6 +404,7 @@ function initNewDmn(keyDmn, $scope){
 function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix){
 	var dmnInProtocol = protocol[keyDmn];
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+	//console.log(dmnXmldoc.toString());
 	dmnInProtocol.dmnName = dmnXmldoc.firstChild.attr.id;
 	camundaAppendix.dmn.push({path: keyDmn
 		, xmldoc: dmnXmldoc
@@ -390,6 +434,10 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 		var targetRef = walkElement.node.attr.targetRef;
 		walkIds(bpmnInit, nodeTree, targetRef, parentIds);
 	}else
+	if(walkElement.node.name == 'bpmn:parallelGateway'){
+		console.log(walkElement.node.toString());
+		nodeTree.push(walkElement);
+	}else
 	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
 		nodeTree.push(walkElement);
 	}
@@ -418,15 +466,15 @@ function initBpmnVerticalTable(bpmnInit){
 	bpmnInit.processElements = {};
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
 	//console.log(bpmnProcess.toString());
-	bpmnInit.startId = null;
+	bpmnInit.config = {startId:null};
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
 		if(elementId.indexOf('StartEvent')==0){
-			bpmnInit.startId = elementId;
+			bpmnInit.config.startId = elementId;
 		}
 		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
 	});
-	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.startId);
+	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.config.startId);
 	console.log(bpmnInit.nodeTree);
 }
 

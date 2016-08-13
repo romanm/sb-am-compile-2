@@ -25,25 +25,28 @@
 		</label>
 	</div>
 
-	<div ng-show="!useJsonEditor">
-		<div ng-repeat="(k,v) in obj.data">
-			<div ng-switch on="k">
-				<p ng-switch-when="p">{{v}}</p>
-				<div ng-switch-when="home">Home Span</div>
-				<div class="animate-switch" ng-switch-default></div>
-			</div>
-		</div>
-		<div class="container">
-			<div class="row">
-				<div class="col-md-10">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-10">
+				<div ng-show="!useJsonEditor">
+					<div ng-repeat="(k,v) in obj.data">
+						<div ng-switch on="k">
+							<p ng-switch-when="p">{{v}}</p>
+							<div ng-switch-when="home">Home Span</div>
+							<div class="animate-switch" ng-switch-default></div>
+						</div>
+					</div>
+					----------------
 					<div id="bpmn-canvas-0">
 						<div ng-repeat="editorBpmnNr in [0]"
 							ng-if="obj.data.init.camundaAppendix.bpmn[0]"
+							ng-init="bpmnInit = obj.data.init.camundaAppendix.bpmn[0]"
 							ng-include="'/h/dev/sah/p5-view/app/ui/editorBpmn.html'"></div>
 					</div>
 					<div id="bpmn-canvas-1">
 						<div ng-repeat="editorBpmnNr in [1]"
 							ng-if="obj.data.init.camundaAppendix.bpmn[1]"
+							ng-init="bpmnInit = obj.data.init.camundaAppendix.bpmn[1]"
 							ng-include="'/h/dev/sah/p5-view/app/ui/editorBpmn.html'"></div>
 					</div>
 					<div id="bpmn-canvas-2"></div>
@@ -57,22 +60,10 @@
 					<div id="dmn-canvas-4"></div>
 					<hr />
 				</div>
-				<div class="col-md-2">
-					<h3 ng-click="openMarkers = !openMarkers">
-						<small> <i class="fa fa-bars" aria-hidden="true"></i>
-						</small>Маркери
-					</h3>
-					<div ng-if="openMarkers">---</div>
-					<h3 ng-click="openOtherProtocol = !openOtherProtocol">
-						<small> <i class="fa fa-bars" aria-hidden="true"></i>
-						</small> Протоколи
-					</h3>
-					<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
-				</div>
+				<div id="jsoneditor" ng-show="useJsonEditor"></div>
 			</div>
 		</div>
 	</div>
-	<div id="jsoneditor" ng-show="useJsonEditor"></div>
 
 	<script src="./app.js"></script>
 	<script src="/v/lib/js/angular-translate-my.min.js"></script>

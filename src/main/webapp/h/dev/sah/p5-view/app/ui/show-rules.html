@@ -1,6 +1,5 @@
 <div
 	ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')">
-	
 	<b> Якщо </b> : <span
 		ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
 		ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
