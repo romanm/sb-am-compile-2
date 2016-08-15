@@ -1,0 +1,41 @@
+<hr/>
+<table class="table table-bordered">
+	<tr
+		ng-repeat="parallelOneTable in getParallelOneTable(flowTableElement, bpmnInit)"
+		ng-init="sourceRef = parallelOneTable.flowTableElement.node.attr.sourceRef;
+		ruleNr = $index;
+		ruleHead = $index%2 == 0;
+		ruleBody = $index%2 == 1;
+		">
+		<td>
+		<div ng-if="ruleHead">
+				<b> {{bpmnInit.processElements[sourceRef].obj.attr.name}} </b> <br />
+				<span class="bg-info">
+					{{parallelOneTable.flowTableElement.valueRule}} </span>
+			</div>
+			<div ng-if="ruleBody">
+			{{parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.input').attr.label}}
+			</div>
+		</td>
+		<td width="8%" class="bg-info">
+			<div ng-if="ruleHead">
+			{{parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output').attr.value}}
+			</div>
+			<div ng-if="ruleBody">
+			{{parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output').attr.expInput}}
+			</div>
+		</td>
+		<td
+		title="{{rule.descendantWithPath('description').val}}"
+			ng-repeat="rule in parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')"
+			ng-click="setRuleState(parallelOneTable, rule, ruleHead)"
+			ng-class="{'bg-info':parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output').attr.value
+			== rule.descendantWithPath('outputEntry.text').val}"
+			>
+			<div ng-if="ruleHead">
+				{{rule.descendantWithPath('outputEntry.text').val}}</div>
+			<div ng-if="ruleBody">
+				{{rule.descendantWithPath('inputEntry.text').val}}</div>
+		</td>
+	</tr>
+</table>

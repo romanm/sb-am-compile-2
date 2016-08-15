@@ -34,20 +34,20 @@
 						<a href="#"
 							ng-click="showAsOneTable(flowTableElement, editorBpmnNr)">
 							показувати <span
-							ng-if="bpmnInit.config[lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
+							ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
 								однією таблицею </span> <span
-							ng-if="bpmnInit.config[lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'">
+							ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'">
 								звичайний вигляд </span>
 						</a>
 					</div>
 				</div>
 		</span>
 			<div
-				ng-if="bpmnInit.config[lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'"
+				ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'"
 				ng-include="'/h/dev/sah/p5-view/app/ui/parallelGatewayDmnAsOneTable.html'">
 			</div>
 			<div
-				ng-if="bpmnInit.config[lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
+				ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
 				<!-- 
 			<table class="table table-bordered">
 			<table >

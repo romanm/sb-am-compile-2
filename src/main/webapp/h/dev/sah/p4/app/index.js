@@ -101,7 +101,7 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 	
 	var exportArtifacts = _.debounce(function() {
 		saveDiagram(function(err, xml) {
-			setBpmnContent($scope.obj.data, params.jsonpath, xml);
+			setBpmnContent($scope.obj.data, params.jsonpath + '.bpmnContent', xml);
 		});
 	}, 500);
 
@@ -122,8 +122,10 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 			options : { mode : 'tree' }
 		};
 		console.log($scope.obj);
-		var key1 = params.jsonpath.split('.')[0];
-		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath)
+//		var key1 = params.jsonpath.split('.')[0];
+		var key1 = params.jsonpath;
+//		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath)
+		var bpmnContent = jsonPath($scope.obj.data, params.jsonpath + '.bpmnContent');
 		var bpmnXmldoc = new xmldoc.XmlDocument(bpmnContent);
 		bpmnXmldoc = initBpmnXml($scope.obj.data, key1, bpmnXmldoc);
 		console.log("---------------------");
@@ -136,13 +138,14 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 			openDiagram(bpmnContent);
 		}
 	});
-	
+
 	$scope.addProtocolUrl = function(){
 		if(params.p){
 			return '?p='+params.p;
 		}
 		return '';
 	}
+
 	$scope.saveFile = function(){
 		console.log("-------saveFile--------");
 		
@@ -154,7 +157,7 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 			console.log(response.length);
 		});
 	}
-	
+
 });
 
 var xmldoc = require('xmldoc');

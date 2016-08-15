@@ -126,7 +126,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 			options : { mode : 'tree' }
 		};
 		editor.set($scope.obj.data);
-		initBpmnDmnToId($scope.obj.data);
+		initBpmnDmnToId($scope.obj.data, $scope);
 		viewerBpmnDmn($scope.obj.data);
 		console.log($scope.obj.data);
 	});
@@ -151,10 +151,24 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 		return lastParentId;
 	}
 
+	/*
+	 * */
+	$scope.setRuleState = function(parallelOneTable, rule, ruleHead){
+		console.log("----------------");
+		var ruleOutput = parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output');
+		var valOutput = rule.descendantWithPath('outputEntry.text').val;
+		var valInput = rule.descendantWithPath('inputEntry.text').val;
+		ruleOutput.attr.value = valOutput;
+		ruleOutput.attr.expInput = valInput;
+		parallelOneTable.flowTableElement.valueRule = rule.descendantWithPath('description').val;
+	}
+
 	$scope.getParallelOneTable = function(flowTableElement, bpmnInit){
 		var parentId = $scope.lastParentId(flowTableElement.parentIds);
-		var flowElementConfig = bpmnInit.config[parentId];
+		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parentId];
+		console.log(flowElementConfig.parallelOneTable);
 		if(!flowElementConfig.parallelOneTable){
+			console.log("--------getParallelOneTable--------------make new----------------");
 			flowElementConfig.parallelOneTable = [];
 			flowTableElement.children.forEach(function(c){
 				c.nodeTree.forEach(function(flowTableElement2){
@@ -173,6 +187,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 					}
 				});
 			});
+		console.log(flowElementConfig.parallelOneTable);
 		}
 		console.log(flowElementConfig.parallelOneTable);
 		return flowElementConfig.parallelOneTable;
@@ -181,13 +196,18 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	$scope.showAsOneTable = function(flowTableElement, editorBpmnNr){
 		var parentId = $scope.lastParentId(flowTableElement.parentIds);
 		var bpmnInit = $scope.obj.data.init.camundaAppendix.bpmn[editorBpmnNr];
-		console.log(bpmnInit.config[parentId]);
-		if(!bpmnInit.config[parentId]){
-			bpmnInit.config[parentId] = {showAs:''};
+		console.log(bpmnInit.path);
+		if(!$scope.obj.data.config[bpmnInit.path]){
+			$scope.obj.data.config[bpmnInit.path] = {};
 		}
-		console.log(bpmnInit.config[parentId]);
-		bpmnInit.config[parentId].showAs = bpmnInit.config[parentId].showAs != 'oneTable'?'oneTable':'';
-		console.log(bpmnInit.config[parentId]);
+		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
+		if(!$scope.obj.data.config[bpmnInit.path][parentId]){
+			$scope.obj.data.config[bpmnInit.path][parentId] = {showAs:''};
+		}
+		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
+		$scope.obj.data.config[bpmnInit.path][parentId].showAs 
+			= $scope.obj.data.config[bpmnInit.path][parentId].showAs != 'oneTable'?'oneTable':'';
+		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
 	}
 
 	
@@ -336,7 +356,7 @@ function viewerBpmnDmn(protocol){
 	for (var dmnNr in protocol.init.camundaAppendix.dmn){
 		var dmnViewerInitData = protocol.init.camundaAppendix.dmn[dmnNr];
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
-		caElement.prepend(angular.element('<a id="/'
+		caElement.prepend(angular.element('<b>Редактор: </b><a id="/'
 				+dmnViewerInitData.path+'" href="/h/dev/sah/p5-view/dist/p5dmn.html?jsonpath='
 				+dmnViewerInitData.path+addProtocol()+'">' +dmnViewerInitData.path+ '</a>'));
 		var viewerDmn = new DmnViewer(dmnViewerInitData.container);
@@ -363,7 +383,7 @@ function viewerBpmnDmn(protocol){
 				+bpmnViewerInitData.path+addProtocol()+'">' +bpmnViewerInitData.path+ '</a>'));
 		 * */
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);
-		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path);
+		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path + '.bpmnContent');
 		viewerBpm.importXML(bpmnContext, function(err) {
 			if (err) {
 				console.error(err);
@@ -435,7 +455,7 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 		walkIds(bpmnInit, nodeTree, targetRef, parentIds);
 	}else
 	if(walkElement.node.name == 'bpmn:parallelGateway'){
-		console.log(walkElement.node.toString());
+		//console.log(walkElement.node.toString());
 		nodeTree.push(walkElement);
 	}else
 	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
@@ -461,46 +481,29 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 	}
 }
 
-function initBpmnVerticalTable(bpmnInit){
+function initBpmnVerticalTable(bpmnInit, $scope){
 	bpmnInit.nodeTree = [];
 	bpmnInit.processElements = {};
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
-	//console.log(bpmnProcess.toString());
 	bpmnInit.config = {startId:null};
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
 		if(elementId.indexOf('StartEvent')==0){
 			bpmnInit.config.startId = elementId;
 		}
+		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][elementId];
+		if(flowElementConfig){
+			delete flowElementConfig['parallelOneTable']
+		}
 		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
 	});
 	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.config.startId);
-	console.log(bpmnInit.nodeTree);
 }
 
-function initBpmnDmnToId(protocol){
+function initBpmnDmnToId(protocol, $scope){
+	if(!protocol.config)
+		protocol.config = {};
 	var camundaAppendix = {bpmn:[],dmn:[]};
-	var bpmnNr = 0;
-	for (var key1 in protocol) {
-		if(key1.indexOf('bpmn')>=0){
-			for (var key2 in protocol[key1]) {
-				if(key2.indexOf('bpmnContent')>=0){
-					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
-					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
-					var bpmnInit = {path: key1+'.bpmnContent'
-							, xmldoc: bpmnXmldoc
-							, container:
-								{container:'#bpmn-canvas-' + bpmnNr
-								, height: protocol[key1].height
-								}
-							};
-					initBpmnVerticalTable(bpmnInit);
-					camundaAppendix.bpmn.push(bpmnInit);
-					bpmnNr++;
-				}
-			}
-		}
-	}
 	var dmnNr = 0;
 	for (var key1 in protocol) {
 		if(key1.indexOf('dmn')>=0){
@@ -508,6 +511,28 @@ function initBpmnDmnToId(protocol){
 				if(key2.indexOf('dmnContent')>=0){
 					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix);
 					dmnNr++;
+				}
+			}
+		}
+	}
+	var bpmnNr = 0;
+	for (var key1 in protocol) {
+		if(key1.indexOf('bpmn')>=0){
+			for (var key2 in protocol[key1]) {
+				if(key2.indexOf('bpmnContent')>=0){
+					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
+					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
+					//var bpmnInit = {path: key1+'.bpmnContent'
+					var bpmnInit = {path: key1
+							, xmldoc: bpmnXmldoc
+							, container:
+								{container:'#bpmn-canvas-' + bpmnNr
+								, height: protocol[key1].height
+								}
+							};
+					initBpmnVerticalTable(bpmnInit, $scope);
+					camundaAppendix.bpmn.push(bpmnInit);
+					bpmnNr++;
 				}
 			}
 		}
@@ -663,7 +688,7 @@ function readCollectMedData($scope, $http, procInstId, taskId){
 		$scope.collectData = response;
 		console.log($scope.collectData);
 		$scope.openDmnVariable = taskId;
-		initBpmnDmnToId($scope.collectData.protocol);
+		initBpmnDmnToId($scope.collectData.protocol, $scope);
 		seekNextTask($scope.collectData.taskInst.TASK_DEF_KEY_, $scope);
 		setVariableValueToDmn(taskId, $scope);
 	});
