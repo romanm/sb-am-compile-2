@@ -565,7 +565,7 @@ angular.module('P5DmnApp', [])
 			options : { mode : 'tree' }
 		};
 		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
-//		console.log(dmnContent);
+		console.log(dmnContent);
 		renderer.importXML(dmnContent, function(err) {
 			if (err) {
 				console.log('error rendering', err);
@@ -587,6 +587,21 @@ angular.module('P5DmnApp', [])
 		renderer.on('commandStack.changed', exportArtifacts);
 
 	});
+
+	$scope.addHitPolicySum = function(){
+		console.log("-------addHitPolicySum--------");
+		console.log(params);
+		console.log($scope.obj.data[params.jsonpath]);
+		var dmnInProtocol = $scope.obj.data[params.jsonpath];
+		//console.log(dmnInProtocol.dmnContent);
+		var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+		var decisionTable = dmnXmldoc.descendantWithPath('decision.decisionTable');
+		console.log(decisionTable);
+		decisionTable.attr['hitPolicy'] = 'COLLECT';
+		decisionTable.attr['aggregation'] = 'SUM';
+		dmnInProtocol.dmnContent = dmnXmldoc.toString();
+
+	}
 
 	$scope.saveFileTheDMN = function(){
 		console.log("-------saveFile--------");
