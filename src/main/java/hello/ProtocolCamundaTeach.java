@@ -50,15 +50,19 @@ public class ProtocolCamundaTeach {
 			@PathVariable Integer taskId
 			){
 		logger.debug(""+procInstId+"/"+taskId);
-		Map<String, Object> taskInst = camunda1ParamJdbcTemplate.queryForMap(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
 		Map<String,Object> map = new HashMap<>();
-		map.put("taskInst", taskInst);
-		String procDefKey = (String) taskInst.get("PROC_DEF_KEY_");
-		String protocolFileName = procDefKey.split("_bpmn")[0];
-		logger.debug("protocolFileName = "+protocolFileName);
-		Map<String, Object> protocol = fileService.readFileFromLongName(protocolDirName+protocolFileName+".json");
-		map.put("protocol", protocol);
-		map.put("protocolFileName", protocolFileName);
+		//		Map<String, Object> taskInst = camunda1ParamJdbcTemplate.queryForMap(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
+		List<Map<String, Object>> taskInstes = camunda1JdbcTemplate.queryForList(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
+		if(!taskInstes.isEmpty()){
+			Map<String, Object> taskInst = taskInstes.get(0);
+			map.put("taskInst", taskInst);
+			String procDefKey = (String) taskInst.get("PROC_DEF_KEY_");
+			String protocolFileName = procDefKey.split("_bpmn")[0];
+			logger.debug("protocolFileName = "+protocolFileName);
+			Map<String, Object> protocol = fileService.readFileFromLongName(protocolDirName+protocolFileName+".json");
+			map.put("protocol", protocol);
+			map.put("protocolFileName", protocolFileName);
+		}
 		return map;
 	}
 	@Value("${sql.camunda.ACT_GE_BYTEARRAY.by.ACT_HI_PROCINST_ID}") private String sqlCamundaBytearrayByProcInst;

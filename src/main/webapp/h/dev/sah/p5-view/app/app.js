@@ -166,9 +166,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	$scope.getParallelOneTable = function(flowTableElement, bpmnInit){
 		var parentId = $scope.lastParentId(flowTableElement.parentIds);
 		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parentId];
-		console.log(flowElementConfig.parallelOneTable);
 		if(!flowElementConfig.parallelOneTable){
-			console.log("--------getParallelOneTable--------------make new----------------");
 			flowElementConfig.parallelOneTable = [];
 			flowTableElement.children.forEach(function(c){
 				c.nodeTree.forEach(function(flowTableElement2){
@@ -187,9 +185,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 					}
 				});
 			});
-		console.log(flowElementConfig.parallelOneTable);
 		}
-		console.log(flowElementConfig.parallelOneTable);
 		return flowElementConfig.parallelOneTable;
 	}
 
@@ -491,9 +487,14 @@ function initBpmnVerticalTable(bpmnInit, $scope){
 		if(elementId.indexOf('StartEvent')==0){
 			bpmnInit.config.startId = elementId;
 		}
-		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][elementId];
-		if(flowElementConfig){
-			delete flowElementConfig['parallelOneTable']
+		if($scope.obj){
+			if(!$scope.obj.data.config[bpmnInit.path]){
+				$scope.obj.data.config[bpmnInit.path] = {};
+			}
+			var flowElementConfig = $scope.obj.data.config[bpmnInit.path][elementId];
+			if(flowElementConfig){
+				delete flowElementConfig['parallelOneTable']
+			}
 		}
 		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
 	});
@@ -523,6 +524,7 @@ function initBpmnDmnToId(protocol, $scope){
 					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
 					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
 					//var bpmnInit = {path: key1+'.bpmnContent'
+					console.log(key1);
 					var bpmnInit = {path: key1
 							, xmldoc: bpmnXmldoc
 							, container:
@@ -530,6 +532,7 @@ function initBpmnDmnToId(protocol, $scope){
 								, height: protocol[key1].height
 								}
 							};
+					console.log(bpmnInit);
 					initBpmnVerticalTable(bpmnInit, $scope);
 					camundaAppendix.bpmn.push(bpmnInit);
 					bpmnNr++;
@@ -666,11 +669,13 @@ function initDmnRule($scope){
 function configTranslation($translateProvider){
 	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
 	//$translateProvider.useLocalStorage();
-	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
 	var myLocale = 'ua'
+	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
 	if(springCookieLocale){
 		if(springCookieLocale.indexOf(';') > 0){
 			myLocale = springCookieLocale.split(';')[0];
+		}else{
+			myLocale = springCookieLocale;
 		}
 	}
 	$translateProvider.preferredLanguage(myLocale);

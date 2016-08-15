@@ -6,6 +6,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -87,15 +88,29 @@ public class ProtocolRest {
 	}
 
 	@RequestMapping(value = "/saveProtocol", method = RequestMethod.POST)
-	public  @ResponseBody Map<String, Object> saveProtocol(@RequestBody Map<String, Object> protocol) {
+	public @ResponseBody Map<String, Object> saveProtocol(@RequestBody Map<String, Object> protocol) {
 		String fileName = (String) protocol.get("fileName");
 		String fileNameExt = fileName + ".json";
 		logger.debug("/saveProtocol :: "+fileNameExt);
+		protocol.remove("init");
+		cleanInitData(protocol);
 		fileService.saveMapAsFile(protocol, protocolDirName + fileNameExt);
 		logger.debug("backup");
 		fileService.backup(protocolDirName, fileNameExt);
 		logger.debug("----END----");
 		return protocol;
+	}
+
+	private void cleanInitData(Map<String, Object> protocol) {
+		Map<String, Object> config = (Map<String, Object>) protocol.get("config");
+		for (String key1 : config.keySet()) {
+			Map<String, Object> configEl1 = (Map<String, Object>) config.get(key1);
+			for (String key2 : configEl1.keySet()) {
+				Map<String, Object> flowTableElement = (Map<String, Object>) configEl1.get(key2);
+				flowTableElement.remove("parallelOneTable");
+			}
+			
+		}
 	}
 
 	@RequestMapping(value = "/v/readProtocol/{fileName}", method = RequestMethod.GET)
