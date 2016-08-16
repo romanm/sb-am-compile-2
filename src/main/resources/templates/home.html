@@ -5,7 +5,8 @@
 ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 	
 <head>
-<title>САХ домашня сторінка</title>
+<title>САХ <span th:text="#{home_page}" th:remove="tag">title</span>
+</title>
 <link rel="stylesheet" href="/v/css/ui.css"/>
 <link rel="stylesheet" href="/v/css/navbar_horizontal_gray.css"/>
 <link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>

@@ -16,19 +16,19 @@
 </head>
 <body>
 	<div ng-include="'ui/menu.html'"></div>
-	<h1 ng-bind="obj.data.protocolName">Protocole5App</h1>
-	<div>
-		<button ng-click="saveFile()">save</button>
-		<button ng-click="deployFile()">deploy</button>
-		<input type="text" ng-model="obj.data.protocolName" /> <a href="#"></a>
-		<label>json <input type="checkbox" ng-model="useJsonEditor"
-			ng-click="editJson()" />
-		</label>
-	</div>
 
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-10">
+				<h1 ng-bind="obj.data.protocolName">Protocole5App</h1>
+				<div>
+					<button ng-click="saveFile()">save</button>
+					<button ng-click="deployFile()">deploy</button>
+					<input type="text" ng-model="obj.data.protocolName" /> <a href="#"></a>
+					<label>json <input type="checkbox" ng-model="useJsonEditor"
+						ng-click="editJson()" />
+					</label>
+				</div>
 				<div ng-show="!useJsonEditor">
 
 					<div ng-repeat="(k,v) in obj.data">
@@ -46,9 +46,7 @@
 							ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
 					</div>
 					<hr />
-					<h2>
-					{{'appendix' | translate}}
-					</h2>
+					<h2>{{'appendix' | translate}}</h2>
 					<div id="bpmn-canvas-0">
 						<div ng-repeat="editorBpmnNr in [0]"
 							ng-if="obj.data.init.camundaAppendix.bpmn[0]"
