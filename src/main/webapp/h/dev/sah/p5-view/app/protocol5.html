@@ -20,17 +20,31 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-10">
-				<h1 ng-bind="obj.data.protocolName">Protocole5App</h1>
-				<div>
-					<button ng-click="saveFile()">save</button>
-					<button ng-click="deployFile()">deploy</button>
-					<input type="text" ng-model="obj.data.protocolName" /> <a href="#"></a>
-					<label>json <input type="checkbox" ng-model="useJsonEditor"
-						ng-click="editJson()" />
-					</label>
+				<h1 id="doc_head" ng-bind="obj.data.protocolName">Protocole5App</h1>
+				<div class="row">
+					<div class="col-md-10">
+						<form class="form-inline" role="form">
+							<button ng-click="saveFile()" class="btn btn-default btn-xs">
+								<span class="glyphicon glyphicon-save"></span> {{'save' |
+								translate}}
+							</button>
+							<div class="form-group">
+								<input class="form-control" type="text"
+									ng-model="obj.data.protocolName" /> <a href="#"></a> <label>json
+									<input type="checkbox" ng-model="useJsonEditor"
+									ng-click="editJson()" />
+								</label>
+							</div>
+						</form>
+					</div>
+					<div class="col-md-2">
+						<button ng-click="deployFile()" class="btn btn-default btn-xs">
+							<i class="fa fa-cogs" aria-hidden="true"></i> {{'deploy' |
+							translate}}
+						</button>
+					</div>
 				</div>
 				<div ng-show="!useJsonEditor">
-
 					<div ng-repeat="(k,v) in obj.data">
 						<div ng-switch on="k">
 							<p ng-switch-when="p">{{v}}</p>

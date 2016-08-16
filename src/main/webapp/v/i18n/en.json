@@ -1,5 +1,6 @@
 {
 	"appendix": "Appendix",
+	"deploy": "deploy",
 	"deployed": "deployed",
 	"editor": "Editor",
 	"greeting": "Hi",
@@ -7,8 +8,14 @@
 	"logout": "logout",
 	"locale": "Locale",
 	"processes": "Processes",
+	"save": "save",
+	"sah_abbr": "SAH",
 	"bpmn_active": "active",
 	"bpmn_start": "start",
+	"bpmn_perform_proc":"EMR / protocol perform",
+	"bpmn_perform_task":"EMR / perform task",
+	
+	
 	"rules": "Rules",
 	"rule_if": "If",
 	"rule_then": "Then",
@@ -21,6 +28,13 @@
 	"home_writing_file": "Preparation / Writing",
 	"home_deploy_test": "Deploy / Testing",
 	"home_performed": "Performed",
+	"menu_index": "index",
+	"menu_new_bpmn": "new block diagram",
+	"menu_new_dmn": "new rules",
+	"menu_markers": "Markers",
+	"menu_protocolls": "Protocols",
+
+	
 	"clinicalProtocols": "Clinical protocols",
 	"text": "Here is some text."
 }

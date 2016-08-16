@@ -1,14 +1,20 @@
 {
 	"appendix": "Anhang",
-	"deployed": "stationiert",
+	"deploy": "einsetzen",
+	"deployed": "eingesetzt",
 	"editor": "Editor",
 	"greeting": "Hallo",
 	"login": "Anmeldung",
 	"logout": "Ausloggen",
 	"locale": "Locale",
 	"processes": "Prozesse",
+	"save": "speichern",
+	"sah_abbr": "HVA",
+	
 	"bpmn_active":"activ",
 	"bpmn_start":"start",
+	"bpmn_perform_proc":"EMR / Protokoll durchführen ",
+	"bpmn_perform_task":"EMR / führen Aufgabe",
 
 	"rules": "Regeln",
 	"rule_if": "Wenn",
@@ -21,8 +27,15 @@
 	"home_page": "Homepage",
 	"home_teaching": "Lehre",
 	"home_writing_file": "Vorbereitung / Schreiben",
-	"home_deploy_test": "Verteilen / Testing",
+	"home_deploy_test": "Eingesetzt / Testing",
 	"home_performed": "Durchgeführt ",
+	"menu_index": "index",
+	"menu_menu_doc_head": "index",
+	"menu_new_bpmn": "neue Blockdiagramm",
+	"menu_new_dmn": "neue Regeln",
+	"menu_markers": "Markierungen",
+	"menu_protocolls": "Protokolle",
+	
 	"clinicalProtocols": "Klinisches Protokols",
 	"text": "Hier ist einiges Text."
 }

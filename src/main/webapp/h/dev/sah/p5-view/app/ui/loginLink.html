@@ -1,10 +1,22 @@
 <div ng-if="userPrincipal">
 	<form method="post" action="/logout">
-		{{'greeting' | translate}} <b> {{userPrincipal.name}}!</b> <input
+		{{'greeting' | translate}} <b> {{userPrincipal.name}}!</b> 
+		<!-- 
+		<input
 			value="{{'logout' | translate}}" type="submit" class="btn btn-default btn-xs">
+		 -->
+		<button type="submit" class="btn btn-default btn-xs">
+			<span class="glyphicon glyphicon-log-out"></span> {{'logout' |
+			translate}}
+		</button>
 	</form>
 </div>
+<!-- 
+ -->
 <div ng-if="!userPrincipal">
-	<a href="/hello" class="btn btn-default btn-xs"> {{'login' | translate}} </a>
+	<a ng-if="!userPrincipal" href="/hello" class="btn btn-default btn-xs">
+		<span class="glyphicon glyphicon-log-in"></span> {{'login' |
+		translate}}
+	</a>
 </div>
 

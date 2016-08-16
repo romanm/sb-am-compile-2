@@ -472,7 +472,7 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 	if(outgoings.length == 1){
 		outgoings.forEach(function(outgoing, idx){
 			var sequenceFlowId = outgoing.val;
-			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
+//			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
 		});
 	}
 }
@@ -679,10 +679,12 @@ function initDmnRule($scope){
 }
 
 function configTranslation($translateProvider){
+	console.log("-------configTranslation-----------------------------------");
 	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
 	//$translateProvider.useLocalStorage();
 	var myLocale = 'ua'
 	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
+	console.log(springCookieLocale);
 	if(springCookieLocale){
 		if(springCookieLocale.indexOf(';') > 0){
 			myLocale = springCookieLocale.split(';')[0];

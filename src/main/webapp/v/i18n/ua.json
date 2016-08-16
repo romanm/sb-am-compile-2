@@ -1,5 +1,6 @@
 {
 	"appendix": "Додаток",
+	"deploy": "розгорнути",
 	"deployed": "розгорнуто",
 	"editor": "Редактор",
 	"greeting": "Привіт",
@@ -7,8 +8,13 @@
 	"logout": "Вийти",
 	"locale": "Локаль",
 	"processes": "Процеси",
+	"save": "зберегти",
+	"sah_abbr": "САХ",
 	"bpmn_active": "активні",
 	"bpmn_start": "старт",
+	"bpmn_perform_proc":"Історія хвороби / інстанція протоколу",
+	"bpmn_perform_task":"Запис в ІХ / рекомендації протоколу",
+	
 	"rules": "Правила",
 	"rule_if": "Якщо",
 	"rule_then": "Тоді",
@@ -21,6 +27,13 @@
 	"home_writing_file": "Підготовка/Написання",
 	"home_deploy_test": "Тестування/Розгорнуті",
 	"home_performed": "Виконуються",
+	"menu_index": "індекс",
+	"menu_new_bpmn": "нова блоксхема",
+	"menu_new_dmn": "нові правила",
+	"menu_markers": "Маркери",
+	"menu_protocolls": "Протоколи",
+
+
 	"page": {
 		"home": "домашня"
 	},

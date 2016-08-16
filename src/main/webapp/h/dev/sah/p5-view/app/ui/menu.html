@@ -1,17 +1,21 @@
 <div id="menu-fix-top" class="no-print">
 	<div>
 		<ul>
-			<li class="pull-right">
+			<li class="pull-right" style="list-style-type: none;">
 				<div ng-include="'/h/dev/sah/p5-view/app/ui/loginLink.html'"></div>
 			</li>
-			<li><a href="/"><i class="fa fa-home" aria-hidden="true"></i>
-					САХ <i class="fa fa-angle-double-right" aria-hidden="true"></i> </a></li>
+			<li>
+			</li>
+			<li><a href="/"><i class="fa fa-home" aria-hidden="true">
+			</i>{{'sah_abbr' | translate}}<i class="fa fa-angle-double-right"
+					aria-hidden="true"></i> </a></li>
 			<li><a href="#"> <i class="fa fa-codepen" aria-hidden="true"></i>
 					<span ng-bind="obj.data.protocolMenuName">doc</span></a></li>
 			<li>
 				<div class="tooltip2">
 					<a href="#"> <i class="fa fa-angle-double-down"
-						aria-hidden="true"></i> індекс
+						aria-hidden="true"></i>
+						{{'menu_index' | translate}}
 					</a>
 					<div class="tooltiptext">
 						<div ng-repeat="path in obj.data.init.camundaAppendix.bpmn">
@@ -20,11 +24,16 @@
 						<div ng-repeat="path in obj.data.init.camundaAppendix.dmn">
 							<a href="#{{path.path}}"> {{path.path}} </a>
 						</div>
+						<div>
+							<a href="#doc_head">
+						{{'menu_doc_head' | translate}}
+							</a>
+						</div>
 					</div>
 				</div>
 			</li>
-			<li><a href="#" ng-click="createNewBpmn()">нова блоксхема</a>
-			<li><a href="#" ng-click="createNewDMN()">нові правила</a></li>
+			<li><a href="#" ng-click="createNewBpmn()">{{'menu_new_bpmn' | translate}}</a>
+			<li><a href="#" ng-click="createNewDMN()">{{'menu_new_dmn' | translate}}</a></li>
 			<li><h3
 					ng-click="openPanel = openPanel!='openMarkers'?'openMarkers':''">
 					<small> <i class="fa fa-bars" aria-hidden="true"></i>
