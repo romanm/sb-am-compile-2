@@ -52,7 +52,7 @@ public class ProtocolCamundaTeach {
 		logger.debug(""+procInstId+"/"+taskId);
 		Map<String,Object> map = new HashMap<>();
 		//		Map<String, Object> taskInst = camunda1ParamJdbcTemplate.queryForMap(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
-		List<Map<String, Object>> taskInstes = camunda1JdbcTemplate.queryForList(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
+		List<Map<String, Object>> taskInstes = camunda1ParamJdbcTemplate.queryForList(sqlCamundaTaskInstById, new MapSqlParameterSource("taskId", taskId));
 		if(!taskInstes.isEmpty()){
 			Map<String, Object> taskInst = taskInstes.get(0);
 			map.put("taskInst", taskInst);

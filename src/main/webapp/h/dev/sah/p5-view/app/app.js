@@ -565,7 +565,8 @@ angular.module('P5DmnApp', [])
 			options : { mode : 'tree' }
 		};
 		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
-		console.log(dmnContent);
+		$scope.dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
+		console.log($scope.dmnContent);
 		renderer.importXML(dmnContent, function(err) {
 			if (err) {
 				console.log('error rendering', err);
@@ -589,14 +590,10 @@ angular.module('P5DmnApp', [])
 	});
 
 	$scope.addHitPolicySum = function(){
-		console.log("-------addHitPolicySum--------");
-		console.log(params);
-		console.log($scope.obj.data[params.jsonpath]);
 		var dmnInProtocol = $scope.obj.data[params.jsonpath];
-		//console.log(dmnInProtocol.dmnContent);
-		var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
-		var decisionTable = dmnXmldoc.descendantWithPath('decision.decisionTable');
-		console.log(decisionTable);
+//		var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+//		var decisionTable = dmnXmldoc.descendantWithPath('decision.decisionTable');
+		var decisionTable = $scope.dmnXmldoc.descendantWithPath('decision.decisionTable');
 		decisionTable.attr['hitPolicy'] = 'COLLECT';
 		decisionTable.attr['aggregation'] = 'SUM';
 		dmnInProtocol.dmnContent = dmnXmldoc.toString();

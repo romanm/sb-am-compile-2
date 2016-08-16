@@ -2,13 +2,21 @@
 	"greeting": "Привіт",
 	"login": "Ввійти",
 	"logout": "Вийти",
+	"locale": "Локаль",
+	"appendix": "Додаток",
+	"editor": "Редактор",
+	"processes": "Процеси",
+	"deployed": "розгорнуто",
+	"performed_status": "Стани виконання клінічних протоколів",
+	"seek_protocol_placeholder": "Пошук на ім'ям файлів латиницею",
+	"home_page": "Домашня сторінка",
+	"home_teaching": "Навчання",
 	"home_writing_file": "Підготовка/Написання",
 	"home_deploy_test": "Тестування/Розгорнуті",
 	"home_performed": "Виконуються",
-	"page":{
-		"home":"домашня"
+	"page": {
+		"home": "домашня"
 	},
-	"deployed": "розгорнуто",
 	"clinicalProtocols": "Клінічні протоколи",
 	"text": "Тут знаходиться який-небудь текст"
 }

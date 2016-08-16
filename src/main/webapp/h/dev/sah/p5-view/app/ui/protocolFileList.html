@@ -4,7 +4,7 @@
 		<div class="input-group-addon">
 			<span class="glyphicon glyphicon-search"></span>
 		</div>
-		<input ng-model="seekProtocol" placeholder="Пошук по ім'ям файлів латинецею" class="form-control" >
+		<input ng-model="seekProtocol" placeholder="{{'seek_protocol_placeholder' | translate}}" class="form-control" >
 	</div>
 	<ul>
 		<li ng-repeat="protocolFileName in protocolList | filter:seekProtocol"

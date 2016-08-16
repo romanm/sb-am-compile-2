@@ -34,10 +34,7 @@ ng-app="HomeApp" ng-controller="HomeCtrl as myCtrl">
 
 
 	<hr />
-	<p>
-		locale : <a href="?locale=ua">Ukrainish</a>|<a href="?locale=en">English</a>|<a
-			href="?locale=de">German</a> || <a href="/home">home</a>
-	</p>
+	<div ng-include="'/h/dev/sah/p5-view/app/ui/localeLinks.html'"></div>
 	--
 	<span th:text="#{global_language}"></span> --
 	<span th:text="#{welcome_text}"></span>

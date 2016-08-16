@@ -1,28 +1,29 @@
-<h3>
-{{'clinicalProtocols' | translate}}
-</h3>
+<h3>{{'clinicalProtocols' | translate}}</h3>
 
 <div>
 	<ul class="nav nav-tabs">
 		<li ng-class="{'active':userState.tabs1 == 'home_writing_file'}"><a
-			href="#" ng-click="setTabs1('home_writing_file')">{{'home_writing_file' | translate}}</a></li>
-		<li ng-class="{'active':userState.tabs1 == 'home_deploy_test'}"><a href="#"
-			ng-click="setTabs1('home_deploy_test')">{{'home_deploy_test' | translate}}</a></li>
-		<li ng-class="{'active':userState.tabs1 == 'home_performed'}"><a href="#"
-			ng-click="setTabs1('home_performed')">{{'home_performed' | translate}}</a></li>
+			href="#" ng-click="setTabs1('home_writing_file')">{{'home_writing_file'
+				| translate}}</a></li>
+		<li ng-class="{'active':userState.tabs1 == 'home_deploy_test'}"><a
+			href="#" ng-click="setTabs1('home_deploy_test')">{{'home_deploy_test'
+				| translate}}</a></li>
+		<li ng-class="{'active':userState.tabs1 == 'home_performed'}"><a
+			href="#" ng-click="setTabs1('home_performed')">{{'home_performed'
+				| translate}}</a></li>
 	</ul>
 	<div ng-if="userState.tabs1 == 'home_writing_file'">
 		<div ng-include="'/h/dev/sah/p5-view/app/ui/protocolFileList.html'"></div>
 	</div>
 	<div ng-if="userState.tabs1 == 'home_deploy_test'">
-		<h5>Процеси</h5>
+		<h5>
+		{{'processes' | translate}}
+		</h5>
 		<ul>
 			<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF">
-			<div>
-			{{protocolListMap[procDef.RESOURCE_NAME_.split('.')[0]].protocolName}}
-			</div>
-			<span
-				class="showhim"> <b> {{procDef.KEY_}} </b> : <i
+				<div>
+					{{protocolListMap[procDef.RESOURCE_NAME_.split('.')[0]].protocolName}}
+				</div> <span class="showhim"> <b> {{procDef.KEY_}} </b> : <i
 					class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
 						<a href="#" ng-click="showProcessActiviti(procDef.ID_)"> <i
 							class="fa fa-folder-open-o" aria-hidden="true"></i> активності
@@ -35,7 +36,8 @@
 			</li>
 		</ul>
 		<h5>
-			{{'deployed' | translate}} <small> <span
+			{{'deployed' | translate}} 
+			<small> <span
 				class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span
 				class="glyphicon-class"></small>
 		</h5>
@@ -46,8 +48,7 @@
 					<li ng-repeat="procDef in readAllDeployment.ACT_RE_PROCDEF"
 						ng-if="procDef.DEPLOYMENT_ID_ == deployment.ID_"><span>
 							<b> {{procDef.KEY_}} </b> : {{procDef.RESOURCE_NAME_}}
-					</span>
-					</li>
+					</span></li>
 				</ul>
 				<ul>
 					<li
@@ -61,7 +62,7 @@
 	</div>
 	<div ng-if="userState.tabs1 == 'home_performed'">
 		<h4>
-			<small> Стани виконання клінічних протоколів </small> <b
+			<small> {{'performed_status' | translate}} </small> <b
 				title=" {{processActiviti.procDefId}}">
 				{{processActiviti.ACT_RE_PROCDEF.NAME_}} </b>
 		</h4>
@@ -75,9 +76,9 @@
 			</span> <span class="showhim"> <small> <span
 						title="Історія хвороби / інстанція протоколу"> ІХ<sup>№</sup>:
 							{{pA.PARENT_ACT_INST_ID_}}
-					</span> / <span title="Запис в ІХ / рекомендації протоколу"> {{pA.TASK_ID_}} </span>
-				</small> <i
-					class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
+					</span> / <span title="Запис в ІХ / рекомендації протоколу">
+							{{pA.TASK_ID_}} </span>
+				</small> <i class="fa fa-bars" aria-hidden="true"></i> <span class="showme">
 						<a href="#"
 						ng-click="collectMedData(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">
 							Зібрати дані </a>
@@ -88,31 +89,29 @@
 						ng-if="pA.TASK_ID_==varInst.AITASKID"> <span
 						ng-if="varInst.NAME_.indexOf('__')>0 && varInst.TEXT_.length>0">
 							<b> Рекомендовано </b>
-					</span> 
-					{{getVarValText(varInst)}}
-					<span
-						ng-if="!$last">,</span> <span ng-if="$last">.</span>
+					</span> {{getVarValText(varInst)}} <span ng-if="!$last">,</span> <span
+						ng-if="$last">.</span>
 					</span>
-				</div>
-				<!-- 
+				</div> <!-- 
 				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && openDmnVariable" class="alert alert-success">
 				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && openDmnVariable" class="alert alert-info">
 				 -->
-				<div ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && pA.TASK_ID_ == openDmnVariable" class="alert alert-info">
+				<div
+					ng-if="pA.TASK_ID_ == collectData.taskInst.ID_ && pA.TASK_ID_ == openDmnVariable"
+					class="alert alert-info">
 					<span title="{{collectData.taskInst.TASK_DEF_KEY_}}">
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-if="!pA.END_TIME_">
-						<span ng-repeat="dmnInput in ask.dmnInputs"> 
-						<span
-							ng-if="dmnInput.firstChild.attr.typeRef == 'boolean'">
-								<label> <input ng-model="dmnInput.attr.value"
-									type="checkbox"> {{dmnInput.attr.label}}?
+						<span ng-repeat="dmnInput in ask.dmnInputs"> <span
+							ng-if="dmnInput.firstChild.attr.typeRef == 'boolean'"> <label>
+									<input ng-model="dmnInput.attr.value" type="checkbox">
+									{{dmnInput.attr.label}}?
 							</label>
 						</span> <span ng-if="dmnInput.firstChild.attr.typeRef == 'integer'">
 								<span class="glyphicon glyphicon-chevron-right"
 								aria-hidden="true"></span> {{dmnInput.attr.label}}? <input
 								ng-model="dmnInput.attr.value" maxlength="3" size="4">
-						</span> 
+						</span>
 						</span>
 						<button
 							ng-click="saveProcessVariable(pA.PARENT_ACT_INST_ID_, pA.TASK_ID_)">запис
@@ -131,8 +130,8 @@
 	</div>
 </div>
 
-<hr/>
-Навчання:
+<hr />
+{{'home_teaching' | translate}}:
 <a href="/h/dev/sah/protocol1/protocol2.html">
-/h/dev/sah/protocol1/protocol2.html
-</a>⁋
+	/h/dev/sah/protocol1/protocol2.html </a>
+⁋
