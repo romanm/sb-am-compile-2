@@ -5,7 +5,11 @@ display: none;
 display : inline;
 }
 
-
+.well-menu{
+	padding-top: 1px !important; 
+	padding-bottom: 1px !important;
+	
+}
 .navcontainer > ul {
 	margin: 0;
 	padding: 0;

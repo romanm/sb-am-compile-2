@@ -472,7 +472,7 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 	if(outgoings.length == 1){
 		outgoings.forEach(function(outgoing, idx){
 			var sequenceFlowId = outgoing.val;
-//			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
+			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
 		});
 	}
 }

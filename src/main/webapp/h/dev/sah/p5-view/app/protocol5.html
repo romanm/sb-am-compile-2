@@ -21,7 +21,7 @@
 		<div class="row">
 			<div class="col-md-10">
 				<h1 id="doc_head" ng-bind="obj.data.protocolName">Protocole5App</h1>
-				<div class="row">
+				<div class="row well well-menu">
 					<div class="col-md-10">
 						<form class="form-inline" role="form">
 							<button ng-click="saveFile()" class="btn btn-default btn-xs">
@@ -38,7 +38,9 @@
 						</form>
 					</div>
 					<div class="col-md-2">
-						<button ng-click="deployFile()" class="btn btn-default btn-xs">
+						<button ng-click="deployFile()"
+							class="btn btn-default btn-xs form-control"
+							style="vertical-align: middle;">
 							<i class="fa fa-cogs" aria-hidden="true"></i> {{'deploy' |
 							translate}}
 						</button>
