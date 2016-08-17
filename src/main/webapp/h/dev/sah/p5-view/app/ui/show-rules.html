@@ -1,15 +1,38 @@
-<div
-	ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')">
-	<b> {{'rule_if' | translate}} </b> : <span
-		ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
-		ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
-		ng-if="inputEntry.firstChild.val.length > 0"
-		ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
-		{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> 
-	<b>
-		{{'rule_then' | translate}} </b> : <span
-		ng-repeat="outputEntry in rule.childrenNamed('outputEntry')"
-		ng-if="outputEntry.firstChild.val.length > 0">
-		{{nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index].attr.label}}:
-		{{outputEntry.firstChild.val}}, </span>
+<div ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.aggregation == 'SUM'">
+	<div
+		ng-repeat="output in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')">
+		{{output.attr.label}}={{'dmn_hitPolici_aggregation' | translate}}(<span
+			ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')">
+			<b> {{'rule_if' | translate}}</b>: <span
+			ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
+			ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
+			ng-if="inputEntry.firstChild.val.length > 0"
+			ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
+				{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> <b>
+				<u> <span
+					ng-repeat="outputEntry in rule.childrenNamed('outputEntry')"
+					ng-if="outputEntry.firstChild.val.length > 0"> +
+						{{outputEntry.firstChild.val}}</span>
+			</u> ,
+		</b>
+		</span> )
+	</div>
+</div>
+<div ng-if="!nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.aggregation">
+	<div
+		ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')">
+		<b> {{'rule_if' | translate}} </b> : <span
+			ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
+			ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
+			ng-if="inputEntry.firstChild.val.length > 0"
+			ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
+			{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> <b>
+			{{'rule_then' | translate}} 
+			 <span
+			ng-repeat="outputEntry in rule.childrenNamed('outputEntry')"
+			ng-if="outputEntry.firstChild.val.length > 0">
+			{{nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index].attr.label}}:
+			{{outputEntry.firstChild.val}}, </span>
+			</b> 
+	</div>
 </div>

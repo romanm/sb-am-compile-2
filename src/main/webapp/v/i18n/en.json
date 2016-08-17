@@ -14,7 +14,7 @@
 	"bpmn_start": "start",
 	"bpmn_perform_proc":"EMR / protocol perform",
 	"bpmn_perform_task":"EMR / perform task",
-	
+	"dmn_hitPolici_aggregation":"SUM",	
 	
 	"rules": "Rules",
 	"rule_if": "If",
