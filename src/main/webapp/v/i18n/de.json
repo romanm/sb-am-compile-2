@@ -17,7 +17,6 @@
 	"bpmn_perform_task":"EMR / führen Aufgabe",
 	"dmn_hitPolici_aggregation":"SUMME",
 
-
 	"rules": "Regeln",
 	"rule_if": "Wenn",
 	"rule_then": "Dann",

@@ -192,18 +192,14 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	$scope.showAsOneTable = function(flowTableElement, editorBpmnNr){
 		var parentId = $scope.lastParentId(flowTableElement.parentIds);
 		var bpmnInit = $scope.obj.data.init.camundaAppendix.bpmn[editorBpmnNr];
-		console.log(bpmnInit.path);
 		if(!$scope.obj.data.config[bpmnInit.path]){
 			$scope.obj.data.config[bpmnInit.path] = {};
 		}
-		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
 		if(!$scope.obj.data.config[bpmnInit.path][parentId]){
 			$scope.obj.data.config[bpmnInit.path][parentId] = {showAs:''};
 		}
-		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
 		$scope.obj.data.config[bpmnInit.path][parentId].showAs 
 			= $scope.obj.data.config[bpmnInit.path][parentId].showAs != 'oneTable'?'oneTable':'';
-		console.log($scope.obj.data.config[bpmnInit.path][parentId]);
 	}
 
 	
@@ -439,23 +435,45 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 	return bpmnXmldoc;
 }
 
-function walkIds(bpmnInit, nodeTree, elementId, parentIds){
+function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentIds){
 	if(!parentIds) parentIds = '';
 	var walkElement = {node:bpmnInit.processElements[elementId].obj, parentIds:parentIds};
-	if(walkElement.node.name == 'bpmn:sequenceFlow'){
-		if(walkElement.node.attr.sourceRef.indexOf('UserTask')==0 
-		&& walkElement.node.attr.targetRef.indexOf('BusinessRuleTask')==0){
-			nodeTree.push(walkElement);
-		}
+	if($scope.isWalkElementSequenceFlow(walkElement)){
+		//console.log("--------sequenceFlow--------------------"+walkElement.node.attr.id);
 		var targetRef = walkElement.node.attr.targetRef;
-		walkIds(bpmnInit, nodeTree, targetRef, parentIds);
+		if($scope.isUserToRuleSequenceFlow(walkElement)){
+		//UserToRule walkElement
+			nodeTree.push(walkElement);
+		}else
+		if($scope.isToEndEventSequenceFlow(walkElement)){
+		//EndEvent walkElement
+			//console.log("--------sequenceFlow---------to----EndEvent-------"+walkElement.node.attr.id);
+			nodeTree.push(walkElement);
+		}else
+		if(targetRef.indexOf('ExclusiveGateway')==0){
+			//console.log("--------sequenceFlow---------to----ExclusiveGateway-------"+walkElement.node.attr.id);
+		}
+		walkIds($scope, bpmnInit, nodeTree, parentNodeTree, targetRef, parentIds);
 	}else
 	if(walkElement.node.name == 'bpmn:parallelGateway'){
 		//console.log(walkElement.node.toString());
 		nodeTree.push(walkElement);
 	}else
 	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
-		nodeTree.push(walkElement);
+		var incomings = walkElement.node.childrenNamed('bpmn:incoming');
+		console.log("--------exclusiveGateway--------------------"+incomings.length);
+		console.log("--------exclusiveGateway--------------------"+walkElement.node.attr.id);
+		console.log("--------exclusiveGateway--------------------"+walkElement.parentIds);
+		if(incomings.length > 1){
+			if(bpmnInit.alreadyProcessed.indexOf(walkElement.node.attr.id)<0){
+				bpmnInit.alreadyProcessed.push(walkElement.node.attr.id);
+				console.log(parentNodeTree);
+				parentNodeTree.push(walkElement);
+				console.log(parentNodeTree);
+			}
+		}else{
+			nodeTree.push(walkElement);
+		}
 	}
 	var outgoings = walkElement.node.childrenNamed('bpmn:outgoing');
 	if(outgoings.length > 1){
@@ -466,20 +484,34 @@ function walkIds(bpmnInit, nodeTree, elementId, parentIds){
 			var childParentIds = parentIds + sequenceFlowId;
 			var childElement = {parentIds:childParentIds,nodeTree:[]};
 			walkElement.children.push(childElement);
-			walkIds(bpmnInit, childElement.nodeTree, sequenceFlowId, childParentIds);
+			walkIds($scope, bpmnInit, childElement.nodeTree, nodeTree, sequenceFlowId, childParentIds);
 		});
 	}else
-	if(outgoings.length == 1){
-		outgoings.forEach(function(outgoing, idx){
-			var sequenceFlowId = outgoing.val;
-			walkIds(bpmnInit, nodeTree, sequenceFlowId, parentIds);
+		if(outgoings.length == 1){
+			outgoings.forEach(function(outgoing, idx){
+				var sequenceFlowId = outgoing.val;
+				walkIds($scope, bpmnInit, nodeTree, parentNodeTree, sequenceFlowId, parentIds);
 		});
 	}
 }
 
 function initBpmnVerticalTable(bpmnInit, $scope){
+
+$scope.isToEndEventSequenceFlow = function(walkElement){
+	return walkElement.node.attr.targetRef.indexOf('EndEvent')==0;
+}
+
+$scope.isUserToRuleSequenceFlow = function(walkElement){
+	return walkElement.node.attr.sourceRef.indexOf('UserTask')==0 
+	&& walkElement.node.attr.targetRef.indexOf('BusinessRuleTask')==0;
+}
+
+$scope.isWalkElementSequenceFlow = function(walkElement){
+	return walkElement.node.name == 'bpmn:sequenceFlow';
+}
 	bpmnInit.nodeTree = [];
 	bpmnInit.processElements = {};
+	bpmnInit.alreadyProcessed = [];
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
 	bpmnInit.config = {startId:null};
 	bpmnProcess.children.forEach(function(processElement){
@@ -498,7 +530,7 @@ function initBpmnVerticalTable(bpmnInit, $scope){
 		}
 		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
 	});
-	walkIds(bpmnInit, bpmnInit.nodeTree, bpmnInit.config.startId);
+	walkIds($scope, bpmnInit, bpmnInit.nodeTree, null, bpmnInit.config.startId);
 }
 
 function initBpmnDmnToId(protocol, $scope){
