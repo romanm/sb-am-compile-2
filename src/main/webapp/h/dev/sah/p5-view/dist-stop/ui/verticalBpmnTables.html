@@ -1,0 +1,82 @@
+<table class="table table-bordered">
+	<tr ng-repeat="flowTableElement in nodeTree"
+		ng-init="nr1 = nr0 + ($index + 1)">
+		<td ng-if="isWalkElementSequenceFlow(flowTableElement)"
+			ng-init="targetRef = flowTableElement.node.attr.targetRef;targetElement = bpmnInit.processElements[targetRef];">
+			<div ng-if="isToEndEventSequenceFlow(flowTableElement)">
+				<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+				<!-- 
+				<span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+				<i class="fa fa-circle-o" aria-hidden="true"></i>
+			 -->
+			 {{targetElement.obj.attr.name}}
+			</div>
+			<div ng-if="isUserToRuleSequenceFlow(flowTableElement)">
+				<!-- 
+			{{nr1}})
+		 -->
+				<span class="h4">
+					{{bpmnInit.processElements[flowTableElement.node.attr.sourceRef].obj.attr.name}}
+				</span> <a ng-click="openTaskEditor = openTaskEditor!=nr1?nr1:'close'">
+					<i class="fa fa-bars" aria-hidden="true"></i>
+				</a>
+				<div ng-if="openTaskEditor == nr1"
+					ng-init="businessRuleTask = bpmnInit.processElements[targetRef].obj;">
+					<div
+						ng-include="'/h/dev/sah/p5-view/app/ui/choiceDmnToBusinessRule.html'"></div>
+					<div ng-repeat="nextDmn in obj.data.init.camundaAppendix.dmn"
+						ng-if="businessRuleTask.attr['camunda:decisionRef']==nextDmn.xmldoc.firstChild.attr.id">
+						<hr />
+						<div ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td ng-if="flowTableElement.children.length > 1">
+			<!-- {{nr1}}) --> <span class="h4">
+				{{flowTableElement.node.attr.name}} </span> <span
+			ng-if="flowTableElement.node.name == 'bpmn:parallelGateway'">
+				(виконується одночасно-паралельно)
+				<div class="tooltip2">
+					<a> <i class="fa fa-bars" aria-hidden="true"></i>
+					</a>
+					<div class="tooltiptext">
+						<a href="#"
+							ng-click="showAsOneTable(flowTableElement, editorBpmnNr)">
+							показувати <span
+							ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
+								однією таблицею </span> <span
+							ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'">
+								звичайний вигляд </span>
+						</a>
+					</div>
+				</div>
+		</span>
+			<div
+				ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs == 'oneTable'"
+				ng-include="'/h/dev/sah/p5-view/app/ui/parallelGatewayDmnAsOneTable.html'">
+			</div>
+			<div
+				ng-if="obj.data.config[bpmnInit.path][lastParentId(flowTableElement.parentIds)].showAs != 'oneTable'">
+				<!-- 
+			<table class="table table-bordered">
+			<table >
+		 -->
+				<table class="table table-striped">
+					<tr>
+						<td ng-repeat="c in flowTableElement.children"
+							ng-init="nodeTree = c.nodeTree; 
+						sequenceFlowId = lastParentId(c.parentIds); 
+						nr0 = nr1 + '.' + ($index + 1) + '.'">
+							<!-- 
+						{{nr0}})
+						 --> {{bpmnInit.processElements[sequenceFlowId].obj.attr.name}}
+							<div
+								ng-include="'/h/dev/sah/p5-view/app/ui/verticalBpmnTables.html'"></div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+</table>

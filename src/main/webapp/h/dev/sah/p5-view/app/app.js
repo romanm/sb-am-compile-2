@@ -104,6 +104,31 @@ function initEditorBpmn($scope, $http){
 	}
 }
  * */
+angular.module('DevFlowAsTreeApp', ['pascalprecht.translate'])
+.config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
+.controller('DevFlowAsTreeCtrl', function($scope, $http, $translate) {
+	console.log('DevFlowAsTreeCtrl');
+	initAngularCommon($scope, $http);
+
+	var urlForContent = '/v/readContent';
+	if($scope.params.p){
+		urlForContent = '/v/readProtocol/' + $scope.params.p;
+	}
+	console.log(urlForContent);
+	
+	$http.get(urlForContent).success(function(protocol) {
+		console.log(protocol);
+		$scope.obj = {
+			data : protocol,
+			options : { mode : 'tree' }
+		};
+		console.log($scope.obj.data);
+//		editor.set($scope.obj.data);
+		initBpmnDmnToId($scope.obj.data, $scope);
+//		viewerBpmnDmn($scope.obj.data);
+	});
+	
+});
 
 //angular.module('Protocole5App', ['ngCookies', 'pascalprecht.translate'])
 angular.module('Protocole5App', ['pascalprecht.translate'])
@@ -438,11 +463,36 @@ function initBpmnXml(protocol, key1, bpmnXmldoc){
 function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentIds){
 	if(!parentIds) parentIds = '';
 	var walkElement = {node:bpmnInit.processElements[elementId].obj, parentIds:parentIds};
+	if(elementId.indexOf('0r7dqpr')>0||elementId.indexOf('1mfpnxj')>0||elementId.indexOf('0m7k0au')>0){
+	}
+	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
+		var incomings = walkElement.node.childrenNamed('bpmn:incoming');
+//		console.log("--------exclusiveGateway--------------------"+incomings.length);
+//		console.log("--------exclusiveGateway--------------------"+walkElement.node.attr.id);
+//		console.log("--------exclusiveGateway--------------------"+walkElement.parentIds);
+		if(incomings.length > 1){
+			if(bpmnInit.alreadyProcessed.indexOf(walkElement.node.attr.id)<0){
+				bpmnInit.alreadyProcessed.push(walkElement.node.attr.id);
+				console.log(parentNodeTree);
+				parentNodeTree.push(walkElement);
+				console.log('parentNodeTree');
+				console.log(parentNodeTree);
+				console.log($scope.isWalkElementSequenceFlow(walkElement));
+				return;
+			}
+		}else{
+			nodeTree.push(walkElement);
+			console.log(nodeTree);
+			
+		}
+	}else
 	if($scope.isWalkElementSequenceFlow(walkElement)){
 		//console.log("--------sequenceFlow--------------------"+walkElement.node.attr.id);
 		var targetRef = walkElement.node.attr.targetRef;
-		if($scope.isUserToRuleSequenceFlow(walkElement)){
-		//UserToRule walkElement
+//		if($scope.isUserToRuleSequenceFlow(walkElement)){
+			//UserToRule walkElement
+		if($scope.isToRuleSequenceFlow(walkElement)){
+		//AllToRule walkElement
 			nodeTree.push(walkElement);
 		}else
 		if($scope.isToEndEventSequenceFlow(walkElement)){
@@ -458,22 +508,7 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 	if(walkElement.node.name == 'bpmn:parallelGateway'){
 		//console.log(walkElement.node.toString());
 		nodeTree.push(walkElement);
-	}else
-	if(walkElement.node.name == 'bpmn:exclusiveGateway'){
-		var incomings = walkElement.node.childrenNamed('bpmn:incoming');
-		console.log("--------exclusiveGateway--------------------"+incomings.length);
-		console.log("--------exclusiveGateway--------------------"+walkElement.node.attr.id);
-		console.log("--------exclusiveGateway--------------------"+walkElement.parentIds);
-		if(incomings.length > 1){
-			if(bpmnInit.alreadyProcessed.indexOf(walkElement.node.attr.id)<0){
-				bpmnInit.alreadyProcessed.push(walkElement.node.attr.id);
-				console.log(parentNodeTree);
-				parentNodeTree.push(walkElement);
-				console.log(parentNodeTree);
-			}
-		}else{
-			nodeTree.push(walkElement);
-		}
+		console.log(nodeTree);
 	}
 	var outgoings = walkElement.node.childrenNamed('bpmn:outgoing');
 	if(outgoings.length > 1){
@@ -495,10 +530,103 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 	}
 }
 
+function initBpmnTreeWalker(bpmnInit, $scope){
+	bpmnInit.bpmnProcessElements = {};
+	//key is elementFlow
+	bpmnInit.processBranches = {};
+	bpmnInit.mergerBranches = {};
+	
+	//key is sequenceFlow
+	bpmnInit.processChains = {};
+	bpmnInit.config = {startId:null};
+
+	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
+	bpmnProcess.children.forEach(function(processElement){
+		var elementId = processElement.attr.id;
+		bpmnInit.bpmnProcessElements[elementId] = processElement;
+		var elementName = processElement.name;
+		var incomings = processElement.childrenNamed('bpmn:incoming');
+		if(incomings.length > 1){
+			bpmnInit.mergerBranches[elementId] = [];
+			bpmnInit.processChains[elementId] = [];
+		}
+		var outgoings = processElement.childrenNamed('bpmn:outgoing');
+		if(outgoings.length > 1){
+			var processBranches = [];
+			outgoings.forEach(function(outgoing){
+				processBranches.push(outgoing.val);
+				bpmnInit.processChains[outgoing.val] = [];
+			});
+			bpmnInit.processBranches[elementId] = {branches:processBranches};
+		}
+		if(elementId.indexOf('StartEvent')==0){
+			bpmnInit.config.startId = elementId;
+			if(outgoings.length == 1){
+				bpmnInit.processChains[outgoings[0].val] = [];
+			}
+		}
+	});
+	Object.keys(bpmnInit.processChains).forEach(function(sequenceFlowId){
+		composeChain(bpmnInit, sequenceFlowId, bpmnInit.processChains[sequenceFlowId]);
+	});
+	console.log(bpmnInit.processBranches);
+	Object.keys(bpmnInit.processBranches).forEach(function(brancheId){
+		console.log(brancheId);
+		bpmnInit.bpmnProcessElements[brancheId]
+		.childrenNamed('bpmn:outgoing').forEach(function(outgoing){
+			var chain = bpmnInit.processChains[outgoing.val];
+			var lastChainElementId = chain[chain.length - 1];
+			if(bpmnInit.mergerBranches[lastChainElementId]){
+				bpmnInit.mergerBranches[lastChainElementId].push(outgoing.val);
+				var processBranche = bpmnInit.processBranches[brancheId];
+				if(!processBranche.merger){
+					processBranche.merger = {};
+				}
+				if(!processBranche.merger[lastChainElementId]){
+					processBranche.merger[lastChainElementId] = [];
+				}
+				processBranche.merger[lastChainElementId].push(outgoing.val);
+				console.log(lastChainElementId);
+			}
+		});
+		console.log(bpmnInit.processBranches[brancheId]);
+	});
+	
+	function composeChain(bpmnInit, elementId, chain){
+		var processElement = bpmnInit.bpmnProcessElements[elementId];
+		chain.push(elementId);
+		if(processElement.attr.targetRef){//bpmn:sequenceFlow
+			composeChain(bpmnInit, processElement.attr.targetRef, chain);
+		}
+		var incomings = processElement.childrenNamed('bpmn:incoming');
+		var outgoings = processElement.childrenNamed('bpmn:outgoing');
+		if(incomings.length > 1){
+			if(chain.length == 1 && outgoings.length == 1){
+				composeChain(bpmnInit, outgoings[0].val, chain);
+			}else{
+			//end of chain and start to continue in other merged chain
+			}
+		}else{
+			if(outgoings.length == 1){
+				composeChain(bpmnInit, outgoings[0].val, chain);
+			}
+		}
+	}
+
+	$scope.getBpmnInit = function(nr){
+		return $scope.obj.data.init.camundaAppendix.bpmn[nr];
+	}
+
+}
+
 function initBpmnVerticalTable(bpmnInit, $scope){
 
 $scope.isToEndEventSequenceFlow = function(walkElement){
 	return walkElement.node.attr.targetRef.indexOf('EndEvent')==0;
+}
+
+$scope.isToRuleSequenceFlow = function(walkElement){
+	return walkElement.node.attr.targetRef.indexOf('BusinessRuleTask')==0;
 }
 
 $scope.isUserToRuleSequenceFlow = function(walkElement){
@@ -534,6 +662,7 @@ $scope.isWalkElementSequenceFlow = function(walkElement){
 }
 
 function initBpmnDmnToId(protocol, $scope){
+console.log("-------initBpmnDmnToId---------------------");
 	if(!protocol.config)
 		protocol.config = {};
 	var camundaAppendix = {bpmn:[],dmn:[]};
@@ -565,6 +694,8 @@ function initBpmnDmnToId(protocol, $scope){
 								}
 							};
 					console.log(bpmnInit);
+					initBpmnTreeWalker(bpmnInit, $scope);
+					// to delete
 					initBpmnVerticalTable(bpmnInit, $scope);
 					camundaAppendix.bpmn.push(bpmnInit);
 					bpmnNr++;

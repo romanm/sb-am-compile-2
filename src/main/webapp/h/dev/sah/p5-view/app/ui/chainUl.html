@@ -1,0 +1,23 @@
+<li
+	ng-repeat="chainElementId in getBpmnInit(0).processChains[chainStartOutgoingId]"
+	ng-init="
+	processBranches = getBpmnInit(0).processBranches[chainElementId];
+	branches = getBpmnInit(0).bpmnProcessElements[chainElementId].childrenNamed('bpmn:outgoing');
+	">
+	{{chainElementId}}
+	<ol ng-if="branches.length > 1"
+		ng-include="'/h/dev/sah/p5-view/app/ui/brancheOl.html'">
+	</ol>
+	<div ng-if="processBranches.merger">
+		Продовження:
+		<div
+			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
+			{{chainStartOutgoingId}}
+			(для<span ng-repeat="chainId in mergerBranche">
+			{{$first?'':','}}
+			{{processBranches.branches.indexOf(chainId) + 1}}</span>)
+			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
+		</ul>
+		</div>
+	</div>
+</li>

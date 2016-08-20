@@ -1,0 +1,6 @@
+<li ng-repeat="branche in branches"
+	ng-init="chainStartOutgoingId = branche.val"
+	title="{{chainStartOutgoingId}}">
+	<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
+	</ul>
+</li>

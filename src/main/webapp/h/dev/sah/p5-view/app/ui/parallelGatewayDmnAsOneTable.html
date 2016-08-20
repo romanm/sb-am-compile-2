@@ -1,7 +1,7 @@
 <hr/>
 <table class="table table-bordered">
 	<tr
-		ng-repeat="parallelOneTable in getParallelOneTable(flowTableElement, bpmnInit)"
+		ng-repeat="parallelOneTable in getParallelOneTable(walkElement, bpmnInit)"
 		ng-init="sourceRef = parallelOneTable.flowTableElement.node.attr.sourceRef;
 		ruleNr = $index;
 		ruleHead = $index%2 == 0;

@@ -1,0 +1,17 @@
+<div ng-if="!openOtherProtocol">
+</div>
+	<div class="input-group">
+		<div class="input-group-addon">
+			<span class="glyphicon glyphicon-search"></span>
+		</div>
+		<input ng-model="seekProtocol" placeholder="{{'seek_protocol_placeholder' | translate}}" class="form-control" >
+	</div>
+	<ul>
+		<li ng-repeat="protocolFileName in protocolList | filter:seekProtocol"
+			ng-if="protocolListMap[protocolFileName].protocolName"><a
+			href="/h/dev/sah/p5-view/dist/protocol5.html?p={{protocolFileName}}">
+				{{protocolListMap[protocolFileName].protocolName}}<br /> <b>
+					{{protocolFileName}} </b>
+		</a></li>
+	</ul>
+
