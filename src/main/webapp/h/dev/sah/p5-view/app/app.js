@@ -531,10 +531,82 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 }
 
 function initBpmnTreeWalker(bpmnInit, $scope){
+	
+	$scope.isChainPEToView = function(processElement){
+		return $scope.isPEToRuleSequenceFlow(processElement) 
+		|| $scope.isPEEndEvent(processElement)
+		|| $scope.isBranchePE(processElement)
+		|| $scope.isMergerPE(processElement)
+		;
+	}
+
+	$scope.isMergerPE = function(processElement){
+		var incomings = processElement.childrenNamed('bpmn:incoming');
+		return incomings.length > 1;
+	}
+	$scope.isBranchePE = function(processElement){
+		var outgoings = processElement.childrenNamed('bpmn:outgoing');
+		return outgoings.length > 1;
+	}
+
+	$scope.isPEToRuleSequenceFlow = function(processElement){
+		if(!processElement.attr.sourceRef)
+			return false;
+		return  processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
+	}
+
+	$scope.isPEUserToRuleSequenceFlow = function(processElement){
+		if(!processElement.attr.sourceRef)
+			return false;
+		return processElement.attr.sourceRef.indexOf('UserTask')==0 
+		&& processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
+	}
+
+	$scope.isPEEndEvent = function(processElement){
+		return processElement.name == 'bpmn:endEvent';
+	}
+
+	$scope.isPESequenceFlow = function(processElement){
+		return processElement.name == 'bpmn:sequenceFlow';
+	}
+
+	$scope.getSomeRuleElementName = function(bpmnNr, processElementId){
+		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
+		if(processElement.attr.sourceRef){
+			if(processElement.attr.sourceRef.indexOf('UserTask') < 0 
+					&& processElement.attr.targetRef.indexOf('BusinessRuleTask') == 0){
+				var targetElement = $scope.getBpmnInit(bpmnNr)
+				.bpmnProcessElements[processElement.attr.targetRef];
+				return targetElement.attr.name;
+			}
+
+		}
+	}
+	$scope.getProcessElementName = function(bpmnNr, processElementId){
+		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
+		if(processElement)
+			return processElement.attr.name;
+//		return processElement.attr.name?processElement.attr.name:'_';
+	}
+
+	$scope.getUserElementName = function(bpmnNr, chainElementId){
+		var userTaskId = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId].attr.sourceRef;
+		var userTaskElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[userTaskId];
+		if(userTaskElement)
+			return userTaskElement.attr.name;
+	}
+
+	$scope.setTabView = function(tabView){
+		$scope.view = tabView;
+	}
+
+	$scope.view = 'useFlowAsTable';
+//	$scope.view = 'useFlowAsTree';
 	bpmnInit.bpmnProcessElements = {};
 	//key is elementFlow
 	bpmnInit.processBranches = {};
 	bpmnInit.mergerBranches = {};
+	bpmnInit.mergerBranchesNumer = [];
 	
 	//key is sequenceFlow
 	bpmnInit.processChains = {};
@@ -548,6 +620,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		var incomings = processElement.childrenNamed('bpmn:incoming');
 		if(incomings.length > 1){
 			bpmnInit.mergerBranches[elementId] = [];
+			bpmnInit.mergerBranchesNumer.push(elementId);
 			bpmnInit.processChains[elementId] = [];
 		}
 		var outgoings = processElement.childrenNamed('bpmn:outgoing');
@@ -616,6 +689,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	$scope.getBpmnInit = function(nr){
 		return $scope.obj.data.init.camundaAppendix.bpmn[nr];
 	}
+	
 
 }
 

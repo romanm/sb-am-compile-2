@@ -1,0 +1,20 @@
+<span title="{{chainElementId}}"> <span
+	ng-if="isBranchePE(chainElement)"> <i class="fa fa-sitemap"
+		aria-hidden="true"></i>
+		<i 
+		ng-if="chainElement.name == 'bpmn:parallelGateway'"
+		class="fa fa-plus" aria-hidden="true"></i>
+		<i 
+		ng-if="chainElement.name == 'bpmn:exclusiveGateway'"
+		class="fa fa-times" aria-hidden="true"></i>
+</span> <span ng-if="isMergerPE(chainElement)"> <b>{{getBpmnInit(bpmnNr).mergerBranchesNumer.indexOf(chainElement.attr.id)
+			+ 1}} </b> <i class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i>
+</span> <span ng-if="isPEToRuleSequenceFlow(chainElement)"> <i
+		class="fa fa-list-alt" aria-hidden="true"></i>
+</span> <span ng-if="isPEEndEvent(chainElement)"> <i
+		class="fa fa-circle-o" aria-hidden="true"></i>
+</span>
+</span>
+{{getUserElementName(bpmnNr, chainElementId)}}
+{{getProcessElementName(bpmnNr, chainElementId)}}
+{{getSomeRuleElementName(bpmnNr, chainElementId)}}

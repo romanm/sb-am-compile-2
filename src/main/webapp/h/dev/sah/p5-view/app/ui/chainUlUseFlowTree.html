@@ -1,0 +1,22 @@
+<li
+	ng-repeat="chainElementId in getBpmnInit(bpmnNr).processChains[chainStartOutgoingId]"
+	ng-init="
+	processBranches = getBpmnInit(bpmnNr).processBranches[chainElementId];
+	chainElement = getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId];
+	branches = chainElement.childrenNamed('bpmn:outgoing');
+	"
+	ng-if="isChainPEToView(getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId])">
+	<div ng-include="'/h/dev/sah/p5-view/app/ui/viewChainElement.html'">
+	</div> 
+
+	<ol ng-if="branches.length > 1"
+		ng-include="'/h/dev/sah/p5-view/app/ui/brancheOlUseFlowTree.html'">
+	</ol>
+	<div ng-if="processBranches.merger">
+		<div
+			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
+			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+			</ul>
+		</div>
+	</div>
+</li>

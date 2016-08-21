@@ -1,0 +1,10 @@
+<li ng-repeat="branche in branches"
+	ng-init="chainStartOutgoingId = branche.val">
+	{{getProcessElementName(bpmnNr, branche.val)}} <!-- 
+	<span
+	title="{{chainStartOutgoingId}}">
+		{{getProcessElementName(bpmnNr, branche.val)}} </span>
+	 -->
+	<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+	</ul>
+</li>
