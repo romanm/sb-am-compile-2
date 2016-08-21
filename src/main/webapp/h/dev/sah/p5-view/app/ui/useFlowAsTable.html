@@ -10,9 +10,34 @@
 		<td>
 			<div ng-include="'/h/dev/sah/p5-view/app/ui/viewChainElement.html'">
 			</div>
-			<table class="table table-striped" ng-if="branches.length > 1"
-				ng-include="'/h/dev/sah/p5-view/app/ui/brancheTD.html'">
-			</table>
+			<div ng-if="isViewChoiceDmn(bpmnNr, chainElement)"
+				ng-init="businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.attr.targetRef];
+				editorBpmnNr = bpmnNr;
+				">
+				isViewChoiceDmn
+				<div
+					ng-include="'/h/dev/sah/p5-view/app/ui/choiceDmnToBusinessRule.html'"></div>
+			</div>
+			<div ng-if="isViewBusinesRule(bpmnNr, chainElement)"
+				ng-init="businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.attr.targetRef]">
+				<div ng-repeat="nextDmn in obj.data.init.camundaAppendix.dmn"
+					ng-if="businessRuleTask.attr['camunda:decisionRef']==nextDmn.xmldoc.firstChild.attr.id">
+					<div ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
+				</div>
+			</div>
+			<div ng-if="isViewParallelGatewaOneTable(bpmnNr, chainElement)">
+				<!-- 
+				{{obj.data.config[getBpmnInit(bpmnNr).path][chainElement.attr.id].parallelOneTable.length}}
+				-->
+				<div
+					ng-include="'/h/dev/sah/p5-view/app/ui/parallelGatewayDmnAsOneTable2.html'">
+				</div>
+			</div>
+			<div ng-if="isViewBasic(bpmnNr, chainElement)">
+				<table class="table table-striped" ng-if="branches.length > 1"
+					ng-include="'/h/dev/sah/p5-view/app/ui/brancheTD.html'">
+				</table>
+			</div>
 			<table class="table table-striped" ng-if="processBranches.merger">
 				<tr>
 					<td
@@ -22,6 +47,6 @@
 					</td>
 				</tr>
 			</table>
-	</td>
+		</td>
 	</tr>
 </table>

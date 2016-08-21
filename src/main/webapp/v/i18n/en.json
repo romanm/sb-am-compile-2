@@ -14,6 +14,15 @@
 	"bpmn_start": "start",
 	"bpmn_perform_proc":"EMR / protocol perform",
 	"bpmn_perform_task":"EMR / perform task",
+	
+	"bpmn_parallelGateway_title":"(performed simultaneously, in parallel)",
+	"bpmn_parallelGateway_view_basic":"show basic view",
+	"bpmn_parallelGateway_view_oneTable": "show one table",
+	"bpmn_businessRule_view_yes":"show rule",
+	"bpmn_businessRule_view_no":"not show rule",
+	"bpmn_choiceDmn_view_yes":"show choice DMN",
+	"bpmn_choiceDmn_view_no":"not show choice DMN",
+	
 	"dmn_hitPolici_aggregation":"SUM",	
 	
 	"rules": "Rules",

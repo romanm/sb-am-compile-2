@@ -15,6 +15,15 @@
 	"bpmn_start":"start",
 	"bpmn_perform_proc":"EMR / Protokoll durchführen ",
 	"bpmn_perform_task":"EMR / führen Aufgabe",
+	
+	"bpmn_parallelGateway_title":"(gleichzeitig parallel durchgeführt )",
+	"bpmn_parallelGateway_view_oneTable": "zeigen einer Tabelle",
+	"bpmn_parallelGateway_view_basic":"zeigen Basisansicht ",
+	"bpmn_businessRule_view_yes":"Regel anzeigen",
+	"bpmn_businessRule_view_no":"Regel nicht anzeigen",
+	"bpmn_choiceDmn_view_yes":"anzeigen Wahl DMN",
+	"bpmn_choiceDmn_view_no":"nicht anzeigen Wahl DMN",
+
 	"dmn_hitPolici_aggregation":"SUMME",
 
 	"rules": "Regeln",

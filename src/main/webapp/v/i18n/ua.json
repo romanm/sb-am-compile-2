@@ -14,6 +14,14 @@
 	"bpmn_start": "старт",
 	"bpmn_perform_proc":"Історія хвороби / інстанція протоколу",
 	"bpmn_perform_task":"Запис в ІХ / рекомендації протоколу",
+	"bpmn_parallelGateway_title":"(виконується одночасно-паралельно)",
+	"bpmn_parallelGateway_view_oneTable":"показувати однією таблицею ",
+	"bpmn_parallelGateway_view_basic":"показувати звичайний вигляд",
+	"bpmn_businessRule_view_yes":"показувати правило",
+	"bpmn_businessRule_view_no":"не показувати правило",
+	"bpmn_choiceDmn_view_yes":"показувати вибір DMN",
+	"bpmn_choiceDmn_view_no":"не показувати вибір DMN",
+
 	"dmn_hitPolici_aggregation":"СУМА",
 
 	
