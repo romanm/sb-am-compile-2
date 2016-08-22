@@ -14,7 +14,6 @@
 				ng-init="businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.attr.targetRef];
 				editorBpmnNr = bpmnNr;
 				">
-				isViewChoiceDmn
 				<div
 					ng-include="'/h/dev/sah/p5-view/app/ui/choiceDmnToBusinessRule.html'"></div>
 			</div>
@@ -26,9 +25,6 @@
 				</div>
 			</div>
 			<div ng-if="isViewParallelGatewaOneTable(bpmnNr, chainElement)">
-				<!-- 
-				{{obj.data.config[getBpmnInit(bpmnNr).path][chainElement.attr.id].parallelOneTable.length}}
-				-->
 				<div
 					ng-include="'/h/dev/sah/p5-view/app/ui/parallelGatewayDmnAsOneTable2.html'">
 				</div>

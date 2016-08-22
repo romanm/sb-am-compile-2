@@ -535,6 +535,27 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 
 function initBpmnTreeWalker(bpmnInit, $scope){
 	
+	$scope.getObjectKeys = function(parallelOneTable){
+		return Object.keys(parallelOneTable);
+	}
+	$scope.setRuleState2 = function(parallelOneTable, rule, ruleHead){
+		console.log("----------------");
+		console.log(parallelOneTable);
+		var ruleOutput = parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output');
+		var valOutput = rule.descendantWithPath('outputEntry.text').val;
+		var valInput = rule.descendantWithPath('inputEntry.text').val;
+		var description = rule.descendantWithPath('description').val;
+		console.log(description);
+		ruleOutput.attr.value = valOutput;
+		ruleOutput.attr.description = description;
+		ruleOutput.attr.expInput = valInput;
+		//parallelOneTable.flowTableElement.valueRule = rule.descendantWithPath('description').val;
+		//parallelOneTable.valueRule = rule.descendantWithPath('description').val;
+
+		console.log($scope.getObjectKeys(parallelOneTable));
+		console.log(parallelOneTable.valueRule);
+	}
+
 	//$scope.getParallelGatewayOneTable = function(flowTableElement, bpmnInit){
 	$scope.getParallelGatewayOneTable =  function(bpmnNr, parallelGatewayElement){
 		var bpmnInit = $scope.getBpmnInit(bpmnNr);
@@ -638,7 +659,10 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 
 	$scope.showParallelGatewayAsOneTable = function(bpmnNr, chainElement){
 		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showAs');
-		configChainElement = configChainElement.showAs != 'oneTable'?'oneTable':'';
+		console.log(configChainElement);
+		console.log(configChainElement.showAs);
+		console.log(configChainElement.showAs != 'oneTable');
+		configChainElement.showAs = configChainElement.showAs != 'oneTable'?'oneTable':'';
 	}
 
 	$scope.isChainPEToView = function(processElement){

@@ -13,7 +13,8 @@
 		<div ng-if="ruleHead">
 				<b> {{getBpmnInit(bpmnNr).bpmnProcessElements[parallelOneTable.userTaskId].attr.name}} </b> <br />
 				<span class="bg-info">
-					{{parallelOneTable.valueRule}} </span>
+					{{parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output').attr.description}}
+					</span>
 			</div>
 			<div ng-if="ruleBody">
 			{{parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.input').attr.label}}
@@ -28,11 +29,11 @@
 			</div>
 		</td>
 		<td
-		title="{{rule.descendantWithPath('description').val}}"
 			ng-repeat="rule in parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')"
-			ng-click="setRuleState(parallelOneTable, rule, ruleHead)"
+			ng-click="setRuleState2(parallelOneTable, rule, ruleHead)"
 			ng-class="{'bg-info':parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output').attr.value
 			== rule.descendantWithPath('outputEntry.text').val}"
+		title="{{rule.descendantWithPath('description').val}}"
 			>
 			<div ng-if="ruleHead">
 				{{rule.descendantWithPath('outputEntry.text').val}}</div>

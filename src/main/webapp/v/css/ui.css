@@ -1,3 +1,12 @@
+@media print {
+	a[href]:after {
+		content: none;
+	}
+	.no-print, .no-print * {
+		display: none !important;
+	}
+}
+
 .showme{ 
 display: none;
 }
