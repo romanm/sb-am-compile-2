@@ -50,6 +50,8 @@
 					<div ng-repeat="(k,v) in obj.data">
 						<div ng-switch on="k">
 							<p ng-switch-when="p">{{v}}</p>
+							<p ng-switch-when="p2">{{v}}</p>
+							<p ng-switch-when="p3">{{v}}</p>
 							<div ng-switch-when="home">Home Span</div>
 							<div class="animate-switch" ng-switch-default></div>
 						</div>

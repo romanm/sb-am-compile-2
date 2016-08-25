@@ -28,11 +28,17 @@
 			ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
 			{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> <b>
 			{{'rule_then' | translate}} 
-			 <span
+			<span
 			ng-repeat="outputEntry in rule.childrenNamed('outputEntry')"
 			ng-if="outputEntry.firstChild.val.length > 0">
 			{{nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index].attr.label}}:
-			{{outputEntry.firstChild.val}}, </span>
+			{{outputEntry.firstChild.val}}
+			<a ng-click="clickRuleChoice(rule, nextDmn)">
+			{{rule.descendantWithPath('description').val?' - ':''}}
+			{{rule.descendantWithPath('description').val}}
+			</a>
+			,
+			</span>
 			</b> 
 	</div>
 </div>

@@ -67,7 +67,7 @@
 				title=" {{processActiviti.procDefId}}">
 				{{processActiviti.ACT_RE_PROCDEF.NAME_}} </b>
 		</h4>
-
+--123
 		<ul>
 			<li ng-repeat="pA in processActiviti.actInstList">{{pA.START_TIME_
 				| date:'yyyy-MM-dd HH:mm:ss'}} <span ng-if="!pA.END_TIME_">
@@ -105,6 +105,7 @@
 					<span title="{{collectData.taskInst.TASK_DEF_KEY_}}">
 						{{collectData.taskInst.NAME_}} -> {{nextTask.attr.name}} </span>
 					<div ng-if="!pA.END_TIME_">
+					--321
 						<span ng-repeat="dmnInput in ask.dmnInputs"> <span
 							ng-if="dmnInput.firstChild.attr.typeRef == 'boolean'"> <label>
 									<input ng-model="dmnInput.attr.value" type="checkbox">

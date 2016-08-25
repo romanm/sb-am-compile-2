@@ -21,6 +21,12 @@
 				ng-init="businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.attr.targetRef]">
 				<div ng-repeat="nextDmn in obj.data.init.camundaAppendix.dmn"
 					ng-if="businessRuleTask.attr['camunda:decisionRef']==nextDmn.xmldoc.firstChild.attr.id">
+					---
+	<span
+	ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.clickRuleChoice"
+	ng-include="'/h/dev/sah/p5-view/app/ui/viewClickRuleChoice.html'"></span>
+---
+					
 					<div ng-include="'/h/dev/sah/p5-view/app/ui/show-rules.html'"></div>
 				</div>
 			</div>

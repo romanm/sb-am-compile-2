@@ -120,7 +120,8 @@ public class ProtocolCamundaTeach {
 		List<Map<String, Object>> actReProcdef = camunda1JdbcTemplate.queryForList("SELECT * FROM ACT_RE_PROCDEF WHERE ID_='"
 				+ procDefId
 				+ "'");
-		map.put("ACT_RE_PROCDEF", actReProcdef.get(0));
+		if(actReProcdef.size()>0)
+			map.put("ACT_RE_PROCDEF", actReProcdef.get(0));
 //		map.put("list", processInstances);
 		logger.debug("" + map);
 		return map;

@@ -33,6 +33,20 @@
 							translate}}</a></li>
 				</ul>
 
+
+				<div ng-if="view == 'useFlowAsTree2'">
+				useFlowAsTree2
+					<div ng-repeat="bpmnNr in [0]">
+						<div
+							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+	.childrenNamed('bpmn:outgoing')"
+							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
+							<ul
+								ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chainUlUseFlowTree.html'">
+							</ul>
+						</div>
+					</div>
+				</div>
 				<div ng-if="view == 'useFlowAsTable'">
 					<div ng-repeat="bpmnNr in [0]">
 						<div

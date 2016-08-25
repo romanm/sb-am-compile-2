@@ -1,0 +1,11 @@
+<span ng-repeat="branche in branches"
+	ng-init="chainStartOutgoingId = branche.val">
+	<span 
+	ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-EMR.html'"
+	ng-init="firstBranche = $first && isBranchePE(chainElement);
+	chainParentId = chainElementId;
+	chainParentElement = chainElement;
+	"
+	>
+	</span>
+</span>

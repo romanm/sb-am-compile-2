@@ -7,6 +7,13 @@
 	}
 }
 
+.hr_text a, .hr_text span {
+	margin-top: -34px;
+	background: #fff;
+	padding: 2px 6px;
+	float: left;
+}
+
 .showme{ 
 display: none;
 }
@@ -17,7 +24,6 @@ display : inline;
 .well-menu{
 	padding-top: 1px !important; 
 	padding-bottom: 1px !important;
-	
 }
 .navcontainer > ul {
 	margin: 0;
@@ -48,6 +54,7 @@ display : inline;
 	position: absolute;
 	border: 1px solid #e7e7e7;
 	background-color: #f3f3f3;
+	padding: 12px 16px;
 }
 .tooltip2:hover .tooltiptext {
 	visibility: visible;

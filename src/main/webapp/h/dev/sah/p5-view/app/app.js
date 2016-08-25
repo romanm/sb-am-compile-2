@@ -99,6 +99,240 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 
 function initEditorBpmn($scope, $http){
 
+	$scope.getObjectKeys = function(parallelOneTable){
+		return Object.keys(parallelOneTable);
+	}
+
+	//$scope.getParallelGatewayOneTable = function(flowTableElement, bpmnInit){
+	$scope.getParallelGatewayOneTable =  function(bpmnNr, parallelGatewayElement){
+		var bpmnInit = $scope.getBpmnInit(bpmnNr);
+		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parallelGatewayElement.attr.id];
+		if(!flowElementConfig.parallelOneTable){
+			flowElementConfig.parallelOneTable = [];
+			var outgoings = parallelGatewayElement.childrenNamed('bpmn:outgoing');
+			outgoings.forEach(function(outgoing){
+				var sequenceFlowElement = bpmnInit.bpmnProcessElements[outgoing.val];
+				var userTaskElement = bpmnInit.bpmnProcessElements[sequenceFlowElement.attr.targetRef];
+				userTaskElement.childrenNamed('bpmn:outgoing').forEach(function(outgoing2){
+					var sequenceFlow2Element = bpmnInit.bpmnProcessElements[outgoing2.val];
+					var businessRuleTaskElement = bpmnInit.bpmnProcessElements[sequenceFlow2Element.attr.targetRef];
+					if(businessRuleTaskElement.attr['camunda:decisionRef']){
+						var parallelOneTableElement = {businessRuleTaskId:businessRuleTaskElement.attr.id,userTaskId:userTaskElement.attr.id};
+						var parallelOneTableElement2 = {businessRuleTaskId:businessRuleTaskElement.attr.id,userTaskId:userTaskElement.attr.id};
+						$scope.obj.data.init.camundaAppendix.dmn.forEach(function(nextDmn){
+							if(businessRuleTaskElement.attr['camunda:decisionRef'] == nextDmn.xmldoc.firstChild.attr.id){
+								parallelOneTableElement.dmn = nextDmn;
+								parallelOneTableElement2.dmn = nextDmn;
+							}
+						});
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement);
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement2);
+					}
+				});
+			});
+			if(false)
+			flowTableElement.children.forEach(function(c){
+				c.nodeTree.forEach(function(flowTableElement2){
+					if(flowTableElement2.node.name == 'bpmn:sequenceFlow'){
+						var parallelOneTableElement = {flowTableElement:flowTableElement2};
+						var parallelOneTableElement2 = {flowTableElement:flowTableElement2};
+						var businessRuleTask = bpmnInit.processElements[flowTableElement2.node.attr.targetRef].obj;
+						$scope.obj.data.init.camundaAppendix.dmn.forEach(function(nextDmn){
+							if(businessRuleTask.attr['camunda:decisionRef'] == nextDmn.xmldoc.firstChild.attr.id){
+								parallelOneTableElement.dmn = nextDmn;
+								parallelOneTableElement2.dmn = nextDmn;
+							}
+						});
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement);
+						flowElementConfig.parallelOneTable.push(parallelOneTableElement2);
+					}
+				});
+			});
+		}
+		return flowElementConfig.parallelOneTable;
+	}
+
+	$scope.isViewBasic = function(bpmnNr, chainElement){
+		if($scope.isViewParallelGatewaOneTable(bpmnNr, chainElement)){
+			return false;
+		}
+		return true;
+	}
+	$scope.getConfigParameter = function(bpmnNr, chainElement, key){
+		if(!chainElement)
+			return false;
+		if(!$scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id])
+			return false;
+		return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id][key]
+	}
+	$scope.isClosedParallelGatewaOneTable = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
+			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].openParallelGateway == 'no';
+		}
+		return false;
+	}
+	$scope.isViewParallelGatewaOneTable = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
+			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showAs == 'oneTable';
+		}
+		return false;
+	}
+	$scope.isViewBusinesRule = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
+			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showBusinessRule == 'yes';
+		}
+		return false;
+	}
+	$scope.isViewChoiceDmn = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
+			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showChoiceDmn == 'yes';
+		}
+		return false;
+	}
+
+	var getConfigChainElement = function(bpmnNr, chainElement, key){
+		var bpmnInit = $scope.getBpmnInit(bpmnNr);
+		if(!$scope.obj.data.config[bpmnInit.path]){
+			$scope.obj.data.config[bpmnInit.path] = {};
+		}
+		if(!$scope.obj.data.config[bpmnInit.path][chainElement.attr.id]){
+			$scope.obj.data.config[bpmnInit.path][chainElement.attr.id] = {};
+			//$scope.obj.data.config[bpmnInit.path][chainElement.attr.id] = {showAs:''};
+		}
+		if(!$scope.obj.data.config[bpmnInit.path][chainElement.attr.id][key]){
+			$scope.obj.data.config[bpmnInit.path][chainElement.attr.id][key] = '';
+		}
+		return $scope.obj.data.config[bpmnInit.path][chainElement.attr.id];
+	}
+
+	$scope.showChoiceDmn = function(bpmnNr, chainElement){
+		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showChoiceDmn');
+		console.log(configChainElement);
+		configChainElement.showChoiceDmn = configChainElement.showChoiceDmn != 'yes'?'yes':'no';
+		console.log(configChainElement);
+	}
+
+	$scope.showBusinessRule = function(bpmnNr, chainElement){
+		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showBusinessRule');
+		configChainElement.showBusinessRule = configChainElement.showBusinessRule != 'yes'?'yes':'no';
+	}
+
+	$scope.openParallelGatewayAsOneTable = function(bpmnNr, chainElement){
+		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'openParallelGateway');
+		configChainElement.openParallelGateway = configChainElement.openParallelGateway != 'no'?'no':'yes';
+	}
+
+	$scope.showParallelGatewayAsOneTable = function(bpmnNr, chainElement){
+		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showAs');
+		configChainElement.showAs = configChainElement.showAs != 'oneTable'?'oneTable':'';
+	}
+
+	$scope.isChainPEToViewForVariableClick = function(processElement){
+		return $scope.isPEToRuleSequenceFlow(processElement) 
+		|| $scope.isBranchePE(processElement)
+		;
+	}
+
+	$scope.isChainPEToView = function(processElement){
+		return $scope.isPEToRuleSequenceFlow(processElement) 
+		|| $scope.isPEEndEvent(processElement)
+		|| $scope.isBranchePE(processElement)
+		|| $scope.isMergerPE(processElement)
+		;
+	}
+
+	$scope.isMergerPE = function(processElement){
+		var incomings = processElement.childrenNamed('bpmn:incoming');
+		return incomings.length > 1;
+	}
+
+	$scope.isBranchePE = function(processElement){
+		var outgoings = processElement.childrenNamed('bpmn:outgoing');
+		return outgoings.length > 1;
+	}
+
+	$scope.isPEToRuleSequenceFlow = function(processElement){
+		if(!processElement.attr.sourceRef)
+			return false;
+		return  processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
+	}
+
+	$scope.isPEUserToRuleSequenceFlow = function(processElement){
+		if(!processElement.attr.sourceRef)
+			return false;
+		return processElement.attr.sourceRef.indexOf('UserTask')==0 
+		&& processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
+	}
+
+	$scope.isPEEndEvent = function(processElement){
+		return processElement.name == 'bpmn:endEvent';
+	}
+
+	$scope.isPESequenceFlow = function(processElement){
+		return processElement.name == 'bpmn:sequenceFlow';
+	}
+
+	$scope.getSomeRuleElementName = function(bpmnNr, processElementId){
+		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
+		if(processElement.attr.sourceRef){
+			if(processElement.attr.sourceRef.indexOf('UserTask') < 0 
+					&& processElement.attr.targetRef.indexOf('BusinessRuleTask') == 0){
+				var targetElement = $scope.getBpmnInit(bpmnNr)
+				.bpmnProcessElements[processElement.attr.targetRef];
+				return targetElement.attr.name;
+			}
+
+		}
+	}
+	$scope.getProcessElementName = function(bpmnNr, processElementId){
+		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
+		if(processElement)
+			return processElement.attr.name;
+//		return processElement.attr.name?processElement.attr.name:'_';
+	}
+
+	$scope.getUserElementName = function(bpmnNr, chainElementId){
+	console.log(chainElementId);
+		var userTaskId = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId].attr.sourceRef;
+		var userTaskElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[userTaskId];
+		if(userTaskElement)
+			return userTaskElement.attr.name;
+	}
+
+	$scope.setTabView = function(tabView){
+		$scope.view = tabView;
+	}
+
+
+
+	$scope.setRuleState2 = function(nextDmn, rule, ruleHead){
+		console.log("----------------");
+		console.log(nextDmn);
+//		var ruleOutput = nextDmn.dmn.xmldoc.descendantWithPath('decision.decisionTable.output');
+		var ruleOutput = nextDmn.xmldoc.descendantWithPath('decision.decisionTable.output');
+		var valOutput = rule.descendantWithPath('outputEntry.text').val;
+		var valInput = rule.descendantWithPath('inputEntry.text').val;
+		var description = rule.descendantWithPath('description').val;
+		console.log(description);
+		ruleOutput.attr.value = valOutput;
+		ruleOutput.attr.description = description;
+		ruleOutput.attr.expInput = valInput;
+		//nextDmn.flowTableElement.valueRule = rule.descendantWithPath('description').val;
+		//nextDmn.valueRule = rule.descendantWithPath('description').val;
+//		console.log($scope.getObjectKeys(nextDmn));
+//		console.log(nextDmn.valueRule);
+		console.log(ruleOutput);
+		console.log(ruleOutput.toString());
+	}
+	
+	$scope.clickRuleChoice = function(rule, nextDmn){
+		console.log("-------clickRuleChoice()-----------");
+		console.log(rule.attr.id);
+		nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.clickRuleChoice = rule.attr.id;
+//		nextDmn.xmldoc.descendantWithPath('decision.decisionTable')['clickRuleChoice'] = rule.attr.id;
+		console.log(nextDmn.xmldoc.descendantWithPath('decision.decisionTable'));
+	}
+
 	$scope.addDmnToBpmn = function(dmnXmldoc, businessRuleTask, editorBpmnNr){
 //		console.log(dmn.toString());
 		console.log(dmnXmldoc.firstChild.attr.id);
@@ -437,13 +671,15 @@ function initNewDmnId(dmnNr, $scope){
 function initNewDmn(keyDmn, $scope){
 	var camundaAppendix = $scope.obj.data.init.camundaAppendix;
 	var dmnNr = camundaAppendix.dmn.length;
-	addAppendixDmn(keyDmn, dmnNr, camundaAppendix);
+	addAppendixDmn(keyDmn, dmnNr, camundaAppendix, $scope);
 	initNewDmnId(dmnNr, $scope);
 }
 
-function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix){
+function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix, $scope){
 	var dmnInProtocol = protocol[keyDmn];
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+	var decisionId = dmnXmldoc.descendantWithPath('decision').attr.id;
+	$scope.dmnIndexMap[decisionId] = dmnNr;
 	//console.log(dmnXmldoc.toString());
 	dmnInProtocol.dmnName = dmnXmldoc.firstChild.attr.id;
 	camundaAppendix.dmn.push({path: keyDmn
@@ -476,16 +712,11 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 		if(incomings.length > 1){
 			if(bpmnInit.alreadyProcessed.indexOf(walkElement.node.attr.id)<0){
 				bpmnInit.alreadyProcessed.push(walkElement.node.attr.id);
-				console.log(parentNodeTree);
 				parentNodeTree.push(walkElement);
-				console.log('parentNodeTree');
-				console.log(parentNodeTree);
-				console.log($scope.isWalkElementSequenceFlow(walkElement));
 				return;
 			}
 		}else{
 			nodeTree.push(walkElement);
-			console.log(nodeTree);
 			
 		}
 	}else
@@ -534,208 +765,10 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 }
 
 function initBpmnTreeWalker(bpmnInit, $scope){
-	
-	$scope.getObjectKeys = function(parallelOneTable){
-		return Object.keys(parallelOneTable);
-	}
-	$scope.setRuleState2 = function(parallelOneTable, rule, ruleHead){
-		console.log("----------------");
-		console.log(parallelOneTable);
-		var ruleOutput = parallelOneTable.dmn.xmldoc.descendantWithPath('decision.decisionTable.output');
-		var valOutput = rule.descendantWithPath('outputEntry.text').val;
-		var valInput = rule.descendantWithPath('inputEntry.text').val;
-		var description = rule.descendantWithPath('description').val;
-		console.log(description);
-		ruleOutput.attr.value = valOutput;
-		ruleOutput.attr.description = description;
-		ruleOutput.attr.expInput = valInput;
-		//parallelOneTable.flowTableElement.valueRule = rule.descendantWithPath('description').val;
-		//parallelOneTable.valueRule = rule.descendantWithPath('description').val;
 
-		console.log($scope.getObjectKeys(parallelOneTable));
-		console.log(parallelOneTable.valueRule);
-	}
-
-	//$scope.getParallelGatewayOneTable = function(flowTableElement, bpmnInit){
-	$scope.getParallelGatewayOneTable =  function(bpmnNr, parallelGatewayElement){
-		var bpmnInit = $scope.getBpmnInit(bpmnNr);
-		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parallelGatewayElement.attr.id];
-		if(!flowElementConfig.parallelOneTable){
-			flowElementConfig.parallelOneTable = [];
-			var outgoings = parallelGatewayElement.childrenNamed('bpmn:outgoing');
-			outgoings.forEach(function(outgoing){
-				var sequenceFlowElement = bpmnInit.bpmnProcessElements[outgoing.val];
-				var userTaskElement = bpmnInit.bpmnProcessElements[sequenceFlowElement.attr.targetRef];
-				userTaskElement.childrenNamed('bpmn:outgoing').forEach(function(outgoing2){
-					var sequenceFlow2Element = bpmnInit.bpmnProcessElements[outgoing2.val];
-					var businessRuleTaskElement = bpmnInit.bpmnProcessElements[sequenceFlow2Element.attr.targetRef];
-					if(businessRuleTaskElement.attr['camunda:decisionRef']){
-						var parallelOneTableElement = {businessRuleTaskId:businessRuleTaskElement.attr.id,userTaskId:userTaskElement.attr.id};
-						var parallelOneTableElement2 = {businessRuleTaskId:businessRuleTaskElement.attr.id,userTaskId:userTaskElement.attr.id};
-						$scope.obj.data.init.camundaAppendix.dmn.forEach(function(nextDmn){
-							if(businessRuleTaskElement.attr['camunda:decisionRef'] == nextDmn.xmldoc.firstChild.attr.id){
-								parallelOneTableElement.dmn = nextDmn;
-								parallelOneTableElement2.dmn = nextDmn;
-							}
-						});
-						flowElementConfig.parallelOneTable.push(parallelOneTableElement);
-						flowElementConfig.parallelOneTable.push(parallelOneTableElement2);
-					}
-				});
-			});
-			if(false)
-			flowTableElement.children.forEach(function(c){
-				c.nodeTree.forEach(function(flowTableElement2){
-					if(flowTableElement2.node.name == 'bpmn:sequenceFlow'){
-						var parallelOneTableElement = {flowTableElement:flowTableElement2};
-						var parallelOneTableElement2 = {flowTableElement:flowTableElement2};
-						var businessRuleTask = bpmnInit.processElements[flowTableElement2.node.attr.targetRef].obj;
-						$scope.obj.data.init.camundaAppendix.dmn.forEach(function(nextDmn){
-							if(businessRuleTask.attr['camunda:decisionRef'] == nextDmn.xmldoc.firstChild.attr.id){
-								parallelOneTableElement.dmn = nextDmn;
-								parallelOneTableElement2.dmn = nextDmn;
-							}
-						});
-						flowElementConfig.parallelOneTable.push(parallelOneTableElement);
-						flowElementConfig.parallelOneTable.push(parallelOneTableElement2);
-					}
-				});
-			});
-		}
-		return flowElementConfig.parallelOneTable;
-	}
-
-	$scope.isViewBasic = function(bpmnNr, chainElement){
-		if($scope.isViewParallelGatewaOneTable(bpmnNr, chainElement)){
-			return false;
-		}
-		return true;
-	}
-	$scope.isViewParallelGatewaOneTable = function(bpmnNr, chainElement){
-		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
-			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showAs == 'oneTable';
-		}
-		return false;
-	}
-	$scope.isViewBusinesRule = function(bpmnNr, chainElement){
-		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
-			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showBusinessRule == 'yes';
-		}
-		return false;
-	}
-	$scope.isViewChoiceDmn = function(bpmnNr, chainElement){
-		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
-			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showChoiceDmn == 'yes';
-		}
-		return false;
-	}
-
-	var getConfigChainElement = function(bpmnNr, chainElement, key){
-		var bpmnInit = $scope.getBpmnInit(bpmnNr);
-		if(!$scope.obj.data.config[bpmnInit.path]){
-			$scope.obj.data.config[bpmnInit.path] = {};
-		}
-		if(!$scope.obj.data.config[bpmnInit.path][chainElement.attr.id]){
-			$scope.obj.data.config[bpmnInit.path][chainElement.attr.id] = {};
-			//$scope.obj.data.config[bpmnInit.path][chainElement.attr.id] = {showAs:''};
-		}
-		if(!$scope.obj.data.config[bpmnInit.path][chainElement.attr.id][key]){
-			$scope.obj.data.config[bpmnInit.path][chainElement.attr.id][key] = '';
-		}
-		return $scope.obj.data.config[bpmnInit.path][chainElement.attr.id];
-	}
-
-	$scope.showChoiceDmn = function(bpmnNr, chainElement){
-		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showChoiceDmn');
-		console.log(configChainElement);
-		configChainElement.showChoiceDmn = configChainElement.showChoiceDmn != 'yes'?'yes':'no';
-		console.log(configChainElement);
-	}
-
-	$scope.showBusinessRule = function(bpmnNr, chainElement){
-		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showBusinessRule');
-		configChainElement.showBusinessRule = configChainElement.showBusinessRule != 'yes'?'yes':'no';
-	}
-
-	$scope.showParallelGatewayAsOneTable = function(bpmnNr, chainElement){
-		var configChainElement = getConfigChainElement(bpmnNr, chainElement, 'showAs');
-		console.log(configChainElement);
-		console.log(configChainElement.showAs);
-		console.log(configChainElement.showAs != 'oneTable');
-		configChainElement.showAs = configChainElement.showAs != 'oneTable'?'oneTable':'';
-	}
-
-	$scope.isChainPEToView = function(processElement){
-		return $scope.isPEToRuleSequenceFlow(processElement) 
-		|| $scope.isPEEndEvent(processElement)
-		|| $scope.isBranchePE(processElement)
-		|| $scope.isMergerPE(processElement)
-		;
-	}
-
-	$scope.isMergerPE = function(processElement){
-		var incomings = processElement.childrenNamed('bpmn:incoming');
-		return incomings.length > 1;
-	}
-
-	$scope.isBranchePE = function(processElement){
-		var outgoings = processElement.childrenNamed('bpmn:outgoing');
-		return outgoings.length > 1;
-	}
-
-	$scope.isPEToRuleSequenceFlow = function(processElement){
-		if(!processElement.attr.sourceRef)
-			return false;
-		return  processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
-	}
-
-	$scope.isPEUserToRuleSequenceFlow = function(processElement){
-		if(!processElement.attr.sourceRef)
-			return false;
-		return processElement.attr.sourceRef.indexOf('UserTask')==0 
-		&& processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
-	}
-
-	$scope.isPEEndEvent = function(processElement){
-		return processElement.name == 'bpmn:endEvent';
-	}
-
-	$scope.isPESequenceFlow = function(processElement){
-		return processElement.name == 'bpmn:sequenceFlow';
-	}
-
-	$scope.getSomeRuleElementName = function(bpmnNr, processElementId){
-		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
-		if(processElement.attr.sourceRef){
-			if(processElement.attr.sourceRef.indexOf('UserTask') < 0 
-					&& processElement.attr.targetRef.indexOf('BusinessRuleTask') == 0){
-				var targetElement = $scope.getBpmnInit(bpmnNr)
-				.bpmnProcessElements[processElement.attr.targetRef];
-				return targetElement.attr.name;
-			}
-
-		}
-	}
-	$scope.getProcessElementName = function(bpmnNr, processElementId){
-		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
-		if(processElement)
-			return processElement.attr.name;
-//		return processElement.attr.name?processElement.attr.name:'_';
-	}
-
-	$scope.getUserElementName = function(bpmnNr, chainElementId){
-		var userTaskId = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId].attr.sourceRef;
-		var userTaskElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[userTaskId];
-		if(userTaskElement)
-			return userTaskElement.attr.name;
-	}
-
-	$scope.setTabView = function(tabView){
-		$scope.view = tabView;
-	}
-
-	$scope.view = 'useFlowAsTable';
+//	$scope.view = 'useFlowAsTable';
 //	$scope.view = 'useFlowAsTree';
+	$scope.view = 'useFlowAsTree2';
 	bpmnInit.bpmnProcessElements = {};
 	//key is elementFlow
 	bpmnInit.processBranches = {};
@@ -873,12 +906,13 @@ console.log("-------initBpmnDmnToId---------------------");
 	if(!protocol.config)
 		protocol.config = {};
 	var camundaAppendix = {bpmn:[],dmn:[]};
+	$scope.dmnIndexMap = {};
 	var dmnNr = 0;
 	for (var key1 in protocol) {
 		if(key1.indexOf('dmn')>=0){
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
-					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix);
+					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix, $scope);
 					dmnNr++;
 				}
 			}
