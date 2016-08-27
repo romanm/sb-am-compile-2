@@ -8,7 +8,7 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 .controller('HomeCtrl', function($scope, $http, $filter, $translate) {
 	console.log('HomeCtrl');
 	initAngularCommon($scope, $http);
-	initDmnRule($scope);
+	initEditorBpmn($scope, $http);
 
 	initUserState($scope, $http);
 	readProtocolDir($scope, $http);
@@ -97,7 +97,126 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 });
 
 
+var Regex = require("regex");
+var regex = new Regex(/[(\d+)..(\d+)]/);
+function initDmnRule($scope){
+	console.log($scope.dictionary);
+
+	$scope.getSelectedRuleDmnInputs = function(nextDmn){
+		var ruleUserChooce = $scope.getRuleUserSelected(nextDmn);
+		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		var ruleInputIndexes = [];
+		ruleUserChooce.childrenNamed('inputEntry').forEach(function(inputEntry, inputEntryIndex) {
+			if(inputEntry.firstChild.val){
+				var dmnInput = dmnInputs[inputEntryIndex];
+				ruleInputIndexes.push(dmnInput);
+			}
+		});
+		return ruleInputIndexes;
+	}
+
+
+	$scope.equalInputToSelectedResult = function(nextDmn){
+		var equals = false;
+		if($scope.hasInputForRule(nextDmn)){
+			var ruleFromOwnDmnInputs = $scope.getRuleFromOwnDmnInputs(nextDmn);
+			var ruleUserChooce = $scope.getRuleUserSelected(nextDmn);
+			if(ruleUserChooce){
+				if(ruleUserChooce.attr.id == ruleFromOwnDmnInputs.attr.id){
+					equals = true;
+				}
+			}
+		}
+		return equals
+	}
+	$scope.hasInputForRule = function(nextDmn){
+		var isInputForRule = true;
+		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		var ruleUserChooce = $scope.getRuleUserSelected(nextDmn);
+//		console.log(ruleUserChooce.toString());
+		ruleUserChooce.childrenNamed('inputEntry').forEach(function(inputEntry, inputEntryIndex) {
+			if(inputEntry.firstChild.val){
+				var dmnInput = dmnInputs[inputEntryIndex];
+//				console.log(dmnInput.toString());
+				if(!dmnInput.attr.value){
+					isInputForRule = false;
+				}
+			}
+		});
+		return isInputForRule;
+	}
+
+	$scope.getRuleUserSelected = function(nextDmn){
+		return nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
+		.childrenNamed('rule')[nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
+		.attr.ruleIndexUserChooce]
+	}
+
+	$scope.setRuleIndexUserSelected = function(nextDmn, ruleIndexUserChooce){
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		decisionTable.attr.ruleIndexUserChooce = ruleIndexUserChooce;
+		console.log(decisionTable.attr);
+		console.log($scope.getRuleUserSelected(nextDmn));
+	}
+
+	$scope.getRuleFromOwnDmnInputs = function(nextDmn){
+		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		var rule = null;
+		var dmnRules = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule');
+		dmnRules.forEach(function(dmnRule, dmnRuleIndex){
+			if(!rule){
+				if(evalRuleFromDmnInputs(dmnRule, dmnInputs)){
+					rule = dmnRule;
+				}
+			}
+		})
+		return rule;
+	}
+
+	function evalRuleFromDmnInputs(rule, dmnInputs){
+		var evalRuleLogicValue = true;
+		var inputEntrys = rule.childrenNamed('inputEntry');
+		dmnInputs.forEach(function(dmnInput, dmnInputIndex){
+			var evalInputLogicValue = false;
+			if(dmnInput.attr.value){
+//				console.log(dmnInput.attr.value+'/'+dmnInputIndex+'/'+inputEntrys[dmnInputIndex].firstChild.val);
+				evalRuleLogicValue = evalRuleLogicValue &&
+				$scope.evalLogicExp(dmnInput, inputEntrys[dmnInputIndex]);
+			}else{
+				evalRuleLogicValue = false;
+			}
+		});
+		return evalRuleLogicValue;
+	}
+
+	$scope.evalRuleFromOwnDmnInputs = function(nextDmn, rule){
+		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		return evalRuleFromDmnInputs(rule, dmnInputs);
+	}
+
+	$scope.evalLogicExp = function(input, inputEntry){
+		var value = input.attr.value;
+		var expr = inputEntry.firstChild.val;
+//		console.log(input.firstChild.attr.typeRef+'/'+value+'/'+expr);
+		var evalLogicExp = false;
+		if(value){
+			if(expr.indexOf('..') > 0){
+				var endExpr = expr.replace('[',value + ' >= ').replace('..',' && ').replace(']',' >= ' + value);
+				//console.log(endExpr);
+				evalLogicExp = eval(endExpr)
+			}else if(input.firstChild.attr.typeRef == 'boolean'){
+				evalLogicExp = eval(value+'=='+expr)
+			}else{
+				evalLogicExp = eval(value+expr)
+			}
+		}
+		return evalLogicExp;
+	}
+}
+
+
 function initEditorBpmn($scope, $http){
+	initDmnRule($scope);
 
 	$scope.getObjectKeys = function(parallelOneTable){
 		return Object.keys(parallelOneTable);
@@ -303,6 +422,15 @@ function initEditorBpmn($scope, $http){
 		$scope.view = tabView;
 	}
 
+	$scope.getRuleInputIndexes = function(rule){
+		var ruleInputIndexes = [];
+		rule.childrenNamed('inputEntry').forEach(function(inputEntry, inputEntryIndex) {
+			if(inputEntry.firstChild.val){
+				ruleInputIndexes.push(inputEntryIndex);
+			}
+		});
+		return ruleInputIndexes;
+	}
 
 
 	$scope.setRuleState2 = function(nextDmn, rule, ruleHead){
@@ -1056,31 +1184,6 @@ function initAngularCommon($scope, $http){
 //console.log("params = " + location.search);
 const params = require('query-string').parse(location.search);
 //console.log(params);
-
-var Regex = require("regex");
-var regex = new Regex(/[(\d+)..(\d+)]/);
-function initDmnRule($scope){
-	console.log($scope.dictionary);
-
-	$scope.evalLogicExp = function(input, inputEntry){
-		var value = input.attr.value;
-		var expr = inputEntry.firstChild.val;
-//		console.log(input.firstChild.attr.typeRef+'/'+value+'/'+expr);
-		var evalLogicExp = false;
-		if(value){
-			if(expr.indexOf('..') > 0){
-				var endExpr = expr.replace('[',value + ' >= ').replace('..',' && ').replace(']',' >= ' + value);
-				console.log(endExpr);
-				evalLogicExp = eval(endExpr)
-			}else if(input.firstChild.attr.typeRef == 'boolean'){
-				evalLogicExp = eval(value+'=='+expr)
-			}else{
-				evalLogicExp = eval(value+expr)
-			}
-		}
-		return evalLogicExp;
-	}
-}
 
 function configTranslation($translateProvider){
 	console.log("-------configTranslation-----------------------------------");

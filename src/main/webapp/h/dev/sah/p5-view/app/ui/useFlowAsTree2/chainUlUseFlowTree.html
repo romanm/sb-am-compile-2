@@ -17,8 +17,7 @@
 	dmnIndex = dmnIndexMap[businessRuleTask.attr['camunda:decisionRef']];
 	nextDmn = obj.data.init.camundaAppendix.dmn[dmnIndex];
 	"
-	>
-		<div
+	><div
 			ng-repeat="output in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')"
 			ng-init="outputIndex = $index">
 			<div class="">
@@ -31,22 +30,25 @@
 			{{output.attr.description}}
 				<div class="">
 					<span
-						ng-repeat="dmnInput in nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
-						.childrenNamed('input')">
-						{{dmnInput.attr.label}} <input ng-model="dmnInput.attr.value"
-						maxlength="3" size="4"> <span ng-if="!$last">,</span> <span
-						ng-if="$last">.</span>
-					</span><br /> <span
+					ng-init="dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
+						.childrenNamed('input')"
+						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/inputsDmnInputs.html'"
+					></span>
+					<br /> 
+					<span
 						ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
 						.childrenNamed('rule')">
-						| <a ng-click="setRuleState2(nextDmn, rule)"
-						title="{{rule.childrenNamed('outputEntry')[outputIndex].descendantWithPath('text').val}}">
+						| 
+							<a ng-click="setRuleIndexUserSelected(nextDmn, $index)"
+						ng-class="[{'alert-success': evalRuleFromOwnDmnInputs(nextDmn, rule)}]"
+						title="{{rule.childrenNamed('outputEntry')[outputIndex].descendantWithPath('text').val
+						+ ' - ' + rule.childrenNamed('inputEntry')[outputIndex].descendantWithPath('text').val
+						}}">
 							{{rule.descendantWithPath('description').val}} </a>
 					</span>
 				</div>
 			</div>
-		</div>
-</div>
+	</div></div>
 	<div
 		ng-if="getConfigParameter(bpmnNr, chainElement, 'openParallelGateway') != 'no'">
 		<ol ng-if="branches.length > 1"

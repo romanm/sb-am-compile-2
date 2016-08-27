@@ -7,7 +7,8 @@
 			ng-repeat="inputEntry in rule.childrenNamed('inputEntry')"
 			ng-init="input = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input')[$index]"
 			ng-if="inputEntry.firstChild.val.length > 0"
-			ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]">
+			ng-class="[{'alert-success': evalLogicExp(input, inputEntry)}]"
+			>
 				{{input.attr.label}} {{inputEntry.firstChild.val}}, </span> <b>
 				<u> <span
 					ng-repeat="outputEntry in rule.childrenNamed('outputEntry')"

@@ -1,0 +1,6 @@
+<span
+	ng-repeat="dmnInput in dmnInputs">
+	{{dmnInput.attr.label}} <input ng-model="dmnInput.attr.value"
+	maxlength="3" size="4"> <span ng-if="!$last">,</span> <span
+	ng-if="$last">.</span>
+</span>
