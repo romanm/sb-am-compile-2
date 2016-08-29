@@ -115,7 +115,6 @@ function initDmnRule($scope){
 		return ruleInputIndexes;
 	}
 
-
 	$scope.equalInputToSelectedResult = function(nextDmn){
 		var equals = false;
 		if($scope.hasInputForRule(nextDmn)){
@@ -146,17 +145,55 @@ function initDmnRule($scope){
 		return isInputForRule;
 	}
 
+	$scope.isRuleUserSelected = function(nextDmn){
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		if($scope.isDmnTypeAggregationSUM(nextDmn)){
+			return decisionTable.attr.ruleIndexesUserChooce;
+		}else{
+			return decisionTable.childrenNamed('rule')[decisionTable.attr.ruleIndexUserChooce];
+		}
+	}
+
 	$scope.getRuleUserSelected = function(nextDmn){
-		return nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
-		.childrenNamed('rule')[nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
-		.attr.ruleIndexUserChooce]
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		return decisionTable.childrenNamed('rule')[decisionTable.attr.ruleIndexUserChooce];
+	}
+
+	$scope.sumDmn = function(nextDmn){
+		if($scope.isDmnTypeAggregationSUM(nextDmn)){
+			var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+			var rules = decisionTable.childrenNamed('rule');
+			var ruleSelectedIndexes = decisionTable.attr.ruleIndexesUserChooce;
+			var sum = 0;
+			ruleSelectedIndexes.forEach(function(ruleIndex){
+				var rule = rules[ruleIndex];
+				var valOutput = rule.descendantWithPath('outputEntry.text').val;
+				sum += parseInt(valOutput);
+			});
+			return sum;
+		}
+	}
+
+	$scope.isDmnTypeAggregationSUM = function(nextDmn){
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		var isDmnTypeAggregationSUM =  decisionTable.attr.aggregation == 'SUM';
+		return isDmnTypeAggregationSUM;
 	}
 
 	$scope.setRuleIndexUserSelected = function(nextDmn, ruleIndexUserChooce){
 		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
-		decisionTable.attr.ruleIndexUserChooce = ruleIndexUserChooce;
-		console.log(decisionTable.attr);
-		console.log($scope.getRuleUserSelected(nextDmn));
+		if($scope.isDmnTypeAggregationSUM(nextDmn)){
+			if(!decisionTable.attr.ruleIndexesUserChooce){
+				decisionTable.attr.ruleIndexesUserChooce = [];
+			}
+			var index = decisionTable.attr.ruleIndexesUserChooce.indexOf(ruleIndexUserChooce)
+			if(index>=0){
+				decisionTable.attr.ruleIndexesUserChooce.splice(index,1);
+			}
+			decisionTable.attr.ruleIndexesUserChooce.push(ruleIndexUserChooce);
+		}else{
+			decisionTable.attr.ruleIndexUserChooce = ruleIndexUserChooce;
+		}
 	}
 
 	$scope.getRuleFromOwnDmnInputs = function(nextDmn){

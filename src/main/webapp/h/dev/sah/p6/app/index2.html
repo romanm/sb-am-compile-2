@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="css/diagram-js.css" />
 <link rel="stylesheet" href="vendor/bpmn-font/css/bpmn-embedded.css" />
 <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>
+<link rel='stylesheet prefetch' href='/v/lib/css/font-awesome.min.css'/>
 </head>
 <body>
 	<div class="content" id="js-drop-zone">
@@ -33,12 +35,29 @@
 	</div>
 
 	<ul class="buttons">
+		<li>
+			<form method="get" action="/h/dev/sah/p5-view/dist/protocol6.html">
+				<input type="hidden" name="p" value="{{params.p}}" />
+				<button type="submit" class="btn btn-default"
+					title="Редактор всього протоколу">
+					<span class="glyphicon glyphicon-chevron-right"></span> <i
+						class="fa fa-codepen" aria-hidden="true"></i> goto
+				</button>
+			</form>
+		</li>
+		<li>Protocol: <span ng-bind="obj.data.protocolName"></span>
+		</li>
+		<li>
+			<button ng-click="saveFile()" class="btn btn-default"
+				title="save as Protocol">
+				<span class="glyphicon glyphicon-save"></span>
+				save Protocol</button>
+		</li>
 		<li>download</li>
-		<li><a id="js-download-diagram" href
+		<li><a id="js-download-diagram" href class="btn btn-default"
 			title="download BPMN diagram"> BPMN diagram </a></li>
-		<li><a id="js-download-svg" href title="download as SVG image">
-				SVG image </a></li>
-		<li><h1>Protocol clinical</h1></li>
+		<li><a id="js-download-svg" href title="download as SVG image"
+			class="btn btn-default"> SVG image </a></li>
 	</ul>
 
 	<script src="index.js"></script>

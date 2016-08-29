@@ -60,7 +60,12 @@ function saveSVG(done) {
 }
 
 function saveDiagram(done) {
+	bpmnModeler.saveXML({ format: true }, function(err, xml) {
+		done(err, xml);
+	});
+}
 
+function saveProtocol(done) {
 	bpmnModeler.saveXML({ format: true }, function(err, xml) {
 		done(err, xml);
 	});
@@ -121,6 +126,7 @@ var angular = require('angular');
 var app = angular.module('BpmnModelerApp', []);
 app.controller('BpmnModelerCtrl', function($scope, $http) {
 	console.log("BpmnModelerCtrl");
+	$scope.params = params;
 
 	$('#js-create-diagram').click(function(e) {
 		e.stopPropagation();
@@ -163,6 +169,10 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 		saveDiagram(function(err, xml) {
 			setEncoded(downloadLink, 'diagram.bpmn', err ? null : xml);
 		});
+
+		saveProtocol(function(err, xml) {
+			$scope.obj.data[params.jsonpath].bpmnContent = xml;
+		});
 	}, 500);
 
 	bpmnModeler.on('commandStack.changed', exportArtifacts);
@@ -178,15 +188,32 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 		var protocol1 = response;
 		console.log(protocol1);
 		$scope.obj = {
-				data : protocol1,
-				options : { mode : 'tree' }
+			data : protocol1,
+			options : { mode : 'tree' }
 		};
 		console.log($scope.obj);
 		var bpmnContent = $scope.obj.data[params.jsonpath].bpmnContent;
-		console.log(bpmnContent);
 		openDiagram(bpmnContent);
 	});
 
 	//createNewDiagram();
+	$scope.saveFile = function(){
+		console.log("-------saveFile-------- " + $scope.obj.data.fileName);
+		
+		var urlToSave = '/saveCommonContent';
+		if($scope.obj.data.fileName){
+			urlToSave = '/saveProtocol';
+		}
+		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
+			console.log(response.length);
+		});
+	}
 
+	$scope.addProtocolUrl = function(){
+		if(params.p){
+			return '?p='+params.p;
+		}
+		return '';
+	}
+	
 });
