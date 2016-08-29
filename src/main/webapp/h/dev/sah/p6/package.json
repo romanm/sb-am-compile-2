@@ -1,0 +1,45 @@
+{
+  "name": "bpmn-js-example-properties-panel",
+  "version": "0.0.0",
+  "description": "A bpmn-js modeler + properties panel example",
+  "main": "app/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bpmn-io/bpmn-js-examples"
+  },
+  "keywords": [
+    "bpmnjs-example"
+  ],
+  "author": {
+    "name": "Nico Rehwaldt",
+    "url": "https://github.com/nikku"
+  },
+  "contributors": [
+    {
+      "name": "bpmn.io contributors",
+      "url": "https://github.com/bpmn-io"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "brfs": "^1.2.0",
+    "grunt": "~1.0.1",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-connect": "~1.0.2",
+    "grunt-contrib-copy": "~1.0.0",
+    "grunt-contrib-jshint": "~1.0.0",
+    "grunt-contrib-less": "^1.0.1",
+    "grunt-contrib-watch": "~1.0.0",
+    "load-grunt-tasks": "~3.5.0"
+  },
+  "dependencies": {
+  	"angular": "latest",
+  	"query-string": "latest",
+    "bpmn-js": "latest",
+    "bpmn-js-properties-panel": "latest",
+    "camunda-bpmn-moddle": "latest",
+    "diagram-js": "latest",
+    "jquery": "^2.1.1",
+    "lodash": "^3.0.0"
+  }
+}
