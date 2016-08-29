@@ -50,15 +50,19 @@
 		<li>
 			<button ng-click="saveFile()" class="btn btn-default"
 				title="save as Protocol">
-				<span class="glyphicon glyphicon-save"></span>
-				save Protocol</button>
+				<span class="glyphicon glyphicon-save"></span> save Protocol
+			</button>
 		</li>
 		<li>download</li>
 		<li><a id="js-download-diagram" href class="btn btn-default"
 			title="download BPMN diagram"> BPMN diagram </a></li>
 		<li><a id="js-download-svg" href title="download as SVG image"
 			class="btn btn-default"> SVG image </a></li>
+		<li>
+			<div ng-include="'/h/dev/sah/p5-view/app/ui/loginLink.html'"></div>
+		</li>
 	</ul>
 
 	<script src="index.js"></script>
+	<script src="/v/lib/js/angular-translate-my.min.js"></script>
 </html>

@@ -122,8 +122,27 @@ const params = require('query-string').parse(location.search);
 console.log("params = ");
 console.log(params);
 
+function configTranslation($translateProvider){
+	console.log("-------configTranslation-----------------------------------");
+	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
+	//$translateProvider.useLocalStorage();
+	var myLocale = 'ua'
+	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
+	console.log(springCookieLocale);
+	if(springCookieLocale){
+		if(springCookieLocale.indexOf(';') > 0){
+			myLocale = springCookieLocale.split(';')[0];
+		}else{
+			myLocale = springCookieLocale;
+		}
+	}
+	$translateProvider.preferredLanguage(myLocale);
+//	$translateProvider.preferredLanguage('en');
+}
+
 var angular = require('angular');
-var app = angular.module('BpmnModelerApp', []);
+var app = angular.module('BpmnModelerApp', ['pascalprecht.translate']);
+app.config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 app.controller('BpmnModelerCtrl', function($scope, $http) {
 	console.log("BpmnModelerCtrl");
 	$scope.params = params;
@@ -215,5 +234,10 @@ app.controller('BpmnModelerCtrl', function($scope, $http) {
 		}
 		return '';
 	}
+	
+	$http.get("/v/read_user").success(function(response) {
+		$scope.userPrincipal = response;
+		console.log($scope.userPrincipal);
+	});
 	
 });
