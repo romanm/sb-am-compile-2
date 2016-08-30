@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html ng-app="DevFlowAsTreeApp" ng-controller="DevFlowAsTreeCtrl as myCtrl">
+<head>
+<title>{{obj.data.fileName}}</title>
+<meta charset="utf-8">
+<link href="/v/dmn/css/dmn-js.css" rel="stylesheet" />
+<link href="/v/lib/css/jsoneditor.min.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="css/diagram-js.css" />
+<link rel="stylesheet" href="vendor/bpmn-font/css/bpmn-embedded.css" />
+<link rel="stylesheet" href="/v/css/navbar_horizontal_gray.css"/>
+<link rel="stylesheet" href="/v/css/ui.css"/>
+<link rel='stylesheet prefetch' href='/v/lib/css/font-awesome.min.css'/>
+<link rel="stylesheet" href="/v/lib/css/bootstrap.min.css"></link>
+<script src="/v/lib/js/bootstrap.min.js"></script>
+<script src="/v/lib/js/jquery-2.2.4.min.js"></script>
+<script src="/v/lib/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+	<h1>devFlowAsTree</h1>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-10">
+				<ul class="nav nav-tabs">
+					<li 
+					ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 useFlowAsTable devFlowAsTree'.split(' ') "
+					ng-class="{'active':view == tabName}"><a href="#"
+						ng-click="setTabView(tabName)">{{tabName |
+							translate}}</a></li>
+				</ul>
+
+				<div ng-if="view == 'useFlowAsTree2'">
+					<div ng-repeat="bpmnNr in [0]">
+						<div
+							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+	.childrenNamed('bpmn:outgoing')"
+							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
+							<div class="row">
+								<div class="col-md-7">
+									<div class="hr_text">
+										<hr>
+										<span> <u> Історія хвороби </u>:</span>
+									</div>
+									<div
+									ng-init="level = '-'"
+										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-EMR.html'">
+									</div>
+								</div>
+								<div class="col-md-5">
+									<div class="hr_text">
+										<hr>
+										<span>Контроль по протоколу:</span>
+									</div>
+									<div
+									ng-init="level = '-'"
+										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-pCheck.html'">
+									</div>
+								</div>
+							</div>
+							<div class="no-print">
+								<div class="hr_text">
+									<hr>
+									<span>Протокол:</span>
+								</div>
+								<ul
+									ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chainUlUseFlowTree.html'">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div ng-if="view == 'useFlowAsTable'">
+					<div ng-repeat="bpmnNr in [0]">
+						<div
+ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+	.childrenNamed('bpmn:outgoing')"
+							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
+							<div
+								ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div ng-if="view == 'useFlowAsTree'">
+					<div ng-repeat="bpmnNr in [0]">
+						<div
+ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+	.childrenNamed('bpmn:outgoing')"
+							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
+							<ul
+								ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div ng-if="view == 'devFlowAsTree'">
+					{{getBpmnInit(0).config.startId}} ----
+					<div ng-repeat="bpmnNr in [0]">
+						<div
+							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+		.childrenNamed('bpmn:outgoing')"
+							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
+							<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
+							</ul>
+						</div>
+					</div>
+					<div>
+						processChains =
+						<div
+							ng-repeat="(key, processChains) in getBpmnInit(0).processChains">
+							{{key}} = {{processChains}}</div>
+					</div>
+					<div>
+						processBranches=
+						<div
+							ng-repeat="(key, processBranche) in getBpmnInit(0).processBranches">
+							{{key}}= {{processBranche}}</div>
+					</div>
+					<div>
+						mergerBranches=
+						<div
+							ng-repeat="(key, mergerBranche) in getBpmnInit(0).mergerBranches">
+							{{key}}= {{mergerBranche}}</div>
+					</div>
+					mergerBranchesNumer= {{getBpmnInit(0).mergerBranchesNumer}}
+				</div>
+
+			</div>
+			<div class="col-md-2 no-print">
+			<div>
+			<a href="/h/dev/sah/p5-view/dist/protocol6.html?p={{params.p}}">
+			protocol
+			</a>
+			</div>
+				<i class="fa fa-bars" aria-hidden="true"></i> <i
+					class="fa fa-sitemap" aria-hidden="true"></i> <i
+					class="fa fa-sitemap" aria-hidden="true"></i> <i class="fa fa-plus"
+					aria-hidden="true"></i> <i class="fa fa-sitemap" aria-hidden="true"></i>
+				<i class="fa fa-times" aria-hidden="true"></i> <i
+					class="fa fa-list-alt" aria-hidden="true"></i> <i
+					class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i> <i
+					class="fa fa-circle-o" aria-hidden="true"></i> <i
+					class="fa fa-circle-thin" aria-hidden="true"></i> <i
+					class="fa fa-square-o" aria-hidden="true"></i> <i
+					class="fa fa-toggle-off" aria-hidden="true"></i> <i
+					class="fa fa-toggle-on" aria-hidden="true"></i> <i
+					class="fa fa-times" aria-hidden="true"></i> <i class="fa fa-plus"
+					aria-hidden="true"></i> <i class="fa fa-minus" aria-hidden="true"></i>
+				<i class="fa fa-plus-circle" aria-hidden="true"></i> <i
+					class="fa fa-minus-circle" aria-hidden="true"></i> <i
+					class="fa fa-plus-square" aria-hidden="true"></i> <i
+					class="fa fa-minus-square" aria-hidden="true"></i> <i
+					class="fa fa-plus-square-o" aria-hidden="true"></i> <i
+					class="fa fa-minus-square-o" aria-hidden="true"></i> <i
+					class="fa fa-info-circle" aria-hidden="true"></i> <i
+					class="fa fa-cog" aria-hidden="true"></i> <i class="fa fa-cogs"
+					aria-hidden="true"></i> <i class="fa fa-folder" aria-hidden="true"></i>
+				<i class="fa fa-folder-o" aria-hidden="true"></i> <i
+					class="fa fa-folder-open" aria-hidden="true"></i> <i
+					class="fa fa-folder-open-o" aria-hidden="true"></i> <i
+					class="fa fa-language" aria-hidden="true"></i> <i
+					class="fa fa-map-signs" aria-hidden="true"></i> <i
+					class="fa fa-map-signs" aria-hidden="true"></i> <i
+					class="fa fa-plus" aria-hidden="true"></i> <i
+					class="fa fa-map-signs" aria-hidden="true"></i> <i
+					class="fa fa-times" aria-hidden="true"></i> <b> <span
+					class="glyphicon glyphicon-arrow-right"></span>3
+				</b>
+			</div>
+		</div>
+	</div>
+
+
+	{{getBpmnInit(0).parentIdToChilds[getBpmnInit(0).config.startId]}}
+
+	<script src="./app.js"></script>
+	<script src="/v/lib/js/angular-locale_uk.js"></script>
+	<script src="/v/lib/js/angular-translate-my.min.js"></script>
+
+</body>
+</html>

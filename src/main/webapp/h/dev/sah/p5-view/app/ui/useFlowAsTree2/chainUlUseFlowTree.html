@@ -25,7 +25,7 @@
 			ng-click="openParallelGatewayAsOneTable(bpmnNr, chainParentElement)"
 			 class="btn btn-default btn-xs"> <i
 				class="fa fa-minus-square-o" aria-hidden="true"></i>
-			</a> 
+			</a>
 			<a> {{output.attr.label}}: </a>
 			{{output.attr.description}}
 				<div class="">
@@ -40,7 +40,8 @@
 						.childrenNamed('rule')">
 						| 
 							<a ng-click="setRuleIndexUserSelected(nextDmn, $index)"
-						ng-class="[{'alert-success': evalRuleFromOwnDmnInputs(nextDmn, rule)}]"
+						ng-class="[{'alert-success': evalRuleFromOwnDmnInputs(nextDmn, rule)}
+						,{'bold':isRuleNrUserSelected(nextDmn, $index)}]"
 						title="{{rule.childrenNamed('outputEntry')[outputIndex].descendantWithPath('text').val
 						+ ' - ' + rule.childrenNamed('inputEntry')[outputIndex].descendantWithPath('text').val
 						}}">

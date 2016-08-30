@@ -145,9 +145,23 @@ function initDmnRule($scope){
 		return isInputForRule;
 	}
 
-	$scope.isRuleUserSelected = function(nextDmn){
+	$scope.isRuleNrUserSelected = function(nextDmn, ruleNr){
+		var isRuleNrUserSelected = false;
 		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
-		if($scope.isDmnTypeAggregationSUM(nextDmn)){
+		if(ruleNr == decisionTable.attr.ruleIndexUserChooce){
+			isRuleNrUserSelected = true;
+		}else if(decisionTable.attr.ruleIndexesUserChooce){
+			isRuleNrUserSelected = decisionTable.attr.ruleIndexesUserChooce.indexOf(ruleNr) >= 0;
+		}
+		return isRuleNrUserSelected;
+	}
+
+	$scope.existRuleUserSelected = function(nextDmn){
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		if($scope.isDmnTypeAggregationSUM(nextDmn)
+		&& decisionTable.attr.ruleIndexesUserChooce
+		&& decisionTable.attr.ruleIndexesUserChooce.length > 0
+		){
 			return decisionTable.attr.ruleIndexesUserChooce;
 		}else{
 			return decisionTable.childrenNamed('rule')[decisionTable.attr.ruleIndexUserChooce];
@@ -186,16 +200,30 @@ function initDmnRule($scope){
 			if(!decisionTable.attr.ruleIndexesUserChooce){
 				decisionTable.attr.ruleIndexesUserChooce = [];
 			}
+			var isLast = 
+				ruleIndexUserChooce ==
+				decisionTable.attr.ruleIndexesUserChooce[decisionTable.attr.ruleIndexesUserChooce.length - 1];
+			console.log(isLast);
 			var index = decisionTable.attr.ruleIndexesUserChooce.indexOf(ruleIndexUserChooce)
-			if(index>=0){
+			if(index >= 0){
 				decisionTable.attr.ruleIndexesUserChooce.splice(index,1);
 			}
-			decisionTable.attr.ruleIndexesUserChooce.push(ruleIndexUserChooce);
+			if(!isLast){
+				decisionTable.attr.ruleIndexesUserChooce.push(ruleIndexUserChooce);
+			}
 		}else{
-			decisionTable.attr.ruleIndexUserChooce = ruleIndexUserChooce;
+			if(decisionTable.attr.ruleIndexUserChooce == ruleIndexUserChooce){
+				delete decisionTable.attr['ruleIndexUserChooce'];
+			}else{
+				decisionTable.attr.ruleIndexUserChooce = ruleIndexUserChooce;
+			}
 		}
 	}
 
+/*
+ * Unique rules type in DMN
+ * get first true rule.
+ * */
 	$scope.getRuleFromOwnDmnInputs = function(nextDmn){
 		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
 		var rule = null;
@@ -210,25 +238,44 @@ function initDmnRule($scope){
 		return rule;
 	}
 
+/*
+ * Check it's rule true or not.
+ * */
+	$scope.evalRuleFromOwnDmnInputs = function(nextDmn, rule){
+		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+		return evalRuleFromDmnInputs(rule, dmnInputs);
+	}
+
+	/*
+	 * Check rule to own DMN inputs.
+	 * */
 	function evalRuleFromDmnInputs(rule, dmnInputs){
 		var evalRuleLogicValue = true;
 		var inputEntrys = rule.childrenNamed('inputEntry');
-		dmnInputs.forEach(function(dmnInput, dmnInputIndex){
-			var evalInputLogicValue = false;
-			if(dmnInput.attr.value){
-//				console.log(dmnInput.attr.value+'/'+dmnInputIndex+'/'+inputEntrys[dmnInputIndex].firstChild.val);
-				evalRuleLogicValue = evalRuleLogicValue &&
-				$scope.evalLogicExp(dmnInput, inputEntrys[dmnInputIndex]);
-			}else{
-				evalRuleLogicValue = false;
+		inputEntrys.forEach(function(inputEntry, inputEntryIndex){
+			var expr = inputEntry.firstChild.val;
+			if(expr){//the rule used this input
+				var evalLogicExp = $scope.evalLogicExp(dmnInputs[inputEntryIndex], inputEntry);
+				evalRuleLogicValue = evalRuleLogicValue && evalLogicExp;
 			}
 		});
 		return evalRuleLogicValue;
 	}
 
-	$scope.evalRuleFromOwnDmnInputs = function(nextDmn, rule){
-		var dmnInputs = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-		return evalRuleFromDmnInputs(rule, dmnInputs);
+	function evalRuleFromDmnInputs2(rule, dmnInputs){
+		var evalRuleLogicValue = true;
+		var inputEntrys = rule.childrenNamed('inputEntry');
+		dmnInputs.forEach(function(dmnInput, dmnInputIndex){
+			var evalInputLogicValue = false;
+			if(dmnInput.attr.value){
+				var evalLogicExp = $scope.evalLogicExp(dmnInput, inputEntrys[dmnInputIndex]);
+				evalRuleLogicValue = evalRuleLogicValue && evalLogicExp;
+				console.log(evalLogicExp +'/'+ evalRuleLogicValue+'/'+dmnInput.attr.value+'/'+dmnInputIndex+'/'+inputEntrys[dmnInputIndex].firstChild.val);
+			}else{
+				evalRuleLogicValue = false;
+			}
+		});
+		return evalRuleLogicValue;
 	}
 
 	$scope.evalLogicExp = function(input, inputEntry){
@@ -393,6 +440,7 @@ function initEditorBpmn($scope, $http){
 		return $scope.isPEToRuleSequenceFlow(processElement) 
 		|| $scope.isPEEndEvent(processElement)
 		|| $scope.isBranchePE(processElement)
+		|| $scope.isScriptTaskPE(processElement)
 		|| $scope.isMergerPE(processElement)
 		;
 	}
@@ -418,6 +466,10 @@ function initEditorBpmn($scope, $http){
 			return false;
 		return processElement.attr.sourceRef.indexOf('UserTask')==0 
 		&& processElement.attr.targetRef.indexOf('BusinessRuleTask')==0;
+	}
+
+	$scope.isScriptTaskPE = function(processElement){
+		return processElement.name == 'bpmn:scriptTask';
 	}
 
 	$scope.isPEEndEvent = function(processElement){
@@ -1134,6 +1186,7 @@ angular.module('P5DmnApp', [])
 			options : { mode : 'tree' }
 		};
 		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
+		console.log(dmnContent);
 		$scope.dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
 		console.log($scope.dmnContent);
 		renderer.importXML(dmnContent, function(err) {

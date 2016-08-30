@@ -7,16 +7,13 @@
 	">
 	<span ng-if="isBranchePE(chainElement)"> <i
 		class="fa fa-sitemap" aria-hidden="true"></i>
-	</span>
-	<span ng-if="isMergerPE(chainElement)"> 
-		<i class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i>
-	</span>
-	{{isChainPEToView(chainElement)}}
-	{{isPEUserToRuleSequenceFlow(chainElement)}}
-	{{isPEEndEvent(chainElement)}} 
-	{{isBranchePE(chainElement)}}
-	{{isMergerPE(chainElement)}}
-	{{chainElementId}}
+</span> <span ng-if="isMergerPE(chainElement)"> <i
+		class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i>
+</span> <span title="{{chainElementId}}/{{chainElement.name}}">
+		{{isChainPEToView(chainElement)}}
+		{{isPEUserToRuleSequenceFlow(chainElement)}}
+		{{isPEEndEvent(chainElement)}} {{isBranchePE(chainElement)}}
+		{{isMergerPE(chainElement)}} {{chainElementId}} </span>
 	<ol ng-if="branches.length > 1"
 		ng-include="'/h/dev/sah/p5-view/app/ui/brancheOl.html'">
 	</ol>
@@ -24,12 +21,11 @@
 		Продовження:
 		<div
 			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
-			{{chainStartOutgoingId}}
-			(для<span ng-repeat="chainId in mergerBranche">
-			{{$first?'':','}}
-			{{processBranches.branches.indexOf(chainId) + 1}}</span>)
+			{{chainStartOutgoingId}} (для<span
+				ng-repeat="chainId in mergerBranche"> {{$first?'':','}}
+				{{processBranches.branches.indexOf(chainId) + 1}}</span>)
 			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
-		</ul>
+			</ul>
 		</div>
 	</div>
 </li>

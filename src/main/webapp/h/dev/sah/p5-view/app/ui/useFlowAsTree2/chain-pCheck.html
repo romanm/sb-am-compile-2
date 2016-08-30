@@ -12,24 +12,37 @@
 	dmnIndex = dmnIndexMap[businessRuleTask.attr['camunda:decisionRef']];
 	nextDmn = obj.data.init.camundaAppendix.dmn[dmnIndex];
 	">
-	<span ng-if="getRuleUserSelected(nextDmn)"> 
-		<span
-			title="{{chainElementId}}"> {{level}} </span> 
-		<span
-			ng-repeat="outputEntry in getRuleUserSelected(nextDmn).childrenNamed('outputEntry')"
-			ng-if="outputEntry.firstChild.val"
-			ng-init="output = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index]">
-				{{output.attr.label}}{{$last?': ':', '}} </span>
-			{{getRuleUserSelected(nextDmn).firstChild.val}}
-			<div ng-if="!equalInputToSelectedResult(nextDmn)">
-				<span ng-init="dmnInputs = getSelectedRuleDmnInputs(nextDmn)"
-					ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/inputsDmnInputs.html'">
-				</span> <span class="alert-danger"> <span
-					ng-if="!hasInputForRule(nextDmn)"> відсутні данні </span> <span
-					ng-if="hasInputForRule(nextDmn)"> данні вказують на інші
-						висновки </span>
-				</span>
-			</div>
+	<span ng-if="existRuleUserSelected(nextDmn)"> 
+	<span
+			title="{{chainElementId}}"> {{level}} </span> <span
+			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce">
+				<span
+				ng-repeat="ruleIndex in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
+				ng-init="rule = nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
+						.childrenNamed('rule')[ruleIndex]">
+					{{rule.descendantWithPath('description').val}}{{$last?'':', '}} <span
+					ng-if="$last"> -
+						{{nextDmn.xmldoc.descendantWithPath('decision').attr.name}} </span>
+			</span> <span ng-if="isDmnTypeAggregationSUM(nextDmn)"> =
+					{{sumDmn(nextDmn)}} </span>
+		</span> <span
+			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexUserChooce">
+				<span
+				ng-repeat="outputEntry in getRuleUserSelected(nextDmn).childrenNamed('outputEntry')"
+				ng-if="outputEntry.firstChild.val"
+				ng-init="output = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')[$index]">
+					{{output.attr.label}}{{$last?': ':', '}} </span>
+				{{getRuleUserSelected(nextDmn).firstChild.val}}
+				<div ng-if="!equalInputToSelectedResult(nextDmn)">
+					<span ng-init="dmnInputs = getSelectedRuleDmnInputs(nextDmn)"
+						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/inputsDmnInputs.html'">
+					</span> <span class="alert-danger"> <span
+						ng-if="!hasInputForRule(nextDmn)"> відсутні данні </span> <span
+						ng-if="hasInputForRule(nextDmn)"> данні вказують на інші
+							висновки </span>
+					</span>
+				</div>
+		</span>
 	</span> <!-- 
 	<span
 		ng-repeat="output in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')"
