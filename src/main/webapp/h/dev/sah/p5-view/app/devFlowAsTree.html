@@ -60,11 +60,14 @@
 							<div class="no-print">
 								<div class="hr_text">
 									<hr>
-									<span>Протокол:</span>
+									<span>Протокол: <b> {{obj.data.protocolName}} </b>
+									</span>
 								</div>
-								<ul
-									ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chainUlUseFlowTree.html'">
-								</ul>
+								<div class="scroll">
+									<ul
+										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chainUlUseFlowTree.html'">
+									</ul>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -127,11 +130,10 @@ ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmn
 
 			</div>
 			<div class="col-md-2 no-print">
-			<div>
-			<a href="/h/dev/sah/p5-view/dist/protocol6.html?p={{params.p}}">
-			protocol
-			</a>
-			</div>
+				<div>
+					<a href="/h/dev/sah/p5-view/dist/protocol6.html?p={{params.p}}">
+						protocol </a>
+				</div>
 				<i class="fa fa-bars" aria-hidden="true"></i> <i
 					class="fa fa-sitemap" aria-hidden="true"></i> <i
 					class="fa fa-sitemap" aria-hidden="true"></i> <i class="fa fa-plus"

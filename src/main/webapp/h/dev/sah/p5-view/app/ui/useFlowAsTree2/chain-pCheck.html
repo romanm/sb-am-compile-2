@@ -6,25 +6,47 @@
 	branches = chainElement.childrenNamed('bpmn:outgoing');
 	"
 	ng-if="isChainPEToViewForVariableClick(getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId])">
+	<span ng-if="isExclusiveGatewayPE(chainElement)"
+	ng-init="
+	incomingSequenceFlow = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.firstChild.val];
+	businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[incomingSequenceFlow.attr.sourceRef];
+	dmnIndex = dmnIndexMap[businessRuleTask.attr['camunda:decisionRef']];
+	nextDmn = obj.data.init.camundaAppendix.dmn[dmnIndex];
+	dmnOutput = nextDmn.xmldoc.descendantWithPath('decision.decisionTable.output');
+	"
+	>
+	<span
+		ng-repeat="executiveGatewayOutgoing in chainElement.childrenNamed('bpmn:outgoing')"
+		ng-init="egOutgoingSequenceFlow = getBpmnInit(bpmnNr).bpmnProcessElements[executiveGatewayOutgoing.val]"
+		>
+			<span
+			ng-if="evalLogicExpForVariable(egOutgoingSequenceFlow.firstChild.val, dmnOutput)">
+				{{egOutgoingSequenceFlow.attr.name}} <small> (
+					{{egOutgoingSequenceFlow.firstChild.val}} ) </small>
+		</span>
+	</span>
+	</span>
 	<span
 		ng-if="isPEToRuleSequenceFlow(chainElement)"
 		ng-init="businessRuleTask = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.attr.targetRef];
 	dmnIndex = dmnIndexMap[businessRuleTask.attr['camunda:decisionRef']];
 	nextDmn = obj.data.init.camundaAppendix.dmn[dmnIndex];
+	dmnOutput = nextDmn.xmldoc.descendantWithPath('decision.decisionTable.output');
 	">
 	<span ng-if="existRuleUserSelected(nextDmn)"> 
 	<span
 			title="{{chainElementId}}"> {{level}} </span> <span
-			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce">
+			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
+			ng-init="ruleIndexesUserChooce = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
+			>
 				<span
-				ng-repeat="ruleIndex in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
+				ng-repeat="ruleIndex in ruleIndexesUserChooce"
 				ng-init="rule = nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
 						.childrenNamed('rule')[ruleIndex]">
 					{{rule.descendantWithPath('description').val}}{{$last?'':', '}} <span
 					ng-if="$last"> -
 						{{nextDmn.xmldoc.descendantWithPath('decision').attr.name}} </span>
-			</span> <span ng-if="isDmnTypeAggregationSUM(nextDmn)"> =
-					{{sumDmn(nextDmn)}} </span>
+			</span> 
 		</span> <span
 			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexUserChooce">
 				<span
@@ -43,18 +65,8 @@
 					</span>
 				</div>
 		</span>
-	</span> <!-- 
-	<span
-		ng-repeat="output in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('output')"
-		ng-init="outputIndex = $index"> {{output.attr.label}}:
-			{{output.attr.description}} 
-			<div ng-if="output.attr.description">
-			{{output.attr}} 
-			</div>
-			
-			</span>
-	 -->
-	</span> 
+	</span>
+	</span>
 	<span ng-if="branches.length > 1" ng-init="level = level + '-'"
 		ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/branche-pCheck.html'">
 	</span>

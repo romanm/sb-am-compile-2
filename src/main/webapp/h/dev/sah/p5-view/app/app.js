@@ -174,18 +174,21 @@ function initDmnRule($scope){
 	}
 
 	$scope.sumDmn = function(nextDmn){
+		var sum = null;
 		if($scope.isDmnTypeAggregationSUM(nextDmn)){
 			var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
-			var rules = decisionTable.childrenNamed('rule');
-			var ruleSelectedIndexes = decisionTable.attr.ruleIndexesUserChooce;
-			var sum = 0;
-			ruleSelectedIndexes.forEach(function(ruleIndex){
-				var rule = rules[ruleIndex];
-				var valOutput = rule.descendantWithPath('outputEntry.text').val;
-				sum += parseInt(valOutput);
-			});
-			return sum;
+			if(decisionTable.attr.ruleIndexesUserChooce){
+				sum = 0;
+				var rules = decisionTable.childrenNamed('rule');
+				var ruleSelectedIndexes = decisionTable.attr.ruleIndexesUserChooce;
+				ruleSelectedIndexes.forEach(function(ruleIndex){
+					var rule = rules[ruleIndex];
+					var valOutput = rule.descendantWithPath('outputEntry.text').val;
+					sum += parseInt(valOutput);
+				});
+			}
 		}
+		return sum;
 	}
 
 	$scope.isDmnTypeAggregationSUM = function(nextDmn){
@@ -203,7 +206,6 @@ function initDmnRule($scope){
 			var isLast = 
 				ruleIndexUserChooce ==
 				decisionTable.attr.ruleIndexesUserChooce[decisionTable.attr.ruleIndexesUserChooce.length - 1];
-			console.log(isLast);
 			var index = decisionTable.attr.ruleIndexesUserChooce.indexOf(ruleIndexUserChooce)
 			if(index >= 0){
 				decisionTable.attr.ruleIndexesUserChooce.splice(index,1);
@@ -211,6 +213,9 @@ function initDmnRule($scope){
 			if(!isLast){
 				decisionTable.attr.ruleIndexesUserChooce.push(ruleIndexUserChooce);
 			}
+			var sumDmn = $scope.sumDmn(nextDmn);
+			var output = decisionTable.descendantWithPath('output');
+			output.attr.value = sumDmn;
 		}else{
 			if(decisionTable.attr.ruleIndexUserChooce == ruleIndexUserChooce){
 				delete decisionTable.attr['ruleIndexUserChooce'];
@@ -276,6 +281,21 @@ function initDmnRule($scope){
 			}
 		});
 		return evalRuleLogicValue;
+	}
+
+	$scope.evalLogicExpForVariable = function(expr, outputVariable){
+		var evalLogicExpForVariable = false;
+		if(expr){
+			var value = outputVariable.attr.value
+			if(value){
+				var variable = outputVariable.attr.name
+				if(expr.indexOf(variable) >= 0){
+					var expr2 = expr.replace(variable, value);
+					evalLogicExpForVariable = eval(expr2);
+				}
+			}
+		}
+		return evalLogicExpForVariable;
 	}
 
 	$scope.evalLogicExp = function(input, inputEntry){
@@ -431,8 +451,9 @@ function initEditorBpmn($scope, $http){
 	}
 
 	$scope.isChainPEToViewForVariableClick = function(processElement){
-		return $scope.isPEToRuleSequenceFlow(processElement) 
+		return $scope.isPEToRuleSequenceFlow(processElement)
 		|| $scope.isBranchePE(processElement)
+//		|| $scope.isExclusiveGatewayPE(processElement)
 		;
 	}
 
@@ -448,6 +469,10 @@ function initEditorBpmn($scope, $http){
 	$scope.isMergerPE = function(processElement){
 		var incomings = processElement.childrenNamed('bpmn:incoming');
 		return incomings.length > 1;
+	}
+
+	$scope.isExclusiveGatewayPE = function(processElement){
+		return processElement.name == 'bpmn:exclusiveGateway';
 	}
 
 	$scope.isBranchePE = function(processElement){
@@ -500,7 +525,7 @@ function initEditorBpmn($scope, $http){
 	}
 
 	$scope.getUserElementName = function(bpmnNr, chainElementId){
-	console.log(chainElementId);
+//	console.log(chainElementId);
 		var userTaskId = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId].attr.sourceRef;
 		var userTaskElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[userTaskId];
 		if(userTaskElement)
