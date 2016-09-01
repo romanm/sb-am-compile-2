@@ -17,18 +17,24 @@
 
 </head>
 <body>
-	<h1>devFlowAsTree</h1>
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-10">
+	<h1>devFlowAsTree</h1>
 				<ul class="nav nav-tabs">
 					<li 
-					ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 useFlowAsTable devFlowAsTree'.split(' ') "
+					ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
 					ng-class="{'active':view == tabName}"><a href="#"
 						ng-click="setTabView(tabName)">{{tabName |
 							translate}}</a></li>
 				</ul>
 
+				<div ng-if="view == 'devVariables'">
+				<div
+						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/devVariables.html'"
+				>
+				</div>
+				</div>
 				<div ng-if="view == 'useFlowAsTree2'">
 					<div ng-repeat="bpmnNr in [0]">
 						<div
@@ -36,7 +42,7 @@
 	.childrenNamed('bpmn:outgoing')"
 							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
 							<div class="row">
-								<div class="col-md-7">
+								<div class="col-md-6">
 									<div class="hr_text">
 										<hr>
 										<span> <u> Історія хвороби </u>:</span>
@@ -46,10 +52,15 @@
 										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-EMR.html'">
 									</div>
 								</div>
-								<div class="col-md-5">
-									<div class="hr_text">
+								<!-- 
+								 style="background-color: #FCF8E3;border-right: 4px solid #009688;border-left: 4px solid #009688;"
+								 -->
+								<div class="col-md-6"
+								 style="background-color: #FCF8E3;"
+								>
+									<div class="hr_text alert-warning">
 										<hr>
-										<span>Контроль по протоколу:</span>
+										<span>Контроль дотримання протоколу:</span>
 									</div>
 									<div
 									ng-init="level = '-'"

@@ -1,0 +1,12 @@
+<div class="tooltip2"
+	ng-init="nextDmnNr = obj.data.init.camundaAppendix
+	.variables[getRuleInputsVariablen(rule, nextDmn)[0].variableName]
+	.outputDmnsNr[0];
+	nextDmn = obj.data.init.camundaAppendix.dmn[nextDmnNr];
+	">
+	{{menuName}}
+	<div class="tooltiptext">
+		<span
+			ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/ruleOutputToSelect.html'"></span>
+	</div>
+</div>

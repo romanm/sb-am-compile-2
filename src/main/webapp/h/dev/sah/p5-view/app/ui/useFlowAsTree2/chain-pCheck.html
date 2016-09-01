@@ -20,7 +20,8 @@
 		ng-init="egOutgoingSequenceFlow = getBpmnInit(bpmnNr).bpmnProcessElements[executiveGatewayOutgoing.val]"
 		>
 			<span
-			ng-if="evalLogicExpForVariable(egOutgoingSequenceFlow.firstChild.val, dmnOutput)">
+			title="{{dmnOutput.attr.value}}"
+			ng-if="evalLogicExpForOutputVariable(egOutgoingSequenceFlow.firstChild.val, dmnOutput)">
 				{{egOutgoingSequenceFlow.attr.name}} <small> (
 					{{egOutgoingSequenceFlow.firstChild.val}} ) </small>
 		</span>
@@ -39,14 +40,17 @@
 			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
 			ng-init="ruleIndexesUserChooce = nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexesUserChooce"
 			>
-				<span
-				ng-repeat="ruleIndex in ruleIndexesUserChooce"
+				<span ng-repeat="ruleIndex in ruleIndexesUserChooce"
 				ng-init="rule = nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
-						.childrenNamed('rule')[ruleIndex]">
-					{{rule.descendantWithPath('description').val}}{{$last?'':', '}} <span
-					ng-if="$last"> -
-						{{nextDmn.xmldoc.descendantWithPath('decision').attr.name}} </span>
-			</span> 
+						.childrenNamed('rule')[ruleIndex];">
+					<span
+					ng-init="menuName = rule.descendantWithPath('description').val;"
+					ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/menu-pCheck-input.html'">
+				</span>{{$last?'':', '}}<span ng-if="$last"> - <span
+						ng-init="menuName = nextDmn.xmldoc.descendantWithPath('decision').attr.name;"
+						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/menu-pCheck-output.html'">
+					</span></span>
+			</span>
 		</span> <span
 			ng-if="nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.ruleIndexUserChooce">
 				<span

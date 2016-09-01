@@ -197,6 +197,26 @@ function initDmnRule($scope){
 		return isDmnTypeAggregationSUM;
 	}
 
+	$scope.getRuleInputsVariablen = function(rule, nextDmn){
+		var ruleInputsVariablen = [];
+		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
+		var dmnInputs = decisionTable.childrenNamed('input');
+		var inputEntrys = rule.childrenNamed('inputEntry');
+		inputEntrys.forEach(function(inputEntry, inputEntryIndex){
+			var expr = inputEntry.firstChild.val;
+			if(expr){//the rule used this input
+				var inputExpression = dmnInputs[inputEntryIndex].firstChild;
+				console.log(inputExpression);
+				ruleInputsVariablen.push({
+					variableName:inputExpression.firstChild.val
+					, 
+					decisionTableInputIndex:inputEntryIndex
+					});
+			}
+		});
+		return ruleInputsVariablen;
+	}
+
 	$scope.setRuleIndexUserSelected = function(nextDmn, ruleIndexUserChooce){
 		var decisionTable = nextDmn.xmldoc.descendantWithPath('decision.decisionTable');
 		if($scope.isDmnTypeAggregationSUM(nextDmn)){
@@ -283,12 +303,12 @@ function initDmnRule($scope){
 		return evalRuleLogicValue;
 	}
 
-	$scope.evalLogicExpForVariable = function(expr, outputVariable){
+	$scope.evalLogicExpForOutputVariable = function(expr, dmnOutput){
 		var evalLogicExpForVariable = false;
 		if(expr){
-			var value = outputVariable.attr.value
+			var value = dmnOutput.attr.value
 			if(value){
-				var variable = outputVariable.attr.name
+				var variable = dmnOutput.attr.name
 				if(expr.indexOf(variable) >= 0){
 					var expr2 = expr.replace(variable, value);
 					evalLogicExpForVariable = eval(expr2);
@@ -650,8 +670,8 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('Protocole5Ctrl', function($scope, $http, $translate) {
 	console.log('Protocole5Ctrl');
-	initEditorBpmn($scope, $http);
 	initAngularCommon($scope, $http);
+	initEditorBpmn($scope, $http);
 
 	var urlForContent = '/v/readContent';
 	if($scope.params.p){
@@ -917,6 +937,34 @@ function initNewDmn(keyDmn, $scope){
 	initNewDmnId(dmnNr, $scope);
 }
 
+function addLastDmnVariables(camundaAppendix){
+	var dmnNr = camundaAppendix.dmn.length - 1;
+	var xmldoc = camundaAppendix.dmn[dmnNr].xmldoc;
+	var decisionTable = xmldoc.descendantWithPath('decision.decisionTable');
+	var dmnInputs = decisionTable.childrenNamed('input');
+	var dmnOutputs = decisionTable.childrenNamed('output');
+	dmnInputs.forEach(function(dmnInput){
+		var varName = dmnInput.valueWithPath("inputExpression.text");
+		if(!camundaAppendix.variables[varName]){
+			camundaAppendix.variables[varName] = {};
+		}
+		if(!camundaAppendix.variables[varName].inputDmnsNr){
+			camundaAppendix.variables[varName].inputDmnsNr = [];
+		}
+		camundaAppendix.variables[varName].inputDmnsNr.push(dmnNr);
+	});
+	dmnOutputs.forEach(function(dmnOutput){
+		var varName = dmnOutput.attr.name;
+		if(!camundaAppendix.variables[varName]){
+			camundaAppendix.variables[varName] = {};
+		}
+		if(!camundaAppendix.variables[varName].outputDmnsNr){
+			camundaAppendix.variables[varName].outputDmnsNr = [];
+		}
+		camundaAppendix.variables[varName].outputDmnsNr.push(dmnNr);
+	});
+}
+
 function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix, $scope){
 	var dmnInProtocol = protocol[keyDmn];
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
@@ -928,6 +976,7 @@ function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix, $scope){
 		, xmldoc: dmnXmldoc
 		, container:{container:'#dmn-canvas-' + dmnNr}
 	});
+	addLastDmnVariables(camundaAppendix);
 }
 
 function initBpmnXml(protocol, key1, bpmnXmldoc){
@@ -1147,7 +1196,7 @@ function initBpmnDmnToId(protocol, $scope){
 console.log("-------initBpmnDmnToId---------------------");
 	if(!protocol.config)
 		protocol.config = {};
-	var camundaAppendix = {bpmn:[],dmn:[]};
+	var camundaAppendix = {bpmn:[],dmn:[],variables:{}};
 	$scope.dmnIndexMap = {};
 	var dmnNr = 0;
 	for (var key1 in protocol) {

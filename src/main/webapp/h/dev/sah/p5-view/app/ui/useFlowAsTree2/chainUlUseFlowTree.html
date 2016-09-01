@@ -36,17 +36,8 @@
 					></span>
 					<br /> 
 					<span
-						ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable')
-						.childrenNamed('rule')">
-						| 
-							<a ng-click="setRuleIndexUserSelected(nextDmn, $index)"
-						ng-class="[{'alert-success': evalRuleFromOwnDmnInputs(nextDmn, rule)}
-						,{'bold':isRuleNrUserSelected(nextDmn, $index)}]"
-						title="{{rule.childrenNamed('outputEntry')[outputIndex].descendantWithPath('text').val
-						+ ' - ' + rule.childrenNamed('inputEntry')[outputIndex].descendantWithPath('text').val
-						}}">
-							{{rule.descendantWithPath('description').val}} </a>
-					</span>
+					ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/ruleOutputToSelect.html'"
+					></span>
 				</div>
 			</div>
 	</div></div>

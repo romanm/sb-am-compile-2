@@ -1,0 +1,21 @@
+<table class="table">
+	<tr>
+		<th>variable</th>
+		<th>input</th>
+		<th>output</th>
+	</tr>
+	<tr ng-repeat="(k,o) in obj.data.init.camundaAppendix.variables">
+		<td>{{k}}</td>
+		<td>
+			<div ng-repeat="inputDmnsNr in o.inputDmnsNr"
+				ng-init="dmn = obj.data.init.camundaAppendix.dmn[inputDmnsNr]">
+				{{dmn.path}} - {{dmn.xmldoc.firstChild.attr.name}}</div>
+		</td>
+		<td>
+			<div ng-repeat="outputDmnsNr in o.outputDmnsNr"
+				ng-init="dmn = obj.data.init.camundaAppendix.dmn[outputDmnsNr]">
+				{{dmn.path}} - {{dmn.xmldoc.firstChild.attr.name}}</div>
+		</td>
+	</tr>
+</table>
+<hr />
