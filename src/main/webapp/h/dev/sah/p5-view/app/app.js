@@ -96,7 +96,6 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 
 });
 
-
 var Regex = require("regex");
 var regex = new Regex(/[(\d+)..(\d+)]/);
 function initDmnRule($scope){
@@ -346,7 +345,7 @@ function initEditorBpmn($scope, $http){
 		return Object.keys(parallelOneTable);
 	}
 
-	//$scope.getParallelGatewayOneTable = function(flowTableElement, bpmnInit){
+	//$scope.getParallelGatewayOneTable = function(flowTableElement, bpmnInit)
 	$scope.getParallelGatewayOneTable =  function(bpmnNr, parallelGatewayElement){
 		var bpmnInit = $scope.getBpmnInit(bpmnNr);
 		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parallelGatewayElement.attr.id];
@@ -473,6 +472,7 @@ function initEditorBpmn($scope, $http){
 	$scope.isChainPEToViewForVariableClick = function(processElement){
 		return $scope.isPEToRuleSequenceFlow(processElement)
 		|| $scope.isBranchePE(processElement)
+		|| $scope.isScriptTaskPE(processElement)
 //		|| $scope.isExclusiveGatewayPE(processElement)
 		;
 	}
@@ -516,7 +516,55 @@ function initEditorBpmn($scope, $http){
 	$scope.isScriptTaskPE = function(processElement){
 		return processElement.name == 'bpmn:scriptTask';
 	}
+	$scope.executeScriptTask = function(scriptTask, bpmnNr){
+		var camundaResultVariable = scriptTask.attr['camunda:resultVariable'];
+		var camundaResource = scriptTask.attr['camunda:resource'];
+		var functionName = camundaResource.split('(')[0];
+		var parameter = camundaResource.split('(')[1].split(')')[0].replace(/'/g,'');
+		switch (functionName) {
+			case 'sumOutput': sumOutput(scriptTask, $scope, bpmnNr, parameter); break;
+		}
+	}
 
+	//function to call from bpmn:scriptTask -- BEGIN
+
+	//sumOutputsInAllFirstBusinessRules
+	function sumOutput(scriptTask, $scope, bpmnNr, processElementId){
+		delete scriptTask.attr.value;
+		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
+		processElement.childrenNamed('bpmn:outgoing').forEach(function(s1) {
+			var tr1 = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[s1.val].attr.targetRef;
+			var e1 = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[tr1];
+			if(!calcBusinessRuleTask(scriptTask, e1, $scope)){
+				e1.childrenNamed('bpmn:outgoing').forEach(function(s2) {
+					var tr2 = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[s2.val].attr.targetRef;
+					var e2 = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[tr2];
+					if(!calcBusinessRuleTask(scriptTask, e2, $scope)){
+					}
+				});
+			}
+		});
+	}
+
+	function calcBusinessRuleTask(scriptTask, businessRuleTask, $scope){
+		if(businessRuleTask.name != 'bpmn:businessRuleTask')
+			return false;
+		var dmnId = businessRuleTask.attr['camunda:decisionRef'];
+		var dmnIndex = $scope.dmnIndexMap[dmnId];
+		var nextDmn = $scope.obj.data.init.camundaAppendix.dmn[dmnIndex];
+		var ruleUserChooce = $scope.getRuleUserSelected(nextDmn);
+		if(ruleUserChooce){
+			if(!scriptTask.attr.value){
+				scriptTask.attr.value = 0;
+			}
+			//SUM
+			scriptTask.attr.value += Number(ruleUserChooce.descendantWithPath('outputEntry.text').val);
+		}
+		return true;
+	}
+
+	//function to call from bpmn:scriptTask -- END
+	
 	$scope.isPEEndEvent = function(processElement){
 		return processElement.name == 'bpmn:endEvent';
 	}
@@ -629,6 +677,7 @@ function initEditorBpmn($scope, $http){
 		console.log(urlToSave+'/?' + $scope.obj.data.fileName);
  		$http.post(urlToSave, $scope.obj.data ).success(function(response) {
 			console.log(response.length);
+			location.reload();
 		});
 	}
 
@@ -638,6 +687,8 @@ function initEditorBpmn($scope, $http){
 	}
  * */
 }
+
+
 angular.module('DevFlowAsTreeApp', ['pascalprecht.translate'])
 .config(['$translateProvider', function($translateProvider) { configTranslation($translateProvider); } ])
 .controller('DevFlowAsTreeCtrl', function($scope, $http, $translate) {
@@ -711,6 +762,7 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 		return lastParentId;
 	}
 
+	console.log("----------764------");
 	/*
 	 * */
 	$scope.setRuleState = function(parallelOneTable, rule, ruleHead){
@@ -766,15 +818,9 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	$scope.createNewDMN = function(){
 		console.log("-------createNewDMN--------");
 		var maxN = getMaxNr('dmn');
-		console.log(maxN);
-		$http.get("/h/dev/sah/p4/resources/newDMN.dmn").success(function(response) {
-			var keyDmn = 'dmn'+maxN;
-			$scope.obj.data[keyDmn] = {dmnContent:response};
-			initNewDmn(keyDmn, $scope);
-			console.log($scope.obj.data);
-			if($scope.useJsonEditor){
-				editor.set($scope.obj.data);
-			}
+		var keyDmn = 'dmn'+maxN;
+		$http.get('/v/newDMN.json').success(function(response) {
+			$scope.obj.data[keyDmn] = {dmnContent:response.dmn.dmnContent};
 			$scope.saveFile();
 		});
 	}
@@ -837,13 +883,15 @@ function initDictionary($scope, $http){
 						for (var key2 in protocol[keyDmn]) {
 							if(key2.indexOf('dmnContent')>=0){
 								var dmnInProtocol = protocol[keyDmn];
-								var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
-								var dmnInputs = dmnXmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
-								dmnInputs.forEach(function(dmnInput){
-									var varName = dmnInput.valueWithPath("inputExpression.text");
-									var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
-									$scope.dictionary[varName] ={label:dmnInput.attr.label, typeRef:typeRef}; 
-								});
+								if(dmnInProtocol.dmnContent.length > 1){
+									var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
+									var dmnInputs = dmnXmldoc.descendantWithPath('decision.decisionTable').childrenNamed('input');
+									dmnInputs.forEach(function(dmnInput){
+										var varName = dmnInput.valueWithPath("inputExpression.text");
+										var typeRef = dmnInput.valueWithPath("inputExpression@typeRef");
+										$scope.dictionary[varName] ={label:dmnInput.attr.label, typeRef:typeRef}; 
+									});
+								}
 							}
 						}
 					}
@@ -877,6 +925,8 @@ function viewerBpmnDmn(protocol){
 				+dmnViewerInitData.path+addProtocol()+'">' +dmnViewerInitData.path+ '</a>'));
 		var viewerDmn = new DmnViewer(dmnViewerInitData.container);
 		var dmnContext = jsonPath(protocol, dmnViewerInitData.path+'.dmnContent');
+		if(dmnContext == '-')
+			continue;
 		viewerDmn.importXML(dmnContext, function(err) {
 			if (err) {
 				console.log('error rendering', err);
@@ -900,6 +950,9 @@ function viewerBpmnDmn(protocol){
 		 * */
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);
 		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path + '.bpmnContent');
+		console.log(bpmnViewerInitData.path + '--------------------' + bpmnContext.length);
+		if(bpmnContext == '-')
+			return;
 		viewerBpm.importXML(bpmnContext, function(err) {
 			if (err) {
 				console.error(err);
@@ -908,6 +961,7 @@ function viewerBpmnDmn(protocol){
 			}
 		});
 	}
+	console.log("------------viewerBpmnDmn-----------END--------");
 
 }
 
@@ -966,7 +1020,14 @@ function addLastDmnVariables(camundaAppendix){
 }
 
 function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix, $scope){
+	console.log(31);
+	console.log(keyDmn);
 	var dmnInProtocol = protocol[keyDmn];
+	console.log(keyDmn + '-----------------------------' + dmnInProtocol.dmnContent.length);
+	console.log(dmnInProtocol.dmnContent == '-');
+	if(dmnInProtocol.dmnContent == '-')
+		return;
+	console.log(32);
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
 	var decisionId = dmnXmldoc.descendantWithPath('decision').attr.id;
 	$scope.dmnIndexMap[decisionId] = dmnNr;
@@ -1189,21 +1250,26 @@ $scope.isWalkElementSequenceFlow = function(walkElement){
 		}
 		bpmnInit.processElements[elementId] = {obj:processElement,elementId:elementId};
 	});
-	walkIds($scope, bpmnInit, bpmnInit.nodeTree, null, bpmnInit.config.startId);
+	//TODO! recursion problem
+	//walkIds($scope, bpmnInit, bpmnInit.nodeTree, null, bpmnInit.config.startId);
 }
 
 function initBpmnDmnToId(protocol, $scope){
 console.log("-------initBpmnDmnToId---------------------");
 	if(!protocol.config)
 		protocol.config = {};
-	var camundaAppendix = {bpmn:[],dmn:[],variables:{}};
+	console.log(1);
+	var camundaAppendix = {bpmn:[],dmn:[],variables:{},dmnIdPosition:{}};
 	$scope.dmnIndexMap = {};
 	var dmnNr = 0;
+	console.log(2);
 	for (var key1 in protocol) {
 		if(key1.indexOf('dmn')>=0){
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
+					console.log(3);
 					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix, $scope);
+					console.log(4);
 					dmnNr++;
 				}
 			}
@@ -1261,6 +1327,20 @@ angular.module('P5DmnApp', [])
 		};
 		var dmnContent = jsonPath($scope.obj.data, params.jsonpath+'.dmnContent');
 		console.log(dmnContent);
+		if(dmnContent.length == 1){
+			$http.get("/h/dev/sah/p4/resources/newDMN.dmn").success(function(response) {
+				console.log(response);
+				/*
+				$scope.obj.data[keyDmn] = {dmnContent:response};
+				initNewDmn(keyDmn, $scope);
+				console.log($scope.obj.data);
+				if($scope.useJsonEditor){
+					editor.set($scope.obj.data);
+				}
+				$scope.saveFile();
+				 * */
+			});
+		}
 		$scope.dmnXmldoc = new xmldoc.XmlDocument(dmnContent);
 		console.log($scope.dmnContent);
 		renderer.importXML(dmnContent, function(err) {
@@ -1339,9 +1419,10 @@ function jsonPath_stop(obj, path){
 
 function initAngularCommon($scope, $http){
 	$scope.params = params;
+	console.log($scope.params);
 	$http.get("/v/read_user").success(function(response) {
 		$scope.userPrincipal = response;
-		//console.log($scope.userPrincipal);
+		console.log($scope.userPrincipal);
 	});
 }
 
