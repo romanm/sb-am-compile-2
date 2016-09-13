@@ -99,7 +99,6 @@ angular.module('HomeApp', ['pascalprecht.translate'])
 var Regex = require("regex");
 var regex = new Regex(/[(\d+)..(\d+)]/);
 function initDmnRule($scope){
-	console.log($scope.dictionary);
 
 	$scope.getSelectedRuleDmnInputs = function(nextDmn){
 		var ruleUserChooce = $scope.getRuleUserSelected(nextDmn);
@@ -700,15 +699,13 @@ angular.module('DevFlowAsTreeApp', ['pascalprecht.translate'])
 	if($scope.params.p){
 		urlForContent = '/v/readProtocol/' + $scope.params.p;
 	}
-	console.log(urlForContent);
+	console.log('------read from--------' + urlForContent);
 	
 	$http.get(urlForContent).success(function(protocol) {
-		console.log(protocol);
 		$scope.obj = {
 			data : protocol,
 			options : { mode : 'tree' }
 		};
-		console.log($scope.obj.data);
 //		editor.set($scope.obj.data);
 		initBpmnDmnToId($scope.obj.data, $scope);
 //		viewerBpmnDmn($scope.obj.data);
@@ -1020,14 +1017,9 @@ function addLastDmnVariables(camundaAppendix){
 }
 
 function addAppendixDmn(protocol, keyDmn, dmnNr, camundaAppendix, $scope){
-	console.log(31);
-	console.log(keyDmn);
 	var dmnInProtocol = protocol[keyDmn];
-	console.log(keyDmn + '-----------------------------' + dmnInProtocol.dmnContent.length);
-	console.log(dmnInProtocol.dmnContent == '-');
 	if(dmnInProtocol.dmnContent == '-')
 		return;
-	console.log(32);
 	var dmnXmldoc = new xmldoc.XmlDocument(dmnInProtocol.dmnContent);
 	var decisionId = dmnXmldoc.descendantWithPath('decision').attr.id;
 	$scope.dmnIndexMap[decisionId] = dmnNr;
@@ -1118,9 +1110,10 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 
 function initBpmnTreeWalker(bpmnInit, $scope){
 
+// START of INITs
 //	$scope.view = 'useFlowAsTable';
-//	$scope.view = 'useFlowAsTree';
-	$scope.view = 'useFlowAsTree2';
+	$scope.view = 'devFlowAsTree';
+//	$scope.view = 'useFlowAsTree2';
 	bpmnInit.bpmnProcessElements = {};
 	//key is elementFlow
 	bpmnInit.processBranches = {};
@@ -1128,12 +1121,16 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	bpmnInit.mergerBranchesNumer = [];
 	
 	//key is sequenceFlow
+	//ProcessChains is a map where IDs of Elements is a key and value is chains(list of IDs) in this BPMN.
+	//First element in list is == key
 	bpmnInit.processChains = {};
+	//bpmnInit.config.startId is ID of bpmn:startEvent
 	bpmnInit.config = {startId:null};
 
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
+		//console.log(elementId);
 		bpmnInit.bpmnProcessElements[elementId] = processElement;
 		var elementName = processElement.name;
 		var incomings = processElement.childrenNamed('bpmn:incoming');
@@ -1158,32 +1155,11 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 			}
 		}
 	});
+	//Build, compose a chains.
 	Object.keys(bpmnInit.processChains).forEach(function(sequenceFlowId){
 		composeChain(bpmnInit, sequenceFlowId, bpmnInit.processChains[sequenceFlowId]);
 	});
-	console.log(bpmnInit.processBranches);
-	Object.keys(bpmnInit.processBranches).forEach(function(brancheId){
-		console.log(brancheId);
-		bpmnInit.bpmnProcessElements[brancheId]
-		.childrenNamed('bpmn:outgoing').forEach(function(outgoing){
-			var chain = bpmnInit.processChains[outgoing.val];
-			var lastChainElementId = chain[chain.length - 1];
-			if(bpmnInit.mergerBranches[lastChainElementId]){
-				bpmnInit.mergerBranches[lastChainElementId].push(outgoing.val);
-				var processBranche = bpmnInit.processBranches[brancheId];
-				if(!processBranche.merger){
-					processBranche.merger = {};
-				}
-				if(!processBranche.merger[lastChainElementId]){
-					processBranche.merger[lastChainElementId] = [];
-				}
-				processBranche.merger[lastChainElementId].push(outgoing.val);
-				console.log(lastChainElementId);
-			}
-		});
-		console.log(bpmnInit.processBranches[brancheId]);
-	});
-	
+	//Build, compose a one chain.
 	function composeChain(bpmnInit, elementId, chain){
 		var processElement = bpmnInit.bpmnProcessElements[elementId];
 		chain.push(elementId);
@@ -1205,6 +1181,52 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		}
 	}
 
+	//Build a merge of branches.
+	Object.keys(bpmnInit.processBranches).forEach(function(brancheId){
+		bpmnInit.bpmnProcessElements[brancheId]
+		.childrenNamed('bpmn:outgoing').forEach(function(outgoing){
+			var chain = bpmnInit.processChains[outgoing.val];
+			var lastChainElementId = chain[chain.length - 1];
+			if(bpmnInit.mergerBranches[lastChainElementId]){
+				bpmnInit.mergerBranches[lastChainElementId].push(outgoing.val);
+				var processBranche = bpmnInit.processBranches[brancheId];
+				if(!processBranche.merger){
+					processBranche.merger = {};
+				}
+				if(!processBranche.merger[lastChainElementId]){
+					processBranche.merger[lastChainElementId] = [];
+				}
+				processBranche.merger[lastChainElementId].push(outgoing.val);
+			}
+		});
+	});
+	
+	//register sequences that go to repeate
+	//sequencesGoRepeat is ; separated sequences that go to repeat.
+	bpmnInit.config.sequencesGoRepeat = ';';
+	bpmnInit.mergerBranchesNumer.forEach(function(mergePointId){
+		var mergePointChain = bpmnInit.processChains[mergePointId];
+		bpmnInit.mergerBranches[mergePointId].forEach(function(sequenceRepeateCandidateId){
+			checkForRepeate(sequenceRepeateCandidateId, mergePointChain);
+		});
+	});
+	function checkForRepeate(sequenceRepeateCandidateId, chain){
+		var chainEndElementId = chain[chain.length - 1];
+		console.log(chainEndElementId);
+		if(chainEndElementId.indexOf('EndEvent')==0)
+			return;
+		if(bpmnInit.processBranches[chainEndElementId].branches.indexOf(sequenceRepeateCandidateId)>=0){
+			bpmnInit.config.sequencesGoRepeat = bpmnInit.config.sequencesGoRepeat + sequenceRepeateCandidateId + ';';
+			return;
+		}
+		bpmnInit.processBranches[chainEndElementId].branches.forEach(function(processBrancheId){
+			checkForRepeate(sequenceRepeateCandidateId, bpmnInit.processChains[processBrancheId]);
+		});
+	};
+	console.log(bpmnInit.config.sequencesGoRepeat);
+
+// END of INITs
+	
 	$scope.getBpmnInit = function(nr){
 		return $scope.obj.data.init.camundaAppendix.bpmn[nr];
 	}
@@ -1258,18 +1280,14 @@ function initBpmnDmnToId(protocol, $scope){
 console.log("-------initBpmnDmnToId---------------------");
 	if(!protocol.config)
 		protocol.config = {};
-	console.log(1);
 	var camundaAppendix = {bpmn:[],dmn:[],variables:{},dmnIdPosition:{}};
 	$scope.dmnIndexMap = {};
 	var dmnNr = 0;
-	console.log(2);
 	for (var key1 in protocol) {
 		if(key1.indexOf('dmn')>=0){
 			for (var key2 in protocol[key1]) {
 				if(key2.indexOf('dmnContent')>=0){
-					console.log(3);
 					addAppendixDmn(protocol, key1, dmnNr, camundaAppendix, $scope);
-					console.log(4);
 					dmnNr++;
 				}
 			}
@@ -1283,15 +1301,13 @@ console.log("-------initBpmnDmnToId---------------------");
 					var bpmnXmldoc = new xmldoc.XmlDocument(protocol[key1].bpmnContent);
 					bpmnXmldoc = initBpmnXml(protocol, key1, bpmnXmldoc);
 					//var bpmnInit = {path: key1+'.bpmnContent'
-					console.log(key1);
 					var bpmnInit = {path: key1
-							, xmldoc: bpmnXmldoc
-							, container:
-								{container:'#bpmn-canvas-' + bpmnNr
-								, height: protocol[key1].height
-								}
-							};
-					console.log(bpmnInit);
+						, xmldoc: bpmnXmldoc
+						, container:
+							{container:'#bpmn-canvas-' + bpmnNr
+							, height: protocol[key1].height
+							}
+						};
 					initBpmnTreeWalker(bpmnInit, $scope);
 					// to delete
 					initBpmnVerticalTable(bpmnInit, $scope);
@@ -1419,10 +1435,8 @@ function jsonPath_stop(obj, path){
 
 function initAngularCommon($scope, $http){
 	$scope.params = params;
-	console.log($scope.params);
 	$http.get("/v/read_user").success(function(response) {
 		$scope.userPrincipal = response;
-		console.log($scope.userPrincipal);
 	});
 }
 
@@ -1431,12 +1445,10 @@ const params = require('query-string').parse(location.search);
 //console.log(params);
 
 function configTranslation($translateProvider){
-	console.log("-------configTranslation-----------------------------------");
 	$translateProvider.useStaticFilesLoader({ prefix: '/v/i18n/', suffix: '.json' });
 	//$translateProvider.useLocalStorage();
 	var myLocale = 'ua'
 	var springCookieLocale = document.cookie.split('org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=')[1];
-	console.log(springCookieLocale);
 	if(springCookieLocale){
 		if(springCookieLocale.indexOf(';') > 0){
 			myLocale = springCookieLocale.split(';')[0];
