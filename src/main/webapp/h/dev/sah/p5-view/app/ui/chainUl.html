@@ -14,13 +14,11 @@
 		{{isPEUserToRuleSequenceFlow(chainElement)}}
 		{{isPEEndEvent(chainElement)}} {{isBranchePE(chainElement)}}
 		{{isMergerPE(chainElement)}} {{chainElementId}} </span>
-		{{isRepeatSequence(chainElementId, getBpmnInit(bpmnNr))}}
-
-	<div ng-if="!isRepeatSequence(chainElementId, getBpmnInit(bpmnNr))">
 		<div
-			ng-if="$last && getBpmnInit(bpmnNr).processChains[chainElementId]"
+			ng-if="$last && getBpmnInit(bpmnNr).processChains[chainElementId]
+			&& hasIncominFromRepeat(bpmnNr, chainElementId)
+			"
 			ng-init="chainStartOutgoingId = chainElementId">
-			-1-
 			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
 			</ul>
 		</div>
@@ -43,5 +41,4 @@
 				</div>
 			</div>
 		</div>
-	</div>
 </li>
