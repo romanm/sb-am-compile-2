@@ -1,10 +1,15 @@
 <li ng-repeat="branche in branches"
-	ng-init="chainStartOutgoingId = branche.val">
+	ng-init="chainStartOutgoingId = branche.val;
+	repeatSequence = isRepeatSequence(chainStartOutgoingId, getBpmnInit(bpmnNr));
+	">
 	{{getProcessElementName(bpmnNr, branche.val)}} <!-- 
 	<span
 	title="{{chainStartOutgoingId}}">
 		{{getProcessElementName(bpmnNr, branche.val)}} </span>
-	 -->
-	<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+	--> 
+	<span ng-if="repeatSequence"
+	ng-include="'/h/dev/sah/p5-view/app/ui/repeatSequence.html'"> </span>
+	<ul ng-if="!repeatSequence"
+		ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
 	</ul>
 </li>

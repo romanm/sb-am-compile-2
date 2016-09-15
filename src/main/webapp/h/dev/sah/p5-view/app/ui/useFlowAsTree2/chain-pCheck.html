@@ -6,6 +6,8 @@
 	branches = chainElement.childrenNamed('bpmn:outgoing');
 	"
 	ng-if="isChainPEToViewForVariableClick(getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId])">
+	<span ng-if="isScriptTaskPE(chainElement) && chainElement.attr.value">
+		{{chainElement.attr.name}} {{chainElement.attr.value}} </span> 
 	<span ng-if="isExclusiveGatewayPE(chainElement)"
 	ng-init="
 	incomingSequenceFlow = getBpmnInit(bpmnNr).bpmnProcessElements[chainElement.firstChild.val];

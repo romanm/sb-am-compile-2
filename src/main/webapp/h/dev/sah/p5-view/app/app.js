@@ -1111,9 +1111,10 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 function initBpmnTreeWalker(bpmnInit, $scope){
 
 // START of INITs
-//	$scope.view = 'useFlowAsTable';
-	$scope.view = 'devFlowAsTree';
+	//$scope.view = 'useFlowAsTable';
+	//$scope.view = 'devFlowAsTree';
 //	$scope.view = 'useFlowAsTree2';
+	$scope.view = 'useFlowAsTree';
 	bpmnInit.bpmnProcessElements = {};
 	//key is elementFlow
 	bpmnInit.processBranches = {};
@@ -1125,12 +1126,12 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	//First element in list is == key
 	bpmnInit.processChains = {};
 	//bpmnInit.config.startId is ID of bpmn:startEvent
-	bpmnInit.config = {startId:null};
+	//sequencesGoRepeat is ; separated sequences that go to repeat.
+	bpmnInit.config = {startId:null,sequencesGoRepeat:';'};
 
 	var bpmnProcess = bpmnInit.xmldoc.descendantWithPath('bpmn:process');
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
-		//console.log(elementId);
 		bpmnInit.bpmnProcessElements[elementId] = processElement;
 		var elementName = processElement.name;
 		var incomings = processElement.childrenNamed('bpmn:incoming');
@@ -1140,6 +1141,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 			bpmnInit.processChains[elementId] = [];
 		}
 		var outgoings = processElement.childrenNamed('bpmn:outgoing');
+		console.log(elementId + '/' + outgoings.length);
 		if(outgoings.length > 1){
 			var processBranches = [];
 			outgoings.forEach(function(outgoing){
@@ -1200,16 +1202,16 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 			}
 		});
 	});
-	
+
 	//register sequences that go to repeate
 	//sequencesGoRepeat is ; separated sequences that go to repeat.
-	bpmnInit.config.sequencesGoRepeat = ';';
 	bpmnInit.mergerBranchesNumer.forEach(function(mergePointId){
 		var mergePointChain = bpmnInit.processChains[mergePointId];
 		bpmnInit.mergerBranches[mergePointId].forEach(function(sequenceRepeateCandidateId){
 			checkForRepeate(sequenceRepeateCandidateId, mergePointChain);
 		});
 	});
+
 	function checkForRepeate(sequenceRepeateCandidateId, chain){
 		var chainEndElementId = chain[chain.length - 1];
 		console.log(chainEndElementId);
@@ -1224,9 +1226,42 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		});
 	};
 	console.log(bpmnInit.config.sequencesGoRepeat);
+	console.log(bpmnInit.config);
 
 // END of INITs
 	
+	$scope.hasIncominFromRepeat = function(bpmnNr, elementId){
+		var hasIncominFromRepeat = false;
+		var bpmnInit = $scope.getBpmnInit(bpmnNr);
+		var element = bpmnInit.bpmnProcessElements[elementId];
+		element.childrenNamed('bpmn:incoming').forEach(function(incomingElement){
+			if(!hasIncominFromRepeat){
+				hasIncominFromRepeat = $scope.isRepeatSequence(incomingElement.val, bpmnInit);
+			}
+			
+		})
+		return hasIncominFromRepeat;
+	}
+
+	//branche that contain repeate sequence
+	$scope.isContainRepeatSequence = function(bpmnInit, mergerBranche){
+		var isContainRepeatSequence = false;
+		mergerBranche.forEach(function(brancheId){
+			if(!isContainRepeatSequence){
+				isContainRepeatSequence = $scope.isRepeatSequence(brancheId, bpmnInit);
+			}
+		});
+		return isContainRepeatSequence;
+	}
+	$scope.isRepeatSequence = function(sequenceId, bpmnInit){
+		if(bpmnInit.config.sequencesGoRepeat)
+			return bpmnInit.config.sequencesGoRepeat.indexOf(sequenceId) >= 0;
+	}
+
+	$scope.mergesNumer = function(bpmnNr, elementId){
+		return $scope.getBpmnInit(bpmnNr).mergerBranchesNumer.indexOf(elementId) + 1;
+	}
+
 	$scope.getBpmnInit = function(nr){
 		return $scope.obj.data.init.camundaAppendix.bpmn[nr];
 	}
@@ -1259,7 +1294,8 @@ $scope.isWalkElementSequenceFlow = function(walkElement){
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
 		if(elementId.indexOf('StartEvent')==0){
-			bpmnInit.config.startId = elementId;
+			// see initBpmnTreeWalker
+			//bpmnInit.config.startId = elementId;
 		}
 		if($scope.obj){
 			if(!$scope.obj.data.config[bpmnInit.path]){
@@ -1294,6 +1330,7 @@ console.log("-------initBpmnDmnToId---------------------");
 		}
 	}
 	var bpmnNr = 0;
+	console.log('----------------------------' + bpmnNr);
 	for (var key1 in protocol) {
 		if(key1.indexOf('bpmn')>=0){
 			for (var key2 in protocol[key1]) {
@@ -1310,7 +1347,7 @@ console.log("-------initBpmnDmnToId---------------------");
 						};
 					initBpmnTreeWalker(bpmnInit, $scope);
 					// to delete
-					initBpmnVerticalTable(bpmnInit, $scope);
+					//initBpmnVerticalTable(bpmnInit, $scope);
 					camundaAppendix.bpmn.push(bpmnInit);
 					bpmnNr++;
 				}

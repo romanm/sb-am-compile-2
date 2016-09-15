@@ -1,6 +1,10 @@
 <li ng-repeat="branche in branches"
-	ng-init="chainStartOutgoingId = branche.val"
-	>
-	<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
-	</ul>
+	ng-init="chainStartOutgoingId = branche.val;
+	repeateSequence = isRepeateSequence(chainStartOutgoingId, getBpmnInit(bpmnNr));
+	">
+	<div ng-if="!repeateSequence">
+		<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
+		</ul>
+	</div>
+	<div ng-if="repeateSequence">see REPEATe:</div>
 </li>

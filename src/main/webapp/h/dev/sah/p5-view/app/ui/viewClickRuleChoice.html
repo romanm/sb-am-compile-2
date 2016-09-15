@@ -1,0 +1,5 @@
+<span
+	ng-repeat="rule in nextDmn.xmldoc.descendantWithPath('decision.decisionTable').childrenNamed('rule')"
+	ng-if="rule.attr.id == nextDmn.xmldoc.descendantWithPath('decision.decisionTable').attr.clickRuleChoice">
+	{{rule.descendantWithPath('description').val}} </span>
+

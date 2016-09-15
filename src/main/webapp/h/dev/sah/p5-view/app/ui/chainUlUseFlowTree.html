@@ -7,15 +7,24 @@
 	"
 	ng-if="isChainPEToView(getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId])">
 	<div ng-include="'/h/dev/sah/p5-view/app/ui/viewChainElement.html'">
-	</div> 
-
+	</div>
+	<div
+		ng-if="$last && getBpmnInit(bpmnNr).processChains[chainElementId]
+	&& hasIncominFromRepeat(bpmnNr, chainElementId)
+	"
+		ng-init="chainStartOutgoingId = chainElementId">
+		<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+		</ul>
+	</div>
 	<ol ng-if="branches.length > 1"
 		ng-include="'/h/dev/sah/p5-view/app/ui/brancheOlUseFlowTree.html'">
 	</ol>
 	<div ng-if="processBranches.merger">
 		<div
-			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
-			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
+			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger"
+			ng-init="containRepeateSequence = isContainRepeatSequence(getBpmnInit(bpmnNr), mergerBranche);">
+			<ul ng-if="!containRepeateSequence"
+				ng-include="'/h/dev/sah/p5-view/app/ui/chainUlUseFlowTree.html'">
 			</ul>
 		</div>
 	</div>

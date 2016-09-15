@@ -7,6 +7,15 @@
 	"
 	ng-if="isChainPEToViewForVariableClick(getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId])">
 	<span
+	ng-if="isScriptTaskPE(chainElement)"
+	>
+	{{chainElement.attr.name}}
+	{{chainElement.attr.value}}
+	-1-
+	{{executeScriptTask(chainElement, bpmnNr)}}
+	-2-
+	</span>
+	<span
 	ng-if="getConfigParameter(bpmnNr, chainElement, 'openParallelGateway') == 'no'"><a
 		ng-click="openParallelGatewayAsOneTable(bpmnNr, chainElement)"
 		class="btn btn-default btn-xs"> <i aria-hidden="true"

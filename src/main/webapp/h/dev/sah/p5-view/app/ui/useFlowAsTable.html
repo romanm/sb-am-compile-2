@@ -40,7 +40,9 @@
 			<table class="table table-striped" ng-if="processBranches.merger">
 				<tr>
 					<td
-						ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
+						ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger"
+						ng-if="!isContainRepeatSequence(getBpmnInit(bpmnNr), mergerBranche)"
+						>
 						<div ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'">
 						</div>
 					</td>
@@ -49,3 +51,14 @@
 		</td>
 	</tr>
 </table>
+<div
+	ng-init="
+chain = getBpmnInit(bpmnNr).processChains[chainStartOutgoingId];
+lastChainElementId = chain[chain.length - 1];
+">
+	<div ng-if="hasIncominFromRepeat(bpmnNr, lastChainElementId)"
+		ng-init="chainStartOutgoingId = lastChainElementId">
+		<div ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'">
+		</div>
+	</div>
+</div>

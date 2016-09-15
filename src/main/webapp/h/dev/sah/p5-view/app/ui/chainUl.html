@@ -5,7 +5,7 @@
 	chainElement = getBpmnInit(bpmnNr).bpmnProcessElements[chainElementId];
 	branches = chainElement.childrenNamed('bpmn:outgoing');
 	">
-	<span ng-if="isBranchePE(chainElement)"> <i
+<span ng-if="isBranchePE(chainElement)"> <i
 		class="fa fa-sitemap" aria-hidden="true"></i>
 </span> <span ng-if="isMergerPE(chainElement)"> <i
 		class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i>
@@ -14,18 +14,34 @@
 		{{isPEUserToRuleSequenceFlow(chainElement)}}
 		{{isPEEndEvent(chainElement)}} {{isBranchePE(chainElement)}}
 		{{isMergerPE(chainElement)}} {{chainElementId}} </span>
-	<ol ng-if="branches.length > 1"
-		ng-include="'/h/dev/sah/p5-view/app/ui/brancheOl.html'">
-	</ol>
-	<div ng-if="processBranches.merger">
-		Продовження:
+		{{isRepeatSequence(chainElementId, getBpmnInit(bpmnNr))}}
+
+	<div ng-if="!isRepeatSequence(chainElementId, getBpmnInit(bpmnNr))">
 		<div
-			ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger">
-			{{chainStartOutgoingId}} (для<span
-				ng-repeat="chainId in mergerBranche"> {{$first?'':','}}
-				{{processBranches.branches.indexOf(chainId) + 1}}</span>)
+			ng-if="$last && getBpmnInit(bpmnNr).processChains[chainElementId]"
+			ng-init="chainStartOutgoingId = chainElementId">
+			-1-
 			<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
 			</ul>
+		</div>
+		<ol ng-if="branches.length > 1"
+			ng-include="'/h/dev/sah/p5-view/app/ui/brancheOl.html'">
+		</ol>
+		<div ng-if="processBranches.merger">
+			<div
+				ng-repeat="(chainStartOutgoingId, mergerBranche) in processBranches.merger"
+				ng-init="containRepeateSequence = isContainRepeatSequence(getBpmnInit(bpmnNr), mergerBranche);"
+				>
+				Продовження:
+				<div ng-if="containRepeateSequence">see REPEATE:</div>
+				<div ng-if="!containRepeateSequence">
+					{{chainStartOutgoingId}} (для<span
+						ng-repeat="chainId in mergerBranche"> {{$first?'':','}}
+						{{processBranches.branches.indexOf(chainId) + 1}}</span>)
+					<ul ng-include="'/h/dev/sah/p5-view/app/ui/chainUl.html'">
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 </li>

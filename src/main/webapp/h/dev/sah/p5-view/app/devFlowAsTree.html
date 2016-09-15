@@ -20,20 +20,18 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-10">
-	<h1>devFlowAsTree</h1>
+				<h1>devFlowAsTree</h1>
 				<ul class="nav nav-tabs">
-					<li 
-					ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
-					ng-class="{'active':view == tabName}"><a href="#"
-						ng-click="setTabView(tabName)">{{tabName |
-							translate}}</a></li>
+					<li
+						ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
+						ng-class="{'active':view == tabName}"><a href="#"
+						ng-click="setTabView(tabName)">{{tabName | translate}}</a></li>
 				</ul>
 
 				<div ng-if="view == 'devVariables'">
-				<div
-						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/devVariables.html'"
-				>
-				</div>
+					<div
+						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/devVariables.html'">
+					</div>
 				</div>
 				<div ng-if="view == 'useFlowAsTree2'">
 					<div ng-repeat="bpmnNr in [0]">
@@ -45,25 +43,22 @@
 								<div class="col-md-6">
 									<div class="hr_text">
 										<hr>
-										<span> <u> Історія хвороби </u>:</span>
+										<span> <u> Історія хвороби </u>:
+										</span>
 									</div>
-									<div
-									ng-init="level = '-'"
+									<div ng-init="level = '-'"
 										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-EMR.html'">
 									</div>
 								</div>
 								<!-- 
 								 style="background-color: #FCF8E3;border-right: 4px solid #009688;border-left: 4px solid #009688;"
 								 -->
-								<div class="col-md-6"
-								 style="background-color: #FCF8E3;"
-								>
+								<div class="col-md-6" style="background-color: #FCF8E3;">
 									<div class="hr_text alert-warning">
 										<hr>
 										<span>Контроль дотримання протоколу:</span>
 									</div>
-									<div
-									ng-init="level = '-'"
+									<div ng-init="level = '-'"
 										ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/chain-pCheck.html'">
 									</div>
 								</div>
@@ -86,19 +81,19 @@
 				<div ng-if="view == 'useFlowAsTable'">
 					<div ng-repeat="bpmnNr in [0]">
 						<div
-ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
 	.childrenNamed('bpmn:outgoing')"
 							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
-							<div
-								ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'">
+							<div ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'">
 							</div>
 						</div>
 					</div>
 				</div>
+
 				<div ng-if="view == 'useFlowAsTree'">
 					<div ng-repeat="bpmnNr in [0]">
 						<div
-ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
+							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
 	.childrenNamed('bpmn:outgoing')"
 							ng-init="chainStartOutgoingId = chainStartOutgoing.val">
 							<ul
@@ -107,6 +102,7 @@ ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmn
 						</div>
 					</div>
 				</div>
+
 				<div ng-if="view == 'devFlowAsTree'">
 					{{getBpmnInit(0).config.startId}} ----
 					<div ng-repeat="bpmnNr in [0]">
@@ -118,24 +114,24 @@ ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmn
 							</ul>
 						</div>
 					</div>
-					<div>
-						processChains =
-						<div
+					processChains =
+					<ul>
+						<li
 							ng-repeat="(key, processChains) in getBpmnInit(0).processChains">
-							{{key}} = {{processChains}}</div>
-					</div>
-					<div>
-						processBranches=
-						<div
+							{{key}} = {{processChains}}</li>
+					</ul>
+					processBranches=
+					<ul>
+						<li
 							ng-repeat="(key, processBranche) in getBpmnInit(0).processBranches">
-							{{key}}= {{processBranche}}</div>
-					</div>
-					<div>
-						mergerBranches=
-						<div
+							{{key}}= {{processBranche}}</li>
+					</ul>
+					mergerBranches=
+					<ul>
+						<li
 							ng-repeat="(key, mergerBranche) in getBpmnInit(0).mergerBranches">
-							{{key}}= {{mergerBranche}}</div>
-					</div>
+							{{key}}= {{mergerBranche}}</li>
+					</ul>
 					mergerBranchesNumer= {{getBpmnInit(0).mergerBranchesNumer}}
 				</div>
 
