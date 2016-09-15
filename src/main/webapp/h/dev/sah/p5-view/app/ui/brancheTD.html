@@ -1,11 +1,16 @@
 <tr>
 	<td ng-repeat="branche in branches"
 		ng-init="chainStartOutgoingId = branche.val;
-			repeatSequence = isRepeatSequence(chainStartOutgoingId, getBpmnInit(bpmnNr));
+		chainFirstSequenceElement = getBpmnInit(bpmnNr).bpmnProcessElements[chainStartOutgoingId];
+		sequenceExpr = chainFirstSequenceElement.firstChild.val;
+		repeatSequence = isRepeatSequence(chainStartOutgoingId, getBpmnInit(bpmnNr));
 		">
-		<span ng-if="repeatSequence"
-		ng-include="'/h/dev/sah/p5-view/app/ui/repeatSequence.html'"> </span>
-		{{getProcessElementName(bpmnNr, branche.val)}}
+		<span title="{{sequenceExpr}}"> <span ng-if="repeatSequence"
+			ng-include="'/h/dev/sah/p5-view/app/ui/repeatSequence.html'">
+		</span> {{getProcessElementName(bpmnNr, branche.val)}} 
+		<small ng-if="sequenceExpr"> <sup>({{sequenceExpr}})</sup>
+		</small>
+	</span>
 		<div ng-if="!repeatSequence"
 			ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTable.html'"></div>
 	</td>

@@ -584,6 +584,7 @@ function initEditorBpmn($scope, $http){
 
 		}
 	}
+
 	$scope.getProcessElementName = function(bpmnNr, processElementId){
 		var processElement = $scope.getBpmnInit(bpmnNr).bpmnProcessElements[processElementId];
 		if(processElement)
@@ -1141,7 +1142,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 			bpmnInit.processChains[elementId] = [];
 		}
 		var outgoings = processElement.childrenNamed('bpmn:outgoing');
-		console.log(elementId + '/' + outgoings.length);
+//		console.log(elementId + '/' + outgoings.length);
 		if(outgoings.length > 1){
 			var processBranches = [];
 			outgoings.forEach(function(outgoing){
