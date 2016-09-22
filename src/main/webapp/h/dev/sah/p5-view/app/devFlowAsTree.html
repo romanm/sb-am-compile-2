@@ -21,13 +21,60 @@
 		<div class="row">
 			<div class="col-md-10">
 				<h1>devFlowAsTree</h1>
+		<div class="row">
+			<div class="col-md-11">
 				<ul class="nav nav-tabs">
 					<li
-						ng-repeat="tabName in 'useFlowAsTree useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
+						ng-repeat="tabName in 'useFlowAsTree timeControl useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
 						ng-class="{'active':view == tabName}"><a href="#"
 						ng-click="setTabView(tabName)">{{tabName | translate}}</a></li>
 				</ul>
+			</div>
+			<div class="col-md-1">
+			shema
+			</div>
+		</div>
 
+				<div ng-if="view == 'timeControl'">
+				timeControl
+				-2-
+				{{'PT15M'.replace('/PT/','')}}
+				<div ng-repeat="bpmnNr in [0,1,2,3,4]"
+				ng-if="getBpmnInit(bpmnNr)"
+				>
+						<table class="table table-striped">
+							<caption>{{getBpmnInit(bpmnNr).xmldoc.firstChild.attr.name}}</caption>
+							<tr
+								ng-repeat="timeDefinition in getBpmnInit(bpmnNr).timesDefinition">
+								<td><span ng-repeat="t in timeDefinition.value.split(',')">
+										{{t.replace('PT','')}}{{$last?'':', '}} </span></td>
+								<td>
+									<div ng-if="timeDefinition.value.indexOf('R') > 0">
+										{{timeDefinition.value.split(',')}}
+										<div ng-repeat="t in timeDefinition.value.split(',')"
+											ng-if="t.indexOf('R') >= 0">
+											<div ng-if="!(t.split('/')[0].replace('R','').length > 0)"
+												ng-init="
+											interval = periodCipher(timeDefinition.value.split(',')[$index - 1]);
+											cycleInterval = periodCipher(t.split('/')[1]) * 1;
+											cycle = interval/cycleInterval;
+											repTimes = s24.substr(0, cycle).split('')
+											"
+												ng-include="'ui/timeDefinition/hTimeTable.html'"></div>
+											<div ng-if="t.split('/')[0].replace('R','').length > 0"
+												ng-init="
+												cycleInterval = periodCipher(t.split('/')[1]) * 1;
+												cycle = t.split('/')[0].replace('R','') * 1;
+												repTimes = s24.substr(0,cycle).split('')
+												"
+												ng-include="'ui/timeDefinition/hTimeTable.html'"></div>
+										</div>
+									</div> {{timeDefinition.elementId}}
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
 				<div ng-if="view == 'devVariables'">
 					<div
 						ng-include="'/h/dev/sah/p5-view/app/ui/useFlowAsTree2/devVariables.html'">
@@ -91,7 +138,7 @@
 				</div>
 
 				<div ng-if="view == 'useFlowAsTree'">
-					<div ng-repeat="bpmnNr in [0]">
+					<div ng-init="bpmnNr = 0">
 						<div
 							ng-repeat="chainStartOutgoing in getBpmnInit(bpmnNr).bpmnProcessElements[getBpmnInit(bpmnNr).config.startId]
 	.childrenNamed('bpmn:outgoing')"
@@ -141,40 +188,124 @@
 					<a href="/h/dev/sah/p5-view/dist/protocol6.html?p={{params.p}}">
 						protocol </a>
 				</div>
-				<i class="fa fa-bars" aria-hidden="true"></i> <i
-					class="fa fa-sitemap" aria-hidden="true"></i> <i
-					class="fa fa-sitemap" aria-hidden="true"></i> <i class="fa fa-plus"
-					aria-hidden="true"></i> <i class="fa fa-sitemap" aria-hidden="true"></i>
-				<i class="fa fa-times" aria-hidden="true"></i> <i
-					class="fa fa-list-alt" aria-hidden="true"></i> <i
-					class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i> <i
-					class="fa fa-circle-o" aria-hidden="true"></i> <i
-					class="fa fa-circle-thin" aria-hidden="true"></i> <i
-					class="fa fa-square-o" aria-hidden="true"></i> <i
-					class="fa fa-toggle-off" aria-hidden="true"></i> <i
-					class="fa fa-toggle-on" aria-hidden="true"></i> <i
-					class="fa fa-times" aria-hidden="true"></i> <i class="fa fa-plus"
-					aria-hidden="true"></i> <i class="fa fa-minus" aria-hidden="true"></i>
-				<i class="fa fa-plus-circle" aria-hidden="true"></i> <i
-					class="fa fa-minus-circle" aria-hidden="true"></i> <i
-					class="fa fa-plus-square" aria-hidden="true"></i> <i
-					class="fa fa-minus-square" aria-hidden="true"></i> <i
-					class="fa fa-plus-square-o" aria-hidden="true"></i> <i
-					class="fa fa-minus-square-o" aria-hidden="true"></i> <i
-					class="fa fa-info-circle" aria-hidden="true"></i> <i
-					class="fa fa-cog" aria-hidden="true"></i> <i class="fa fa-cogs"
-					aria-hidden="true"></i> <i class="fa fa-folder" aria-hidden="true"></i>
-				<i class="fa fa-folder-o" aria-hidden="true"></i> <i
-					class="fa fa-folder-open" aria-hidden="true"></i> <i
-					class="fa fa-folder-open-o" aria-hidden="true"></i> <i
-					class="fa fa-language" aria-hidden="true"></i> <i
-					class="fa fa-map-signs" aria-hidden="true"></i> <i
-					class="fa fa-map-signs" aria-hidden="true"></i> <i
-					class="fa fa-plus" aria-hidden="true"></i> <i
-					class="fa fa-map-signs" aria-hidden="true"></i> <i
-					class="fa fa-times" aria-hidden="true"></i> <b> <span
-					class="glyphicon glyphicon-arrow-right"></span>3
-				</b>
+				<div>
+				symbol/icons:
+					<i class="fa fa-bars" aria-hidden="true"></i> <i
+						class="fa fa-sitemap" aria-hidden="true"></i> <i
+						class="fa fa-sitemap" aria-hidden="true"></i> <i
+						class="fa fa-plus" aria-hidden="true"></i> <i
+						class="fa fa-sitemap" aria-hidden="true"></i> <i
+						class="fa fa-times" aria-hidden="true"></i> <i
+						class="fa fa-list-alt" aria-hidden="true"></i> <i
+						class="fa fa-sitemap fa-rotate-180" aria-hidden="true"></i> <i
+						class="fa fa-circle-o" aria-hidden="true"></i> <i
+						class="fa fa-circle-thin" aria-hidden="true"></i> <i
+						class="fa fa-square-o" aria-hidden="true"></i> <i
+						class="fa fa-toggle-off" aria-hidden="true"></i> <i
+						class="fa fa-toggle-on" aria-hidden="true"></i> <i
+						class="fa fa-times" aria-hidden="true"></i> <i class="fa fa-plus"
+						aria-hidden="true"></i> <i class="fa fa-minus" aria-hidden="true"></i>
+					<i class="fa fa-plus-circle" aria-hidden="true"></i> <i
+						class="fa fa-minus-circle" aria-hidden="true"></i> <i
+						class="fa fa-plus-square" aria-hidden="true"></i> <i
+						class="fa fa-minus-square" aria-hidden="true"></i> <i
+						class="fa fa-plus-square-o" aria-hidden="true"></i> <i
+						class="fa fa-minus-square-o" aria-hidden="true"></i> <i
+						class="fa fa-info-circle" aria-hidden="true"></i> <i
+						class="fa fa-cog" aria-hidden="true"></i> <i class="fa fa-cogs"
+						aria-hidden="true"></i> <i class="fa fa-folder" aria-hidden="true"></i>
+					<i class="fa fa-folder-o" aria-hidden="true"></i> <i
+						class="fa fa-folder-open" aria-hidden="true"></i> <i
+						class="fa fa-folder-open-o" aria-hidden="true"></i> <i
+						class="fa fa-language" aria-hidden="true"></i> <i
+						class="fa fa-map-signs" aria-hidden="true"></i> <i
+						class="fa fa-map-signs" aria-hidden="true"></i> <i
+						class="fa fa-plus" aria-hidden="true"></i> <i
+						class="fa fa-map-signs" aria-hidden="true"></i> <i
+						class="fa fa-times" aria-hidden="true"></i> <b> <span
+						class="glyphicon glyphicon-arrow-right"></span>3
+					</b>
+				</div>
+				<div>
+					<a href="https://en.wikipedia.org/wiki/ISO_8601">
+					Час/період/інтервал
+					</a>
+					<div>
+					R4/PT15M
+					</div>
+				</div>
+				<div>
+					Кольори ургентності:
+					
+					<ul>
+					<li><span class="signal-R">R</span>::Розовий:одразу</li>
+					<li><span class="signal-O">O</span>::Оранжевий:10-15хв</li>
+					<li><span class="signal-Y">Y</span>::Жовтий:1г</li>
+					<li><span class="signal-G">G</span>::Зелений:3-6г</li>
+					<li><span class="signal-W">W</span>::Білий:</li>
+					<li><span class="signal-B">B</span>::Голубий:летальний</li>
+					</ul>
+					
+					<div>
+					Кандидити з різних палітр:
+						<table>
+							<tr style="font-weight: bold;">
+								<th rowspan="3"><a
+									href="http://www.w3schools.com/colors/colors_ral.asp"> RAL
+								</a></th>
+								<td style="color:#fff;background-color:#a02128">R</td>
+								<td style="color:#fff;background-color:#d4652f">O</td>
+								<td style="color:#fff;background-color:#f7ba0b">Y</td>
+								<td style="color:#fff;background-color:#317f43">G</td>
+								<td style="color:#000;background-color:#f4f4f4">W</td>
+								<td style="color:#fff;background-color:#154889">B</td>
+							</tr>
+							<tr>
+								<td style="color:#fff;background-color:#a02128">R</td>
+								<td style="color:#fff;background-color:#d4652f">O</td>
+								<td style="color:#fff;background-color:#f7ba0b">Y</td>
+								<td style="color:#fff;background-color:#317f43">G</td>
+								<td style="color:#000;background-color:#f4f4f4">W</td>
+								<td style="color:#fff;background-color:#154889">B</td>
+							</tr>
+							<tr>
+								<td style="background-color:#a02128">R</td>
+								<td style="background-color:#d4652f">O</td>
+								<td style="background-color:#f7ba0b">Y</td>
+								<td style="background-color:#317f43">G</td>
+								<td style="background-color:#f4f4f4">W</td>
+								<td style="background-color:#154889">B</td>
+							</tr>
+							<tr>
+								<th>Wiki</th>
+								<td style="background-color: #FFCBDB; color: inherit;">R</td>
+								<td style="background-color: #FFA000; color: inherit;">O</td>
+								<td style="background-color: #FFFF00; color: inherit;">Y</td>
+								<td style="background-color: #00FF00; color: inherit;">G</td>
+								<td style="background-color:; color: inherit;">W</td>
+								<td style="background-color: #0000FF; color: inherit;">B</td>
+							</tr>
+							<tr>
+								<th rowspan="2"><a
+									href="http://www.w3schools.com/colors/colors_names.asp">CSS Names</a></th>
+								<td style="background-color:Pink;">R</td>
+								<td style="background-color:Orange;">O</td>
+								<td style="background-color:Yellow;">Y</td>
+								<td style="background-color:Green;">G</td>
+								<td style="background-color:White;">W</td>
+								<td style="background-color:Blue;">B</td>
+							</tr>
+							<tr>
+								<td style="background-color:Pink;color:White;">R</td>
+								<td style="background-color:Orange;color:White;">O</td>
+								<td style="background-color:Yellow;color:White;">Y</td>
+								<td style="background-color:Green;color:White;">G</td>
+								<td style="background-color:White;">W</td>
+								<td style="background-color:Blue;color:White;">B</td>
+							</tr>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

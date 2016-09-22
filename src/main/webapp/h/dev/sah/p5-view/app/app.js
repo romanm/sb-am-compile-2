@@ -348,6 +348,9 @@ function initEditorBpmn($scope, $http){
 	$scope.getParallelGatewayOneTable =  function(bpmnNr, parallelGatewayElement){
 		var bpmnInit = $scope.getBpmnInit(bpmnNr);
 		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parallelGatewayElement.attr.id];
+		console.log('---------------------------flowElementConfig--------------------------');
+		console.log(flowElementConfig);
+		console.log('---------------------------flowElementConfig--------------------------');
 		if(!flowElementConfig.parallelOneTable){
 			flowElementConfig.parallelOneTable = [];
 			var outgoings = parallelGatewayElement.childrenNamed('bpmn:outgoing');
@@ -413,20 +416,26 @@ function initEditorBpmn($scope, $http){
 		return false;
 	}
 	$scope.isViewParallelGatewaOneTable = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path]){
 		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
 			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showAs == 'oneTable';
+		}
 		}
 		return false;
 	}
 	$scope.isViewBusinesRule = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path]){
 		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
 			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showBusinessRule == 'yes';
+		}
 		}
 		return false;
 	}
 	$scope.isViewChoiceDmn = function(bpmnNr, chainElement){
+		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path]){
 		if($scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id]){
 			return $scope.obj.data.config[$scope.getBpmnInit(bpmnNr).path][chainElement.attr.id].showChoiceDmn == 'yes';
+		}
 		}
 		return false;
 	}
@@ -478,6 +487,9 @@ function initEditorBpmn($scope, $http){
 
 	$scope.isChainPEToView = function(processElement){
 		return $scope.isPEToRuleSequenceFlow(processElement) 
+		|| $scope.isUserTaskPE(processElement)
+		|| $scope.isSubProcessPE(processElement)
+		|| $scope.isBusinessRuleTaskPE(processElement)
 		|| $scope.isPEEndEvent(processElement)
 		|| $scope.isBranchePE(processElement)
 		|| $scope.isScriptTaskPE(processElement)
@@ -493,6 +505,19 @@ function initEditorBpmn($scope, $http){
 	$scope.isExclusiveGatewayPE = function(processElement){
 		return processElement.name == 'bpmn:exclusiveGateway';
 	}
+
+	$scope.isBusinessRuleTaskPE = function(processElement){
+		return processElement.name == 'bpmn:businessRuleTask';
+	}
+
+	$scope.isUserTaskPE = function(processElement){
+		return processElement.name == 'bpmn:userTask';
+	}
+
+	$scope.isSubProcessPE = function(processElement){
+		return processElement.name == 'bpmn:subProcess';
+	}
+
 
 	$scope.isBranchePE = function(processElement){
 		var outgoings = processElement.childrenNamed('bpmn:outgoing');
@@ -581,7 +606,6 @@ function initEditorBpmn($scope, $http){
 				.bpmnProcessElements[processElement.attr.targetRef];
 				return targetElement.attr.name;
 			}
-
 		}
 	}
 
@@ -737,7 +761,6 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 		editor.set($scope.obj.data);
 		initBpmnDmnToId($scope.obj.data, $scope);
 		viewerBpmnDmn($scope.obj.data);
-		console.log($scope.obj.data);
 	});
 
 	function getMaxNr(keyPart){
@@ -760,7 +783,6 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 		return lastParentId;
 	}
 
-	console.log("----------764------");
 	/*
 	 * */
 	$scope.setRuleState = function(parallelOneTable, rule, ruleHead){
@@ -777,6 +799,10 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 	$scope.getParallelOneTable = function(flowTableElement, bpmnInit){
 		var parentId = $scope.lastParentId(flowTableElement.parentIds);
 		var flowElementConfig = $scope.obj.data.config[bpmnInit.path][parentId];
+		console.log('---------------------------flowElementConfig--------------------------');
+		console.log(flowElementConfig);
+		console.log('---------------------------flowElementConfig--------------------------');
+		console.log('---------------------------flowElementConfig--------------------------');
 		if(!flowElementConfig.parallelOneTable){
 			flowElementConfig.parallelOneTable = [];
 			flowTableElement.children.forEach(function(c){
@@ -822,8 +848,23 @@ angular.module('Protocole5App', ['pascalprecht.translate'])
 			$scope.saveFile();
 		});
 	}
-
+	
 	$scope.createNewBpmn = function(){
+		console.log("-------createNewBpmn--------");
+		var maxN = getMaxNr('bpmn');
+		console.log(maxN);
+		$http.get("/v/newBPMN.json").success(function(response) {
+			console.log(response);
+			$scope.obj.data['bpmn'+maxN] = {height:200, bpmnContent:response.bpmn.bpmnContent};
+			console.log($scope.obj.data);
+			if($scope.useJsonEditor){
+				editor.set($scope.obj.data);
+			}
+			$scope.saveFile();
+		});
+	}
+
+	$scope.createNewBpmn0 = function(){
 		console.log("-------createNewBpmn--------");
 		var maxN = getMaxNr('bpmn');
 		console.log(maxN);
@@ -920,16 +961,19 @@ function viewerBpmnDmn(protocol){
 		var caElement = angular.element(document.querySelector(dmnViewerInitData.container.container));
 		caElement.prepend(angular.element('<b>Редактор: </b><a id="/'
 				+dmnViewerInitData.path+'" href="/h/dev/sah/p5-view/dist/p5dmn.html?jsonpath='
-				+dmnViewerInitData.path+addProtocol()+'">' +dmnViewerInitData.path+ '</a>'));
+				+dmnViewerInitData.path+addProtocol()+'">' 
+				+ dmnViewerInitData.xmldoc.firstChild.attr.name 
+				+ ' ('+ dmnViewerInitData.path + ')'
+				+ '</a>'));
 		var viewerDmn = new DmnViewer(dmnViewerInitData.container);
 		var dmnContext = jsonPath(protocol, dmnViewerInitData.path+'.dmnContent');
-		if(dmnContext == '-')
+		if(dmnContext == '-') 
 			continue;
 		viewerDmn.importXML(dmnContext, function(err) {
 			if (err) {
 				console.log('error rendering', err);
 			} else {
-				console.log('rendered: '+dmnViewerInitData.path);
+			//	console.log('rendered: '+dmnViewerInitData.path);
 			}
 		});
 	}
@@ -948,18 +992,18 @@ function viewerBpmnDmn(protocol){
 		 * */
 		var viewerBpm = new BpmnViewer(bpmnViewerInitData.container);
 		var bpmnContext = jsonPath(protocol, bpmnViewerInitData.path + '.bpmnContent');
-		console.log(bpmnViewerInitData.path + '--------------------' + bpmnContext.length);
+		//console.log(bpmnViewerInitData.path + '--------------------' + bpmnContext.length);
 		if(bpmnContext == '-')
 			return;
 		viewerBpm.importXML(bpmnContext, function(err) {
 			if (err) {
 				console.error(err);
 			} else {
-				console.log('rendered: ' + bpmnViewerInitData.path);
+			//	console.log('rendered: ' + bpmnViewerInitData.path);
 			}
 		});
 	}
-	console.log("------------viewerBpmnDmn-----------END--------");
+	//console.log("------------viewerBpmnDmn-----------END--------");
 
 }
 
@@ -1111,16 +1155,18 @@ function walkIds($scope, bpmnInit, nodeTree, parentNodeTree, elementId, parentId
 
 function initBpmnTreeWalker(bpmnInit, $scope){
 
-// START of INITs
-	//$scope.view = 'useFlowAsTable';
+// START of BpmnTreeWalker INITs
+//	$scope.view = 'useFlowAsTable';
 	//$scope.view = 'devFlowAsTree';
 //	$scope.view = 'useFlowAsTree2';
-	$scope.view = 'useFlowAsTree';
+//	$scope.view = 'useFlowAsTree';
+	$scope.view = 'timeControl';
 	bpmnInit.bpmnProcessElements = {};
 	//key is elementFlow
 	bpmnInit.processBranches = {};
 	bpmnInit.mergerBranches = {};
 	bpmnInit.mergerBranchesNumer = [];
+	bpmnInit.timesDefinition = [];
 	
 	//key is sequenceFlow
 	//ProcessChains is a map where IDs of Elements is a key and value is chains(list of IDs) in this BPMN.
@@ -1134,6 +1180,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	bpmnProcess.children.forEach(function(processElement){
 		var elementId = processElement.attr.id;
 		bpmnInit.bpmnProcessElements[elementId] = processElement;
+		initTimeDefinition(processElement);
 		var elementName = processElement.name;
 		var incomings = processElement.childrenNamed('bpmn:incoming');
 		if(incomings.length > 1){
@@ -1158,6 +1205,14 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 			}
 		}
 	});
+	console.log(bpmnInit.timesDefinition);
+	function initTimeDefinition(processElement){
+		var timeProperty = processElement.descendantWithPath('bpmn:extensionElements.camunda:properties.camunda:property');
+		if(timeProperty){
+			var timeDefinition = {name:timeProperty.attr.name,value:timeProperty.attr.value,elementId:processElement.attr.id};
+			bpmnInit.timesDefinition.push(timeDefinition);
+		}
+	}
 	//Build, compose a chains.
 	Object.keys(bpmnInit.processChains).forEach(function(sequenceFlowId){
 		composeChain(bpmnInit, sequenceFlowId, bpmnInit.processChains[sequenceFlowId]);
@@ -1215,7 +1270,6 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 
 	function checkForRepeate(sequenceRepeateCandidateId, chain){
 		var chainEndElementId = chain[chain.length - 1];
-		console.log(chainEndElementId);
 		if(chainEndElementId.indexOf('EndEvent')==0)
 			return;
 		if(bpmnInit.processBranches[chainEndElementId].branches.indexOf(sequenceRepeateCandidateId)>=0){
@@ -1227,7 +1281,6 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		});
 	};
 	console.log(bpmnInit.config.sequencesGoRepeat);
-	console.log(bpmnInit.config);
 
 // END of INITs
 	
@@ -1254,6 +1307,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		});
 		return isContainRepeatSequence;
 	}
+
 	$scope.isRepeatSequence = function(sequenceId, bpmnInit){
 		if(bpmnInit.config.sequencesGoRepeat)
 			return bpmnInit.config.sequencesGoRepeat.indexOf(sequenceId) >= 0;
@@ -1476,6 +1530,11 @@ function initAngularCommon($scope, $http){
 	$http.get("/v/read_user").success(function(response) {
 		$scope.userPrincipal = response;
 	});
+	$scope.s24 = '0123456789abcdefghiklmno';
+
+	$scope.periodCipher = function(period){
+		return period.replace(/(PT|P)/,'').split('').reverse().join('').substring(1).split('').reverse().join('')
+	}
 }
 
 //console.log("params = " + location.search);
@@ -1577,7 +1636,6 @@ function seekNextTask(taskDefKey, $scope){
 	console.log('from:' + thisTask.attr.name + taskDefKey + ' - > to:' + $scope.nextTask.attr.name);
 }
 
-
 var initUserState = function($scope, $http){
 	$scope.$watch("userState.taskId", function handleChange( newValue, oldValue ) {
 		saveUserState(oldValue);
@@ -1609,3 +1667,4 @@ var initUserState = function($scope, $http){
 	});
 
 };
+
