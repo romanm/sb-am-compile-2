@@ -1167,6 +1167,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	bpmnInit.mergerBranches = {};
 	bpmnInit.mergerBranchesNumer = [];
 	bpmnInit.timesDefinition = [];
+	bpmnInit.timeChain = [];
 	
 	//key is sequenceFlow
 	//ProcessChains is a map where IDs of Elements is a key and value is chains(list of IDs) in this BPMN.
@@ -1206,6 +1207,52 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		}
 	});
 	console.log(bpmnInit.timesDefinition);
+	//calc time timechain
+	bpmnInit.timesDefinition.forEach(function(timeDefinition){
+		if(timeDefinition.value.indexOf('R') >= 0){
+			timeDefinition.value.split(',').forEach(function(t,i){
+				if(t.indexOf('R') >= 0){
+					var period = t.split('/')[1];
+					var periodUnit = period.substring(period.length-1);
+					var cycleInterval = $scope.periodCipher(period) * 1;
+					var cycle;
+					if(t.split('/')[0].length > 1){// with cycle numer
+						cycle = parseInt(t.split('/')[0].replace('R',''));
+					}else{//without cycle numer
+						var interval = $scope.periodCipher(timeDefinition.value.split(',')[i - 1]);
+						console.log(interval);
+						cycle = interval/cycleInterval;
+					}
+					//console.log(cycle + '::' + cycleInterval + '::' + t + '::' + timeDefinition.value);
+					for(i = 0; i < cycle; i++){
+						var point = cycleInterval * (i + 1); 
+						var pointPeriod = 'PT'+point+periodUnit;
+						addTimeChain(pointPeriod);
+						if(interval){
+							console.log(interval+'::'+t+'::'+i+'::'+cycleInterval+'::'+period+'::'+periodUnit+'::'+pointPeriod);
+						}else{
+							console.log('::'+t+'::'+i+'::'+cycleInterval+'::'+period+'::'+periodUnit+'::'+pointPeriod);
+						}
+					}
+				}
+			});
+		}else{
+			console.log('------------' + timeDefinition.value);
+			timeDefinition.value.split(',').forEach(function(t,i){
+				addTimeChain(t);
+			});
+		}
+	});
+	console.log(bpmnInit.timeChain);
+	//calc time END
+	function addTimeChain(t){
+		console.log(t);
+		var calc = t;
+		if(t.indexOf('PT') >= 0){
+			calc = calc.replace('PT','P1DT');
+		}
+		bpmnInit.timeChain.push({def:t,calc:calc});
+	}
 	function initTimeDefinition(processElement){
 		var timeProperty = processElement.descendantWithPath('bpmn:extensionElements.camunda:properties.camunda:property');
 		if(timeProperty){

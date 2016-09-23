@@ -36,44 +36,7 @@
 		</div>
 
 				<div ng-if="view == 'timeControl'">
-				timeControl
-				-2-
-				{{'PT15M'.replace('/PT/','')}}
-				<div ng-repeat="bpmnNr in [0,1,2,3,4]"
-				ng-if="getBpmnInit(bpmnNr)"
-				>
-						<table class="table table-striped">
-							<caption>{{getBpmnInit(bpmnNr).xmldoc.firstChild.attr.name}}</caption>
-							<tr
-								ng-repeat="timeDefinition in getBpmnInit(bpmnNr).timesDefinition">
-								<td><span ng-repeat="t in timeDefinition.value.split(',')">
-										{{t.replace('PT','')}}{{$last?'':', '}} </span></td>
-								<td>
-									<div ng-if="timeDefinition.value.indexOf('R') > 0">
-										{{timeDefinition.value.split(',')}}
-										<div ng-repeat="t in timeDefinition.value.split(',')"
-											ng-if="t.indexOf('R') >= 0">
-											<div ng-if="!(t.split('/')[0].replace('R','').length > 0)"
-												ng-init="
-											interval = periodCipher(timeDefinition.value.split(',')[$index - 1]);
-											cycleInterval = periodCipher(t.split('/')[1]) * 1;
-											cycle = interval/cycleInterval;
-											repTimes = s24.substr(0, cycle).split('')
-											"
-												ng-include="'ui/timeDefinition/hTimeTable.html'"></div>
-											<div ng-if="t.split('/')[0].replace('R','').length > 0"
-												ng-init="
-												cycleInterval = periodCipher(t.split('/')[1]) * 1;
-												cycle = t.split('/')[0].replace('R','') * 1;
-												repTimes = s24.substr(0,cycle).split('')
-												"
-												ng-include="'ui/timeDefinition/hTimeTable.html'"></div>
-										</div>
-									</div> {{timeDefinition.elementId}}
-								</td>
-							</tr>
-						</table>
-					</div>
+					<div ng-include="'ui/timeDefinition/timeControl.html'"></div>
 				</div>
 				<div ng-if="view == 'devVariables'">
 					<div
