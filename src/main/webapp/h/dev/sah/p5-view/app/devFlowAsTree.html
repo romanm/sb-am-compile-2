@@ -21,19 +21,17 @@
 		<div class="row">
 			<div class="col-md-10">
 				<h1>devFlowAsTree</h1>
-		<div class="row">
-			<div class="col-md-11">
-				<ul class="nav nav-tabs">
-					<li
-						ng-repeat="tabName in 'useFlowAsTree timeControl useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
-						ng-class="{'active':view == tabName}"><a href="#"
-						ng-click="setTabView(tabName)">{{tabName | translate}}</a></li>
-				</ul>
-			</div>
-			<div class="col-md-1">
-			shema
-			</div>
-		</div>
+				<div class="row">
+					<div class="col-md-11">
+						<ul class="nav nav-tabs">
+							<li
+								ng-repeat="tabName in 'useFlowAsTree timeControl useFlowAsTree2 devVariables useFlowAsTable devFlowAsTree'.split(' ') "
+								ng-class="{'active':view == tabName}"><a href="#"
+								ng-click="setTabView(tabName)">{{tabName | translate}}</a></li>
+						</ul>
+					</div>
+					<div class="col-md-1">shema</div>
+				</div>
 
 				<div ng-if="view == 'timeControl'">
 					<div ng-include="'ui/timeDefinition/timeControl.html'"></div>
@@ -202,9 +200,9 @@
 					
 					<ul>
 					<li><span class="signal-R">R</span>::Розовий:одразу</li>
-					<li><span class="signal-O">O</span>::Оранжевий:10-15хв</li>
-					<li><span class="signal-Y">Y</span>::Жовтий:1г</li>
-					<li><span class="signal-G">G</span>::Зелений:3-6г</li>
+					<li><span class="signal-O">O</span>::Оранжевий: 10-15хв, 30хв</li>
+					<li><span class="signal-Y">Y</span>::Жовтий: 30хв, 1-3г</li>
+					<li><span class="signal-G">G</span>::Зелений:3-6г, 8г</li>
 					<li><span class="signal-W">W</span>::Білий:</li>
 					<li><span class="signal-B">B</span>::Голубий:летальний</li>
 					</ul>
@@ -218,7 +216,7 @@
 								</a></th>
 								<td style="color:#fff;background-color:#a02128">R</td>
 								<td style="color:#fff;background-color:#d4652f">O</td>
-								<td style="color:#fff;background-color:#f7ba0b">Y</td>
+							"src/main/webapp/h/dev/sah/p5-view/app/devFlowAsTree.html"	<td style="color:#fff;background-color:#f7ba0b">Y</td>
 								<td style="color:#fff;background-color:#317f43">G</td>
 								<td style="color:#000;background-color:#f4f4f4">W</td>
 								<td style="color:#fff;background-color:#154889">B</td>

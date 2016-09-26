@@ -1209,6 +1209,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 	console.log(bpmnInit.timesDefinition);
 	//calc time timechain
 	bpmnInit.timesDefinition.forEach(function(timeDefinition){
+		console.log(timeDefinition);
 		if(timeDefinition.value.indexOf('R') >= 0){
 			timeDefinition.value.split(',').forEach(function(t,i){
 				if(t.indexOf('R') >= 0){
@@ -1227,7 +1228,7 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 					for(i = 0; i < cycle; i++){
 						var point = cycleInterval * (i + 1); 
 						var pointPeriod = 'PT'+point+periodUnit;
-						addTimeChain(pointPeriod);
+						addTimeChain(pointPeriod, timeDefinition, i);
 						if(interval){
 							console.log(interval+'::'+t+'::'+i+'::'+cycleInterval+'::'+period+'::'+periodUnit+'::'+pointPeriod);
 						}else{
@@ -1239,19 +1240,19 @@ function initBpmnTreeWalker(bpmnInit, $scope){
 		}else{
 			console.log('------------' + timeDefinition.value);
 			timeDefinition.value.split(',').forEach(function(t,i){
-				addTimeChain(t);
+				addTimeChain(t, timeDefinition, i);
 			});
 		}
 	});
 	console.log(bpmnInit.timeChain);
 	//calc time END
-	function addTimeChain(t){
+	function addTimeChain(t, timeDefinition, item){
 		console.log(t);
 		var calc = t;
 		if(t.indexOf('PT') >= 0){
 			calc = calc.replace('PT','P1DT');
 		}
-		bpmnInit.timeChain.push({def:t,calc:calc});
+		bpmnInit.timeChain.push({def:t,calc:calc, item:item, timeDefinition:timeDefinition});
 	}
 	function initTimeDefinition(processElement){
 		var timeProperty = processElement.descendantWithPath('bpmn:extensionElements.camunda:properties.camunda:property');
@@ -1578,6 +1579,28 @@ function initAngularCommon($scope, $http){
 		$scope.userPrincipal = response;
 	});
 	$scope.s24 = '0123456789abcdefghiklmno';
+
+	$scope.chainItemSignalColor = function(timeItem){
+		console.log(timeItem);
+		return $scope.urgencySignalColor(timeItem.def);
+	}
+
+	$scope.urgencySignalColor = function(period){
+		if(period.indexOf('R')>=0)
+			return;
+		var cipher = $scope.periodCipher(period);
+		var periodUnit = period.substring(period.length - 1);
+		var urgencySignalColor = 'W';
+		if(periodUnit == 'M' && cipher < 30)
+			urgencySignalColor = 'O';
+		else
+			if(periodUnit == 'H' && cipher < 3)
+				urgencySignalColor = 'Y';
+		else
+			if(periodUnit == 'H' && cipher <= 8)
+				urgencySignalColor = 'G';
+		return urgencySignalColor;
+	}
 
 	$scope.periodCipher = function(period){
 		return period.replace(/(PT|P)/,'').split('').reverse().join('').substring(1).split('').reverse().join('')

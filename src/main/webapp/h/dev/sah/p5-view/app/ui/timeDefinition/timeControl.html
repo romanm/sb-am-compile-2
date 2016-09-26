@@ -1,22 +1,28 @@
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-8">
 		timeControl -2-
 		<div ng-repeat="bpmnNr in [0,1,2,3,4]" ng-if="getBpmnInit(bpmnNr)">
-			<table>
+			<table class="table table-striped">
+			<caption>{{getBpmnInit(bpmnNr).xmldoc.firstChild.attr.name}}</caption>
 				<tr ng-repeat="timeItem in getBpmnInit(bpmnNr).timeChain">
-					<td> {{timeItem.calc}}</td>
+					<td><span ng-init="c = chainItemSignalColor(timeItem);"
+						class="signal-{{c}}">|</span> {{timeItem.calc}}</td>
+					<td> {{timeItem.timeDefinition.elementId}}</td>
+					<td> {{timeItem.timeDefinition.name}}</td>
 				</tr>
 			</table>
 		</div>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<div ng-repeat="bpmnNr in [0,1,2,3,4]" ng-if="getBpmnInit(bpmnNr)">
 			<table class="table table-striped">
 				<caption>{{getBpmnInit(bpmnNr).xmldoc.firstChild.attr.name}}</caption>
 				<tr
 					ng-repeat="timeDefinition in getBpmnInit(bpmnNr).timesDefinition">
 					<td><span ng-repeat="t in timeDefinition.value.split(',')">
-							{{t.replace('PT','')}}{{$last?'':', '}} </span></td>
+							<span class="signal-{{urgencySignalColor(t)}}">{{t.replace('PT','')}}</span>{{$last?'':',
+							'}}
+					</span></td>
 					<td>
 						<div ng-if="timeDefinition.value.indexOf('R') > 0">
 							<div ng-repeat="t in timeDefinition.value.split(',')"
